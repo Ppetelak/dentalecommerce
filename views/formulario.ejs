@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquisição</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        #Naoeresponsavel{
+            display:none;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <form>
+                    <div class="progress mb-4">
+                        <div class="progress-bar" role="progressbar" style="width: 33%;" aria-valuenow="33"
+                            aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    
+                    <div class="tab-content" id="pills-tabContent">
+                        <!-- DADOS DO TITULAR DO PLANO -->
+                        <div class="tab-pane fade show active" id="pills-step1" role="tabpanel"
+                            aria-labelledby="pills-step1-tab">
+                            <h3 class="text-center">Dados do Titular</h3>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="nomecompleto">Nome Completo:</label>
+                                            <input type="text" class="form-control required required" id="nomecompleto"
+                                                placeholder="Nome completo do titular do plano">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="datadenascimento">Data de Nascimento:</label>
+                                            <input type="date" class="form-control required" id="datadenascimento"
+                                                placeholder="Input 2">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="cpftitular">CPF</label>
+                                            <input type="text" class="form-control required" id="cpftitular"
+                                                placeholder="Cpf do titular">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="nomemaetitular">Nome da Mãe:</label>
+                                            <input type="text" class="form-control required" id="nomemaetitular"
+                                                placeholder="Nome da mãe">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="rgtitular">RG</label>
+                                            <input type="text" class="form-control required" id="rgtitular"
+                                                placeholder="RG do titular">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="orgaoexpedidor">Orgão expedidor</label>
+                                            <input type="text" class="form-control required" id="orgaoexpedidor"
+                                                placeholder="Nome da mãe">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="dataexpedicaorgtitular">Data Expedição RG</label>
+                                            <input type="date" class="form-control required" id="dataexpedicaorgtitular"
+                                                placeholder="RG do titular">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="sexotitular">Selecione uma opção:</label>
+                                            <select class="form-control required" id="sexotitular">
+                                                <option value="">Selecione...</option>
+                                                <option value="masculino">Masculino</option>
+                                                <option value="feminino">Feminino</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="estadociviltitular">Estado Civil:</label>
+                                            <select class="form-control required" id="estadociviltitular">
+                                                <option value="">Selecione...</option>
+                                                <option value="solteiro">Solteiro</option>
+                                                <option value="casado">Casado</option>
+                                                <option value="divorciado">Divorciado</option>
+                                                <option value="viúvo">Viúvo</option>
+                                                <option value="Outro">Outro</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="telefonetitular">Telefone</label>
+                                            <input type="tel" class="form-control required" id="telefonetitular"
+                                                placeholder="Telefone">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="celulartitular">Celular</label>
+                                            <input type="text" class="form-control required" id="celulartitular"
+                                                placeholder="Informe telefone celular">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="emailtitular">Email</label>
+                                            <input type="email" class="form-control required" id="emailtitular"
+                                                placeholder="Email titular">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="estadociviltitular">Profissão:</label>
+                                            <select class="form-control required" id="estadociviltitular">
+                                                <option value="">Selecione...</option>
+                                                <option value="Comerciário">Comerciário</option>
+                                                <option value="Estudante">Estudante</option>
+                                                <option value="Profissional Liberal">Profissional Liberal</option>
+                                                <option value="Funcionário Público">Funcionário Público</option>
+                                                <option value="Funcionário Correios">Funcionário Correios</option>
+                                                <option value="Profissional de Sãlão de Beleza">Profissional de Sãlão de
+                                                    Beleza</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary next" type="button">Próximo</button>
+                        </div>
+
+                        <!-- DADOS DO TITULAR FINANCEIRO -->
+                        <div class="tab-pane fade" id="pills-step2" role="tabpanel" aria-labelledby="pills-step2-tab">
+                            <h3>Dados Responsável Financeiro</h3>
+                            <div class="form-group">
+                                <label>O titular é o responsável Financeiro?</label>
+                                <select class="form-control required" id="titularresponsavelfinanceiro">
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não">Não</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="Naoeresponsavel">
+                                <h6 class="text-center"> Insira os dados do responsável Financeiro</h6>
+                                <p class="text-center"> A pessoa que serpa legalmente a responsável financeira na
+                                    emissão do contrato</p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="cpffinanceiro">CPF:</label>
+                                            <input type="text" class="form-control required" id="cpffinanceiro"
+                                                placeholder="Cpf titular financeiro">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="nomefinanceiro">Nome Completo:</label>
+                                            <input type="text" class="form-control required" id="nomefinanceiro"
+                                                placeholder="Nome Completo">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="datadenascimentofinanceiro">Data de Nascimento:</label>
+                                            <input type="date" class="form-control required"
+                                                id="datadenascimentofinanceiro" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="sexotitularfinanceiro">Sexo:</label>
+                                            <select class="form-control required" id="sexotitularfinanceiro">
+                                                <option value="">Selecione...</option>
+                                                <option value="masculino">Masculino</option>
+                                                <option value="feminino">Feminino</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="estadociviltitularfinanceiro">Estado Civil:</label>
+                                            <select class="form-control required" id="estadociviltitularfinanceiro">
+                                                <option value="">Selecione...</option>
+                                                <option value="solteiro">Solteiro</option>
+                                                <option value="casado">Casado</option>
+                                                <option value="divorciado">Divorciado</option>
+                                                <option value="viúvo">Viúvo</option>
+                                                <option value="Outro">Outro</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="telefonetitularfinanceiro">Telefone</label>
+                                            <input type="tel" class="form-control required"
+                                                id="telefonetitularfinanceiro" placeholder="Telefone">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="emailtitularfinanceiro">Email</label>
+                                            <input type="email" class="form-control required"
+                                                id="emailtitularfinanceiro" placeholder="Email titular">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="grauparentesco">Grau de Parentesco</label>
+                                            <select class="form-control required" id="grauparentesco">
+                                                <option value="">Selecione...</option>
+                                                <option value="Conjugê">Conjugê</option>
+                                                <option value="Filho">Filho</option>
+                                                <option value="Mãe">Mãe</option>
+                                                <option value="Filha">Filha</option>
+                                                <option value="Enteado">Enteado(a)</option>
+                                                <option value="Pai">Pai</option>
+                                                <option value="Irmão/Irmã">Irmão/Irmã</option>
+                                                <option value="Sogro/Sogra">Sogro/Sogra</option>
+                                                <option value="Bisavô/Bisavó">Bisavô/Bisavó</option>
+                                                <option value="Neto">Neto(a)</option>
+                                                <option value="Bisneto">Bisneto(a)</option>
+                                                <option value="Avô/Avó">Avô/Avó</option>
+                                                <option value="Padrasto/Madastra">Padrasto/Madastra</option>
+                                                <option value="Tio/Tia">Tio/Tia</option>
+                                                <option value="Sobrinho/Sobrinha">Sobrinho/Sobrinha</option>
+                                                <option value="Genro/Nora">Genro/Nora</option>
+                                                <option value="Cunhado/Cunhada">Cunhado/Cunhada</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary prev" type="button">Anterior</button>
+                            <button class="btn btn-primary next" type="button">Próximo</button>
+                        </div>
+
+                        <!-- DADOS DO ENDEREÇO -->
+                        <div class="tab-pane fade" id="pills-step3" role="tabpanel" aria-labelledby="pills-step3-tab">
+                            <h3>Endereço</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="cep">CEP:</label>
+                                        <input type="number" class="form-control required" id="cep" rows="3"
+                                            placeholder="Digite sua mensagem">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="enderecoresidencial">Endereço Residencial</label>
+                                        <input type="text" class="form-control required" id="enderecoresidencial"
+                                            placeholder="Informe o nome da rua, av, logradouro">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="numeroendereco">Número</label>
+                                        <input type="number" class="form-control required" id="numeroendereco" rows="3"
+                                            placeholder="Digite sua mensagem">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="complementoendereco">Complemento:</label>
+                                        <input type="text" class="form-control" id="complementoendereco"
+                                            placeholder="Informe complemento se houver">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="bairro">Bairro:</label>
+                                        <input type="text" class="form-control" id="bairro"
+                                            placeholder="Informe complemento se houver">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="cidade">Cidade:</label>
+                                        <input type="text" class="form-control" id="cidade" placeholder="Cidade">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="estado">UF:</label>
+                                        <select class="form-control required" id="estado">
+                                            <option value="">Selecione...</option>
+                                            <option value="AC">Acre</option>
+                                            <option value="AL">Alagoas</option>
+                                            <option value="AP">Amapá</option>
+                                            <option value="AM">Amazonas</option>
+                                            <option value="BA">Bahia</option>
+                                            <option value="CE">Ceará</option>
+                                            <option value="DF">Distrito Federal</option>
+                                            <option value="ES">Espírito Santo</option>
+                                            <option value="GO">Goiás</option>
+                                            <option value="MA">Maranhão</option>
+                                            <option value="MT">Mato Grosso</option>
+                                            <option value="MS">Mato Grosso do Sul</option>
+                                            <option value="MG">Minas Gerais</option>
+                                            <option value="PA">Pará</option>
+                                            <option value="PB">Paraíba</option>
+                                            <option value="PR">Paraná</option>
+                                            <option value="PE">Pernambuco</option>
+                                            <option value="PI">Piauí</option>
+                                            <option value="RJ">Rio de Janeiro</option>
+                                            <option value="RN">Rio Grande do Norte</option>
+                                            <option value="RS">Rio Grande do Sul</option>
+                                            <option value="RO">Rondônia</option>
+                                            <option value="RR">Roraima</option>
+                                            <option value="SC">Santa Catarina</option>
+                                            <option value="SP">São Paulo</option>
+                                            <option value="SE">Sergipe</option>
+                                            <option value="TO">Tocantins</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary prev" type="button">Anterior</button>
+                            <button class="btn btn-primary next" type="button">Próximo</button>
+                            
+                        </div>
+
+                        <!-- DADOS DO CORRETOR -->
+                        <div class="tab-pane fade" id="pills-step4" role="tabpanel" aria-labelledby="pills-step4-tab">
+                            <h3>Corretor</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="cpfcorretor">CPF Corretor:</label>
+                                        <input type="number" class="form-control required" id="cpfcorretor" rows="3"
+                                            placeholder="Informe o cpf do corretor">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="nomecorretor">Nome do corretor:</label>
+                                        <input type="text" class="form-control required" id="nomecorretor"
+                                            placeholder="Nome do corretor">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="corretora">Corretora:</label>
+                                        <input type="text" class="form-control required" id="corretora" rows="3"
+                                            placeholder="Corretora">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="celularcorretor">Telefone(WhatsApp)</label>
+                                        <input type="tel" class="form-control" id="celularcorretor"
+                                            placeholder="Celular WhatsApp">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary prev" type="button">Anterior</button>
+                            <button class="btn btn-primary next" type="button">Próximo</button>
+                        </div>
+
+                        <!-- DADOS DE DEPENDENTES-->
+                        <div class="tab-pane fade" id="pills-step5" role="tabpanel" aria-labelledby="pills-step5-tab">
+                            <h3>Dependentes</h3>
+                            <div class="form-group">
+                                <label>Possui Dependentes?</label>
+                                <select class="form-control required" id="possuidependentes">
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não">Não</option>
+                                </select>
+                            </div>
+                            <div id="existeSim">
+                                <button class="btn btn-danger">Excluir dependente</button>
+                                <div class="dependente" data-id="dependente-1"> 
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="cpfdependente">CPF:</label>
+                                                <input type="text" class="form-control required" id="cpfdependente" rows="3"
+                                                    placeholder="CPF do dependente">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="nomecompletodependente">Nome completo do dependente:</label>
+                                                <input type="text" class="form-control" id="nomecompletodependente"
+                                                    placeholder="Nome completo do dependente">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="nomemaedependente">Nome da mãe do dependente:</label>
+                                                <input type="text" class="form-control required" id="nomemaedependente" rows="3"
+                                                    placeholder="Nome da mãe do dependente">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="nascimentodependente">Data de Nascimento Dependente</label>
+                                                <input type="date" class="form-control" id="nascimentodependente">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="nomemaedependente">Nome da mãe do dependente:</label>
+                                                <input type="text" class="form-control required" id="nomemaedependente" rows="3"
+                                                    placeholder="Nome da mãe do dependente">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="nascimentodependente">Data de Nascimento Dependente</label>
+                                                <input type="date" class="form-control" id="nascimentodependente">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary prev" type="button">Anterior</button>
+                            <button class="btn btn-primary next" type="button">Próximo</button>
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-step6" role="tabpanel" aria-labelledby="pills-step6-tab">
+                            <h1>Será que acabou?</h1>
+
+                            <button class="btn btn-primary prev" type="button">Anterior</button>
+                            <button class="btn btn-primary" type="submit">Enviar</button>
+                        </div>
+
+
+
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+
+</html>
