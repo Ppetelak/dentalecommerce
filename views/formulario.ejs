@@ -408,7 +408,7 @@
                                 </select>
                             </div>
                             <div id="existeSim">
-                                <button class="btn btn-danger">Excluir dependente</button>
+                                <button class="btn btn-danger excluir-dependente" >Excluir dependente</button>
                                 <div class="dependente" data-id="dependente-1"> 
                                     <div class="row">
                                         <div class="col-md-6">
@@ -442,21 +442,43 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="nomemaedependente">Nome da mãe do dependente:</label>
-                                                <input type="text" class="form-control required" id="nomemaedependente" rows="3"
-                                                    placeholder="Nome da mãe do dependente">
+                                                <label for="sexodependente">Sexo:</label>
+                                                <select class="form-control required" id="sexodependente">
+                                                    <option value="masculino">Masculino</option>
+                                                    <option value="feminino">Feminino</option>
+                                                </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="nascimentodependente">Data de Nascimento Dependente</label>
-                                                <input type="date" class="form-control" id="nascimentodependente">
+                                                <label for="estadocivildependente">Estado Civil Dependente:</label>
+                                                <select class="form-control required" id="estadocivildependente">
+                                                    <option value="Solteiro(a)">Solteiro(a)</option>
+                                                    <option value="Casado(a)">Casado(a)</option>
+                                                    <option value="Divorciado(a)">Divorciado(a)</option>
+                                                    <option value="Viúvo(a)">Viúvo(a)</option>
+                                                    <option value="Outros">Outros</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="grauparentesco">Grau de parentesco com titular:</label>
+                                                <select class="form-control required" id="grauparentesco">
+                                                    <option value="Conjugê">Conjugê</option>
+                                                    <option value="Filhos">Filhos</option>
+                                                    <option value="Pai/Mãe">Pai/Mãe</option>
+                                                    <option value="Avô/Avó">Avô/Avó</option>
+                                                    <option value="Tio/Tia">Tio/Tia</option>
+                                                    <option value="Outros">Outros</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <button class="btn btn-success adicionar-dependente" >Adicionar dependente</button>
                             </div>
                             <button class="btn btn-primary prev" type="button">Anterior</button>
                             <button class="btn btn-primary next" type="button">Próximo</button>
