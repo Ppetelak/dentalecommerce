@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Detalhes da Implantação</title>
+  <link rel="icon" type="image/png" href="./img/faviconV2_mounthermon.png" sizes="32x32">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-4">
+    <h2>Detalhes da Implantação</h2>
+
+    <!-- Card com informações da implantação e Titular -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title">Informações do Titular e Implantação</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>PLANO SELECIONADO:</strong> <%= implantacao.planoSelecionado %></p>
+                <p><strong>ID Implantação:</strong> <%= implantacao.id %></p>
+                <p><strong>Data Implantação:</strong> <%= format(implantacao.data_implantacao, 'dd/MM/yyyy', { locale: ptBR }) %></p>
+                <p><strong>CPF Titular:</strong> <%= implantacao.cpftitular %></p>
+                <p><strong>RG Titular:</strong> <%= implantacao.rgtitular %></p>
+                <p><strong>Orgão Expedidor RG Titular:</strong> <%= implantacao.orgaoexpedidor %></p>
+                <p><strong>Data expedição RG Titular:</strong> <%= format(implantacao.dataexpedicaorgtitular, 'dd/MM/yyyy', { locale: ptBR }) %></p>
+                <p><strong>Celular Titular:</strong> <%= implantacao.telefonetitular %></p>
+                <p><strong>Profissisão Titular:</strong> <%= implantacao.profissaotitular %></p>
+                <p><strong>Titular é o responsável financeiro?:</strong> <%= implantacao.titularresponsavelfinanceiro %></p>
+            </div>
+            <div class="col-md-6">  
+                <p><strong>FORMA DE PAGAMENTO SELECIONADA:</strong> <%= implantacao.formaPagamento %></p>   
+                <p><strong>Nome Titular:</strong> <%= implantacao.nomecompleto %></p>
+                <p><strong>Data de Nascimento Titular:</strong> <%= implantacao.datanascimento %></p>
+                <p><strong>Nome Mãe Titular:</strong> <%= implantacao.nomemaetitular %></p>
+                <p><strong>Sexo Titular:</strong> <%= implantacao.sexotitular %></p>
+                <p><strong>Estado Civil Titular:</strong> <%= implantacao.estadociviltitular %></p>
+                <p><strong>Telefone Titular:</strong> <%= implantacao.telefonetitular %></p>
+                <p><strong>Email Titular:</strong> <%= implantacao.emailtitular %></p>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card com informações do titular financeiro -->
+
+    <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title">Informações do Responsável financeiro</h5>
+        </div>
+        <div class="card-body">
+        <% if (implantacao.cpffinanceiro) { %>
+          <div class="row">
+              <div class="col-md-6">
+                  <p><strong>CPF Financeiro:</strong> <%= implantacao.cpffinanceiro %></p>
+                  <p><strong>Telefone Financeiro:</strong> <%= implantacao.telefonetitularfinanceiro %></p>
+                  <p><strong>Email Financeiro:</strong> <%= implantacao.emailtitular %></p>
+                  <p><strong>Grau de parentesco com titular:</strong> <%= implantacao.grauparentesco %></p>
+              </div>
+              <div class="col-md-6">     
+                  <p><strong>Nome Financeiro:</strong> <%= implantacao.nomefinanceiro %></p>
+                  <p><strong>Data Nascimento Financeiro:</strong> <%= format(implantacao.datadenascimentofinanceiro, 'dd/MM/yyyy', { locale: ptBR }) %></p>
+                  <p><strong>Sexo Titular:</strong> <%= implantacao.sexotitularfinanceiro %></p>
+                  <p><strong>Estado Civil Titular:</strong> <%= implantacao.estadociviltitularfinanceiro %></p>  
+              </div>
+            </div>
+        <% } else { %>
+                <div class="row">
+                    <p> O titular é o mesmo responsável Financeiro </p>
+                </div>
+                <% } %>
+        </div>
+      </div>
+
+    <!-- Card com informações de endereço -->
+
+    <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title">Dados de Endereço</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+              <div class="col-md-6">
+                  <p><strong>Endereço:</strong> <%= implantacao.enderecoresidencial %></p>
+                  <p><strong>CEP:</strong> <%= implantacao.cep %></p>
+                  <p><strong>Número:</strong> <%= implantacao.numeroendereco %></p>
+                  <p><strong>Complemento</strong> <%= implantacao.complementoendereco %></p>
+              </div>
+              <div class="col-md-6">     
+                  <p><strong>Bairro</strong> <%= implantacao.bairro %></p>
+                  <p><strong>Cidade</strong> <%= implantacao.cidade %></p>
+                  <p><strong>Estado</strong> <%= implantacao.estados %></p>  
+              </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- Card com informações do Corretor -->
+
+    <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title">Dados do Corretor</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+              <div class="col-md-6">
+                  <p><strong>Nome Corretor:</strong> <%= implantacao.nomecorretor %></p>
+                  <p><strong>CPF Corretor:</strong> <%= implantacao.cpfcorretor %></p>
+                  <p><strong>Corretora: </strong> <%= implantacao.corretora %></p>
+                  <p><strong>Celular Corretor</strong> <%= implantacao.celularcorretor %></p>
+              </div>
+              <div class="col-md-6">       
+              </div>
+          </div>
+          
+          <!-- Adicione outras informações da implantação que você deseja mostrar -->
+        </div>
+      </div>
+
+    <!-- Card com informações dos dependentes -->
+    <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title">Dependentes</h5>
+        </div>
+        <div class="card-body">
+          <% if (dependentes.length === 0) { %>
+            <p>Não há dependentes.</p>
+          <% } else { %>
+            <% dependentes.forEach(dependente => { %>
+              <div class="card mb-2">
+                <div class="card-body">
+                  <p><strong>CPF Dependente:</strong> <%= dependente.cpfdependente %></p>
+                  <p><strong>Nome completo Dependente:</strong> <%= dependente.nomecompletodependente %></p>
+                  <p><strong>Nome Mãe Dependente:</strong> <%= dependente.nomemaedependente %></p>
+                  <p><strong>Data Nascimento Dependente:</strong> <%= format(dependente.nascimentodependente, 'dd/MM/yyyy', { locale: ptBR }) %></p>
+                  <p><strong>Sexo Dependente:</strong> <%= dependente.sexodependente %></p>
+                  <p><strong>Estado Civil Dependente:</strong> <%= dependente.estadocivildependente %></p>
+                  <p><strong>Grau Parentesco Dependente:</strong> <%= dependente.grauparentescodependente %></p>
+                  <!-- Adicione outras informações dos dependentes que você deseja mostrar -->
+                </div>
+              </div>
+            <% }); %>
+          <% } %>
+        </div>
+      </div>
+  </div>
+  <div class=" container impressao">
+    <h1 class="text-center">Contrato referente ao Plano <% implantacao.planoSelecionado %></h1>
+
+       <p class="text-center">Aqui ficará o contrato para ser impresso</p>
+       <button class="btn btn-success">Gerar PDF Contrato</button> 
+  </div>
+</body>
+</html>

@@ -4,14 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aquisição</title>
+    <title>Mount Hermon - Contratação Dental</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
-    <style>
-        #Naoeresponsavel{
-            display:none;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
 
 </head>
 
@@ -20,12 +19,25 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <form>
+                <div class="container">
+                    <% if (planoSelecionado) { %>
+                    <h3>Plano escolhido</h3>
+                    <p><strong>Nome:</strong> <%= planoSelecionado.nome %></p> 
+                    <% } else { %>
+                    <p>Nenhum plano selecionado ainda.</p>
+                    <% } %>
+
+
+                </div>
+                <form action="/enviadados" method="post">
+                    <% if (planoSelecionado) { %>
+                    <input type="hidden" value="<%= planoSelecionado.nome %>" name="planoSelecionado">
+                    <% } %>
                     <div class="progress mb-4">
-                        <div class="progress-bar" role="progressbar" style="width: 33%;" aria-valuenow="33"
+                        <div class="progress-bar" role="progressbar" style="width: 10%;"
                             aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
-                    
+
                     <div class="tab-content" id="pills-tabContent">
                         <!-- DADOS DO TITULAR DO PLANO -->
                         <div class="tab-pane fade show active" id="pills-step1" role="tabpanel"
@@ -36,15 +48,15 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="nomecompleto">Nome Completo:</label>
-                                            <input type="text" class="form-control required required" id="nomecompleto"
+                                            <input type="text" class="form-control required required" id="nomecompleto" name="nomecompleto"
                                                 placeholder="Nome completo do titular do plano">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="datadenascimento">Data de Nascimento:</label>
-                                            <input type="date" class="form-control required" id="datadenascimento"
-                                                placeholder="Input 2">
+                                            <input type="date" class="form-control required" id="datadenascimento" name="datadenascimento"
+                                                placeholder="Data de Nascimento">
                                         </div>
                                     </div>
                                 </div>
@@ -52,14 +64,14 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="cpftitular">CPF</label>
-                                            <input type="text" class="form-control required" id="cpftitular"
+                                            <input type="text" class="form-control required" id="cpftitular" name="cpftitular"
                                                 placeholder="Cpf do titular">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="nomemaetitular">Nome da Mãe:</label>
-                                            <input type="text" class="form-control required" id="nomemaetitular"
+                                            <input type="text" class="form-control required" id="nomemaetitular" name="nomemaetitular"
                                                 placeholder="Nome da mãe">
                                         </div>
                                     </div>
@@ -68,14 +80,14 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="rgtitular">RG</label>
-                                            <input type="text" class="form-control required" id="rgtitular"
+                                            <input type="text" class="form-control required" id="rgtitular" name="rgtitular"
                                                 placeholder="RG do titular">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="orgaoexpedidor">Orgão expedidor</label>
-                                            <input type="text" class="form-control required" id="orgaoexpedidor"
+                                            <input type="text" class="form-control required" id="orgaoexpedidor" name="orgaoexpedidor"
                                                 placeholder="Nome da mãe">
                                         </div>
                                     </div>
@@ -84,17 +96,17 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="dataexpedicaorgtitular">Data Expedição RG</label>
-                                            <input type="date" class="form-control required" id="dataexpedicaorgtitular"
+                                            <input type="date" class="form-control required" id="dataexpedicaorgtitular" name="dataexpedicaorgtitular"
                                                 placeholder="RG do titular">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="sexotitular">Selecione uma opção:</label>
-                                            <select class="form-control required" id="sexotitular">
-                                                <option value="">Selecione...</option>
-                                                <option value="masculino">Masculino</option>
-                                                <option value="feminino">Feminino</option>
+                                            <select class="form-control required" id="sexotitular" name="sexotitular">
+                                                <option disabled selected value="">Selecione ...</option>
+                                                <option value="Masculino">Masculino</option>
+                                                <option value="Feminino">Feminino</option>
                                             </select>
                                         </div>
                                     </div>
@@ -103,12 +115,12 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="estadociviltitular">Estado Civil:</label>
-                                            <select class="form-control required" id="estadociviltitular">
-                                                <option value="">Selecione...</option>
-                                                <option value="solteiro">Solteiro</option>
-                                                <option value="casado">Casado</option>
-                                                <option value="divorciado">Divorciado</option>
-                                                <option value="viúvo">Viúvo</option>
+                                            <select class="form-control required" id="estadociviltitular" name="estadociviltitular">
+                                                <option disabled selected value="">Selecione ...</option>
+                                                <option value="Solteiro">Solteiro</option>
+                                                <option value="Casado">Casado</option>
+                                                <option value="Divorciado">Divorciado</option>
+                                                <option value="Viúvo">Viúvo</option>
                                                 <option value="Outro">Outro</option>
                                             </select>
                                         </div>
@@ -116,7 +128,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="telefonetitular">Telefone</label>
-                                            <input type="tel" class="form-control required" id="telefonetitular"
+                                            <input type="tel" class="form-control required" id="telefonetitular" name="telefonetitular"
                                                 placeholder="Telefone">
                                         </div>
                                     </div>
@@ -125,14 +137,14 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="celulartitular">Celular</label>
-                                            <input type="text" class="form-control required" id="celulartitular"
+                                            <input type="text" class="form-control required" id="celulartitular" name="celulartitular"
                                                 placeholder="Informe telefone celular">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="emailtitular">Email</label>
-                                            <input type="email" class="form-control required" id="emailtitular"
+                                            <input type="email" class="form-control required" id="emailtitular" name="emailtitular"
                                                 placeholder="Email titular">
                                         </div>
                                     </div>
@@ -140,9 +152,9 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="estadociviltitular">Profissão:</label>
-                                            <select class="form-control required" id="estadociviltitular">
-                                                <option value="">Selecione...</option>
+                                            <label for="profissaotitular">Profissão:</label>
+                                            <select class="form-control required" id="profissaotitular" name="profissaotitular">
+                                                <option disabled selected value="">Selecione ...</option>
                                                 <option value="Comerciário">Comerciário</option>
                                                 <option value="Estudante">Estudante</option>
                                                 <option value="Profissional Liberal">Profissional Liberal</option>
@@ -163,7 +175,7 @@
                             <h3>Dados Responsável Financeiro</h3>
                             <div class="form-group">
                                 <label>O titular é o responsável Financeiro?</label>
-                                <select class="form-control required" id="titularresponsavelfinanceiro">
+                                <select class="form-control required" id="titularresponsavelfinanceiro" name="titularresponsavelfinanceiro">
                                     <option value="Sim">Sim</option>
                                     <option value="Não">Não</option>
                                 </select>
@@ -176,14 +188,14 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="cpffinanceiro">CPF:</label>
-                                            <input type="text" class="form-control required" id="cpffinanceiro"
+                                            <input type="text" class="form-control required" id="cpffinanceiro" name="cpffinanceiro"
                                                 placeholder="Cpf titular financeiro">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="nomefinanceiro">Nome Completo:</label>
-                                            <input type="text" class="form-control required" id="nomefinanceiro"
+                                            <input type="text" class="form-control required" id="nomefinanceiro" name="nomefinanceiro"
                                                 placeholder="Nome Completo">
                                         </div>
                                     </div>
@@ -193,14 +205,15 @@
                                         <div class="form-group">
                                             <label for="datadenascimentofinanceiro">Data de Nascimento:</label>
                                             <input type="date" class="form-control required"
-                                                id="datadenascimentofinanceiro" placeholder="">
+                                                id="datadenascimentofinanceiro"
+                                                name="datadenascimentofinanceiro" placeholder="">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="sexotitularfinanceiro">Sexo:</label>
-                                            <select class="form-control required" id="sexotitularfinanceiro">
-                                                <option value="">Selecione...</option>
+                                            <select class="form-control required" id="sexotitularfinanceiro" name="sexotitularfinanceiro">
+                                                <option disabled selected value="">Selecione ...</option>
                                                 <option value="masculino">Masculino</option>
                                                 <option value="feminino">Feminino</option>
                                             </select>
@@ -211,8 +224,8 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="estadociviltitularfinanceiro">Estado Civil:</label>
-                                            <select class="form-control required" id="estadociviltitularfinanceiro">
-                                                <option value="">Selecione...</option>
+                                            <select class="form-control required" id="estadociviltitularfinanceiro" name="estadociviltitularfinanceiro">
+                                                <option disabled selected value="">Selecione ...</option>
                                                 <option value="solteiro">Solteiro</option>
                                                 <option value="casado">Casado</option>
                                                 <option value="divorciado">Divorciado</option>
@@ -225,7 +238,7 @@
                                         <div class="form-group">
                                             <label for="telefonetitularfinanceiro">Telefone</label>
                                             <input type="tel" class="form-control required"
-                                                id="telefonetitularfinanceiro" placeholder="Telefone">
+                                                id="telefonetitularfinanceiro" name="telefonetitularfinanceiro" placeholder="Telefone">
                                         </div>
                                     </div>
                                 </div>
@@ -234,19 +247,19 @@
                                         <div class="form-group">
                                             <label for="emailtitularfinanceiro">Email</label>
                                             <input type="email" class="form-control required"
-                                                id="emailtitularfinanceiro" placeholder="Email titular">
+                                                id="emailtitularfinanceiro" name="emailtitularfinanceiro" placeholder="Email titular">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="grauparentesco">Grau de Parentesco</label>
-                                            <select class="form-control required" id="grauparentesco">
-                                                <option value="">Selecione...</option>
+                                            <select class="form-control required" id="grauparentesco" name="grauparentesco">
+                                                <option disabled selected value="">Selecione ...</option>
                                                 <option value="Conjugê">Conjugê</option>
                                                 <option value="Filho">Filho</option>
                                                 <option value="Mãe">Mãe</option>
                                                 <option value="Filha">Filha</option>
-                                                <option value="Enteado">Enteado(a)</option>
+                                                <option value="Enteado(a)">Enteado(a)</option>
                                                 <option value="Pai">Pai</option>
                                                 <option value="Irmão/Irmã">Irmão/Irmã</option>
                                                 <option value="Sogro/Sogra">Sogro/Sogra</option>
@@ -275,14 +288,14 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="cep">CEP:</label>
-                                        <input type="number" class="form-control required" id="cep" rows="3"
+                                        <input type="number" class="form-control required" id="cep" name="cep" rows="3"
                                             placeholder="Digite sua mensagem">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="enderecoresidencial">Endereço Residencial</label>
-                                        <input type="text" class="form-control required" id="enderecoresidencial"
+                                        <input type="text" class="form-control required" id="enderecoresidencial" name="enderecoresidencial"
                                             placeholder="Informe o nome da rua, av, logradouro">
                                     </div>
                                 </div>
@@ -291,21 +304,21 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="numeroendereco">Número</label>
-                                        <input type="number" class="form-control required" id="numeroendereco" rows="3"
+                                        <input type="number" class="form-control required" id="numeroendereco" name="numeroendereco" rows="3"
                                             placeholder="Digite sua mensagem">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="complementoendereco">Complemento:</label>
-                                        <input type="text" class="form-control" id="complementoendereco"
+                                        <input type="text" class="form-control" id="complementoendereco" name="complementoendereco"
                                             placeholder="Informe complemento se houver">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="bairro">Bairro:</label>
-                                        <input type="text" class="form-control" id="bairro"
+                                        <input type="text" class="form-control" id="bairro" name="bairro"
                                             placeholder="Informe complemento se houver">
                                     </div>
                                 </div>
@@ -314,14 +327,14 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="cidade">Cidade:</label>
-                                        <input type="text" class="form-control" id="cidade" placeholder="Cidade">
+                                        <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Cidade">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="estado">UF:</label>
-                                        <select class="form-control required" id="estado">
-                                            <option value="">Selecione...</option>
+                                        <select class="form-control required" id="estado" name="estado">
+                                            <option disabled selected value="">Selecione ...</option>
                                             <option value="AC">Acre</option>
                                             <option value="AL">Alagoas</option>
                                             <option value="AP">Amapá</option>
@@ -355,7 +368,7 @@
                             </div>
                             <button class="btn btn-primary prev" type="button">Anterior</button>
                             <button class="btn btn-primary next" type="button">Próximo</button>
-                            
+
                         </div>
 
                         <!-- DADOS DO CORRETOR -->
@@ -365,14 +378,14 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="cpfcorretor">CPF Corretor:</label>
-                                        <input type="number" class="form-control required" id="cpfcorretor" rows="3"
+                                        <input type="number" class="form-control required" id="cpfcorretor" name="cpfcorretor" rows="3"
                                             placeholder="Informe o cpf do corretor">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="nomecorretor">Nome do corretor:</label>
-                                        <input type="text" class="form-control required" id="nomecorretor"
+                                        <input type="text" class="form-control required" id="nomecorretor" name="nomecorretor"
                                             placeholder="Nome do corretor">
                                     </div>
                                 </div>
@@ -381,14 +394,14 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="corretora">Corretora:</label>
-                                        <input type="text" class="form-control required" id="corretora" rows="3"
+                                        <input type="text" class="form-control required" id="corretora" name="corretora" rows="3"
                                             placeholder="Corretora">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="celularcorretor">Telefone(WhatsApp)</label>
-                                        <input type="tel" class="form-control" id="celularcorretor"
+                                        <input type="tel" class="form-control" id="celularcorretor" name="celularcorretor"
                                             placeholder="Celular WhatsApp">
                                     </div>
                                 </div>
@@ -407,21 +420,29 @@
                                     <option value="Não">Não</option>
                                 </select>
                             </div>
+                            <input type="hidden" class="nDependentes" value="1" name="nDependentes">
                             <div id="existeSim">
-                                <button class="btn btn-danger excluir-dependente" >Excluir dependente</button>
-                                <div class="dependente" data-id="dependente-1"> 
+                                <div class="dependente pl-3" data-id="dependente-1">
+                                    <div class="row">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-4">
+                                            <button class="btn btn-danger excluir-dependente">Excluir
+                                                dependente</button>
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="cpfdependente">CPF:</label>
-                                                <input type="text" class="form-control required" id="cpfdependente" rows="3"
-                                                    placeholder="CPF do dependente">
+                                                <input type="text" class="form-control required dependente-input" name="cpfdependente"
+                                                    rows="3" placeholder="CPF do dependente">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="nomecompletodependente">Nome completo do dependente:</label>
-                                                <input type="text" class="form-control" id="nomecompletodependente"
+                                                <input type="text" class="form-control dependente-input" name="nomecompletodependente"
                                                     placeholder="Nome completo do dependente">
                                             </div>
                                         </div>
@@ -430,14 +451,14 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="nomemaedependente">Nome da mãe do dependente:</label>
-                                                <input type="text" class="form-control required" id="nomemaedependente" rows="3"
-                                                    placeholder="Nome da mãe do dependente">
+                                                <input type="text" class="form-control required dependente-input" name="nomemaedependente"
+                                                    rows="3" placeholder="Nome da mãe do dependente">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="nascimentodependente">Data de Nascimento Dependente</label>
-                                                <input type="date" class="form-control" id="nascimentodependente">
+                                                <input type="date" class="form-control dependente-input" name="nascimentodependente">
                                             </div>
                                         </div>
                                     </div>
@@ -445,7 +466,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="sexodependente">Sexo:</label>
-                                                <select class="form-control required" id="sexodependente">
+                                                <select class="form-control required dependente-input" name="sexodependente">
                                                     <option value="masculino">Masculino</option>
                                                     <option value="feminino">Feminino</option>
                                                 </select>
@@ -454,7 +475,8 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="estadocivildependente">Estado Civil Dependente:</label>
-                                                <select class="form-control required" id="estadocivildependente">
+                                                <select class="form-control required dependente-input"  name="estadocivildependente">
+                                                    <option disabled selected value="">Selecione ...</option>
                                                     <option value="Solteiro(a)">Solteiro(a)</option>
                                                     <option value="Casado(a)">Casado(a)</option>
                                                     <option value="Divorciado(a)">Divorciado(a)</option>
@@ -465,8 +487,9 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="grauparentesco">Grau de parentesco com titular:</label>
-                                                <select class="form-control required" id="grauparentesco">
+                                                <label for="grauparentescodependente">Grau de parentesco:</label>
+                                                <select class="form-control required dependente-input" name="grauparentescodependente">
+                                                    <option disabled selected value="">Selecione ...</option>
                                                     <option value="Conjugê">Conjugê</option>
                                                     <option value="Filhos">Filhos</option>
                                                     <option value="Pai/Mãe">Pai/Mãe</option>
@@ -478,22 +501,53 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="btn btn-success adicionar-dependente" >Adicionar dependente</button>
                             </div>
+                            </br>
+                            <div class="row border-left" id="add-dependente">
+                                <button class="btn btn-success adicionar-dependente">Adicionar dependente</button>
+                            </div>
+                            </br>
                             <button class="btn btn-primary prev" type="button">Anterior</button>
                             <button class="btn btn-primary next" type="button">Próximo</button>
                         </div>
 
+                        <!-- FORMAS DE PAGAMENTO E ACEITES -->
                         <div class="tab-pane fade" id="pills-step6" role="tabpanel" aria-labelledby="pills-step6-tab">
-                            <h1>Será que acabou?</h1>
-
+                            <h1>Pagamento e Aceito dos Termos</h1>
+                            <div class="form-group">
+                                <label for="formaPagamento">Forma de Pagamento:</label>
+                                <% if (planoSelecionado) { %>
+                                    <% planoSelecionado.pagamentos.forEach(function(pagamento, index) { %>
+                                <div class="custom-control custom-radio">
+                                  <input type="radio" id="forma<%= index %>" name="formaPagamento" class="custom-control-input" value="<%= pagamento.forma %>">
+                                  <label class="custom-control-label" for="forma<%= index %>"><%= pagamento.forma %> - R$ <%= pagamento.valor %></label>
+                                </div>
+                                <% }); %>
+                                <% } else { %>
+                                    <p>Nenhum plano selecionado ainda.</p>
+                                <% } %>
+                            </div>
+                            <div class="form-group">
+                                <h5>Aceite da Política de Privacidade e LGPD</h5>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="checkbox" id="aceitoTermos" name="aceitoTermos" required>
+                                  <label class="form-check-label" for="aceitoTermos">
+                                    Eu aceito e concordo com os <a href="#">Termos de uso e política de privacidade</a> da MountHermon
+                                  </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h5>Aceite DO CONTRATO DE PRESTAÇÃO DE SERVIÇOS</h5>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="checkbox" id="aceitoPrestacaoServicos" name="aceitoPrestacaoServicos" required>
+                                  <label class="form-check-label" for="aceitoPrestacaoServicos">
+                                    Eu aceito e concordo com os <a href="#">O CONTRATO DE PRESTAÇÃO DE SERVIÇOS CONTRATADOS</a> da MountHermon
+                                  </label>
+                                </div>
+                            </div>                                          
                             <button class="btn btn-primary prev" type="button">Anterior</button>
-                            <button class="btn btn-primary" type="submit">Enviar</button>
+                            <button class="btn btn-primary" id="enviarDados" type="submit">Enviar</button>
                         </div>
-
-
-
-
                     </div>
                 </form>
             </div>

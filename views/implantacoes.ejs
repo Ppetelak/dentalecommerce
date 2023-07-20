@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implantações Dental</title>
+    <link rel="icon" type="image/png" href="./img/faviconV2_mounthermon.png" sizes="32x32">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
+
+</head>
+<body id="bodyImplantacoes">
+<div class="contentImplantacoes mt-5">
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <img src="./img/logomounthermonoriginal.png" width="10%">
+      </div> 
+    <h2>Implantações</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID Implantação</th>
+          <th>CPF Titular</th>
+          <th>Nome Titular</th>
+          <th>Data Implantação</th>
+          <th>Visualizar Informações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% implantacoes.forEach(implantacao => { %>
+        <tr>
+          <td><%= implantacao.id %></td>
+          <td><%= implantacao.cpftitular %></td>
+          <td><%= implantacao.nomecompleto %></td>
+          <td><%= format(implantacao.data_implantacao, 'dd/MM/yyyy', { locale: ptBR }) %></td>
+          <td> <a href="/implantacao/<%= implantacao.id %>" target="_blank" class="btn btn-info"><button class="btn btn-info"> Visualizar </button></a></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<body>
