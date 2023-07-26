@@ -1,10 +1,14 @@
 const express = require("express");
 const app = new express();
 const ejs = require("ejs");
+const path = require('path')
 const bodyParser = require("body-parser");
 const mysql = require("mysql2");
 const session = require("express-session");
 const crypto = require("crypto");
+const cookie = require('cookie-parser');
+const multer = require('multer');
+const fs = require('fs');
 const { format } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
 
@@ -23,8 +27,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/css", express.static("css"));
 app.use("/js", express.static("js"));
 app.use("/img", express.static("img"));
+app.use("/arquivos", express.static("arquivos"));
 app.use("/bootstrap-icons", express.static("node_modules/bootstrap-icons"));
 app.set("view engine", "ejs");
+app.use(cookie());
 app.use(express.json());
 
 const generateSecretKey = () => {
@@ -59,36 +65,126 @@ db.connect((error) => {
   }
 });
 
-// Definindo o objeto com dados dos planos
-var planos = [
-  {
-    nome: "OdontoGroup - Plano Odonto Orto",
-    logo: "",
-    pagamentos: [
-      { forma: "Á vista anual boleto ou Cartão de crédito", valor: 100 },
-      { forma: "Mensal Cartão de Crédito", valor: 150 },
-      { forma: "Mensal no Boleto", valor: 200 },
-    ],
-  },
-  {
-    nome: "DentalUni - Plano Elite",
-    logo: "",
-    pagamentos: [
-      { forma: "Á vista anual boleto ou Cartão de crédito", valor: 120 },
-      { forma: "Mensal Cartão de Crédito", valor: 170 },
-      { forma: "Mensal no Boleto", valor: 220 },
-    ],
-  },
-];
+/* Criação de rota e ambiente de upload de arquivos */
 
-app.get("/", (req, res) => {
-  res.render("index", { planos: planos });
+const storage = multer.diskStorage({
+  destination: 'arquivos/',
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  }
 });
 
-app.get("/formulario", (req, res) => {
-  const planoSelecionado = req.query.planoSelecionado;
-  const planoCompleto = planos.find((plano) => plano.nome === planoSelecionado);
-  res.render("formulario", { planos: planos, planoSelecionado: planoCompleto });
+const upload = multer({ storage: storage });
+
+app.get('/files', (req, res) =>{
+  const files = fs.readdirSync('arquivos/');
+  res.render('uploads', {files:files} )
+})
+
+app.post('/upload', upload.single('file'), (req, res) => {
+  res.json('Enviado com sucesso');
+});
+
+app.post('/deleteImage', (req, res) => {
+  const file = path.join(__dirname, req.body.img)
+  if (fs.existsSync(file)) {
+    try {
+      // Exclui o arquivo
+      fs.unlinkSync(file);
+      res.json({ success: true, message: 'Imagem excluída com sucesso!' });
+    } catch (error) {
+      console.error('Erro ao excluir a imagem:', error);
+      res.json({ success: false, message: 'Erro ao excluir a imagem.' });
+    }
+  } else {
+    res.json({ success: false, message: 'Arquivo não encontrado em: ' + file });
+  }
+});
+
+app.post('/salvarLogo', (req, res) => {
+  const logo = req.body.logoUrl
+  const operadoraId = req.body.operadoraId
+  const query = 'UPDATE planos SET logo = ? WHERE id = ?';
+  db.query(query, [logo, operadoraId], (err, result) => {
+    if (err) {
+      console.error('Erro ao atualizar operadora:', err);
+
+      // Reverter a transação em caso de erro
+      db.rollback(() => {
+        console.error('Transação revertida.');
+        return res.status(500).json({ message: 'Erro interno do servidor' });
+      });
+    }
+
+    // Confirmar a transação
+    db.commit((err) => {
+      if (err) {
+        console.error('Erro ao confirmar a transação:', err);
+
+        // Reverter a transação em caso de erro
+        db.rollback(() => {
+          console.error('Transação revertida.');
+          return res.status(500).json({ message: 'Erro interno do servidor' });
+        });
+      }
+
+      res.cookie('alerta', '✅ Logo da operadora atualizado com SUCESSO', { maxAge: 3000 });
+      res.status(200).json({ message: 'Operadora atualizada com sucesso' });
+    });
+  });
+});
+
+/* FIM DE SEÇÃO DE UPLOAD   */
+
+app.get("/", (req, res) => {
+  const query = 'SELECT * FROM planos'
+  db.query(query, (err, result) =>{
+    if(err) {
+      console.error('Erro ao consultar o banco de dados:', err);
+      return res.status(500).json({ error: 'Erro ao processar consulta ao BD'})
+    }
+    else {
+      res.render("index", { planos: result });
+    }
+  })
+});
+
+app.post("/formulario", (req, res) => {
+  const planoId = req.body.planoSelecionado;
+  const query = 'SELECT * FROM planos WHERE id = ?';
+  db.query(query, [planoId], (err, result) => {
+    if (err) {
+      console.error('Erro ao consultar o banco de dados:', err);
+      return res.status(500).json({ error: 'Erro ao processar consulta ao BD' });
+    } else {
+      // Verifica se foi encontrado algum plano com o ID informado
+      if (result.length === 0) {
+        return res.status(404).json({ error: 'Plano não encontrado' });
+      }
+
+      const planoCompleto = result[0];
+      res.render("formulario", { planoSelecionado: planoCompleto });
+    }
+  });
+});
+
+app.get("/buscar-corretor", (req, res) => {
+  const cpfCorretor = req.query.cpfcorretor;
+  const query = 'SELECT * FROM corretores WHERE cpf = ?';
+  db.query(query, [cpfCorretor], (err, result) => {
+    if (err) {
+      console.error('Erro ao consultar o banco de dados:', err);
+      return res.status(500).json({ error: 'Erro ao processar consulta ao BD' });
+    } else {
+      // Verifica se foi encontrado algum corretor com o CPF informado
+      if (result.length === 0) {
+        return res.status(404).json({ error: 'Corretor não encontrado' });
+      }
+
+      const corretor = result[0];
+      res.json(corretor); // Enviar as informações do corretor como resposta da requisição
+    }
+  });
 });
 
 app.post("/enviadados", (req, res) => {
@@ -252,8 +348,8 @@ app.post('/login-verifica', (req, res) => {
   });
 });
 
-app.get('/implantacoes', verificaAutenticacao, (req, res) => {
-  const query = 'SELECT id, cpftitular, nomecompleto, data_implantacao FROM implantacoes';
+app.get('/implantacoes', (req, res) => {
+  const query = 'SELECT id, cpftitular, nomecompleto, data_implantacao, planoSelecionado FROM implantacoes';
   db.query(query, (err, results) => {
     if (err) {
       console.error('Erro ao consultar o banco de dados:', err);
@@ -264,7 +360,7 @@ app.get('/implantacoes', verificaAutenticacao, (req, res) => {
   });
 });
 
-app.get('/implantacao/:id', verificaAutenticacao, (req, res) => {
+app.get('/implantacao/:id', (req, res) => {
   const idImplantacao = req.params.id;
 
   // Consulta a implantação pelo ID
@@ -300,6 +396,155 @@ app.get('/implantacao/:id', verificaAutenticacao, (req, res) => {
   });
 });
 
+app.get('/corretores', (req, res) => {
+  // Consulta no banco de dados para buscar os dados dos corretores
+  db.query('SELECT * FROM corretores', (error, results) => {
+    if (error) {
+      console.error('Erro ao consultar o banco de dados:', error);
+      return res.status(500).send('Erro ao consultar o banco de dados.');
+    }
+
+    // Adicione a propriedade "editing: false" a cada corretor do resultado da consulta
+    const corretores = results.map(corretor => {
+      return { ...corretor, editing: false };
+    });
+
+    // Renderiza a página "corretores" e passa os dados dos corretores para o template
+    res.render('corretores', { corretores });
+  });
+});
+
+app.post('/edit/:id', (req, res) => {
+  const idCorretor = req.params.id;
+  const { cpf, nome, telefone, email, corretora } = req.body;
+  db.query(
+    'UPDATE corretores SET cpf=?, nome=?, telefone=?, email=?, corretora=? WHERE id=?',
+    [cpf, nome, telefone, email, corretora, idCorretor],
+    (error, results) => {
+      if (error) {
+        console.error('Erro ao atualizar o corretor no banco de dados:', error);
+        return res.status(500).send('Erro ao atualizar o corretor no banco de dados.');
+      }
+
+      console.log('Corretor atualizado com sucesso!');
+      res.sendStatus(200); // Resposta de sucesso (status 200) para o cliente
+    }
+  );
+});
+
+app.post('/cadastrar-corretor', (req, res) => {
+  const { cpf, nome, telefone, email, corretora } = req.body;
+  // Consulta SQL para inserir o novo corretor na tabela corretores
+  const sql = 'INSERT INTO corretores (cpf, nome, telefone, email, corretora) VALUES (?, ?, ?, ?, ?)';
+
+  // Executar a consulta SQL com os valores do novo corretor
+  db.query(sql, [cpf, nome, telefone, email, corretora], (error, result) => {
+    if (error) {
+      console.error('Erro ao cadastrar o corretor:', error);
+      return res.status(500).send('Erro ao cadastrar o corretor no banco de dados.');
+    }
+
+    // Se a inserção foi bem-sucedida, retornar uma resposta de sucesso
+    res.status(200).send('Corretor cadastrado com sucesso.');
+  });
+});
+
+app.delete('/corretores/:id', (req, res) => {
+  const corretorId = req.params.id;
+  // Consulta SQL para excluir o corretor pelo ID
+  const sql = 'DELETE FROM corretores WHERE id = ?';
+
+  // Executar a consulta SQL com o ID do corretor a ser excluído
+  db.query(sql, corretorId, (error, result) => {
+    if (error) {
+      console.error('Erro ao excluir o corretor:', error);
+      return res.status(500).send('Erro ao excluir o corretor do banco de dados.');
+    }
+
+    // Se a exclusão foi bem-sucedida, retornar uma resposta de sucesso
+    res.status(200).send('Corretor excluído com sucesso.');
+  });
+});
+
+app.get('/planos', (req, res) => {
+  const query = 'SELECT * FROM planos';
+  const files = fs.readdirSync('arquivos/');
+
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error('Erro ao consultar o banco de dados:', err);
+      res.status(500).send('Erro ao consultar os planos');
+    } else {
+      // Renderize a página EJS e passe os planos como parâmetro
+      res.render('planos', { planos: result, files:files });
+    }
+  });
+})
+
+app.post('/atualiza-planos', (req, res) => {
+  const { id, nome_do_plano, ans, forma_pagamento1, forma_pagamento2, forma_pagamento3, valor_pagamento1, valor_pagamento2, valor_pagamento3, descricao, observacoes, logo, banner } = req.body;
+
+  const query = 'SELECT * FROM planos WHERE id = ?';
+  // Consultar o banco de dados para verificar se o ID já existe
+  db.query(query, [id], (err, rows) => {
+    if (err) {
+      console.error('Erro ao consultar plano:', err);
+      return res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+
+    if (rows.length > 0) {
+      // O ID existe, realizar a atualização
+      // Iniciar uma transação
+      db.beginTransaction((err) => {
+        if (err) {
+          console.error('Erro ao iniciar a transação:', err);
+          return res.status(500).json({ message: 'Erro interno do servidor' });
+        }
+
+        const updateQuery = 'UPDATE planos SET nome_do_plano = ?, ans = ?, forma_pagamento1 = ?, forma_pagamento2 =?, forma_pagamento3 = ?, valor_pagamento1 = ?, valor_pagamento2 = ?, valor_pagamento3 = ?, descricao = ?, observacoes = ?, logo = ?, banner = ?  WHERE id = ?';
+        db.query(updateQuery, [nome_do_plano, ans, forma_pagamento1, forma_pagamento2, forma_pagamento3, valor_pagamento1, valor_pagamento2, valor_pagamento3, descricao, observacoes, logo, banner, id], (err, result) => {
+          if (err) {
+            console.error('Erro ao atualizar operadora:', err);
+
+            // Reverter a transação em caso de erro
+            db.rollback(() => {
+              console.error('Transação revertida.');
+              return res.status(500).json({ message: 'Erro interno do servidor' });
+            });
+          }
+
+          // Confirmar a transação
+          db.commit((err) => {
+            if (err) {
+              console.error('Erro ao confirmar a transação:', err);
+
+              // Reverter a transação em caso de erro
+              db.rollback(() => {
+                console.error('Transação revertida.');
+                return res.status(500).json({ message: 'Erro interno do servidor' });
+              });
+            }
+
+            // Transação bem-sucedida
+            res.status(200).json({ message: 'Plano atualizado com sucesso' });
+          });
+        });
+      });
+    } else {
+      // O ID não existe, criar uma nova operadora
+      const createQuery = 'INSERT INTO planos (nome_do_plano, ans, forma_pagamento1, forma_pagamento2, forma_pagamento3, valor_pagamento1, valor_pagamento2, valor_pagamento3, descricao, observacoes, logo, banner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+      db.query(createQuery, [nome_do_plano, ans, forma_pagamento1, forma_pagamento2, forma_pagamento3, valor_pagamento1, valor_pagamento2, valor_pagamento3, descricao, observacoes, logo, banner], (err, result) => {
+        if (err) {
+          console.error('Erro ao criar plano:', err);
+          return res.status(500).json({ message: 'Erro interno do servidor' });
+        }
+        //res.cookie('alertSucess', 'Plano criado com Sucesso', { maxAge: 3000 });
+        res.status(200).json({ message: 'Nova plano criado com sucesso' });
+      });
+    }
+  });
+})
+
 app.get("/logout", (req, res) => {
   // Remover as informações de autenticação da sessão
   req.session.destroy((err) => {
@@ -310,7 +555,5 @@ app.get("/logout", (req, res) => {
     res.redirect("/login");
   });
 });
-
-
 
 app.listen(8888);

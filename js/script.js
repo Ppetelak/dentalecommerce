@@ -18,6 +18,32 @@ document.addEventListener('DOMContentLoaded', function() {
       handleExcluirDependenteClick(event.target);
     }
   });
+
+  const cpfCorretorInput = document.getElementById("cpfcorretor");
+const btnBuscarCorretor = document.getElementById("btnBuscarCorretor");
+btnBuscarCorretor.addEventListener("click", () => {
+  const cpfCorretor = cpfCorretorInput.value;
+  if (cpfCorretor) {
+    fetch(`/buscar-corretor?cpfcorretor=${cpfCorretor}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Corretor não encontrado");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Preencher os campos do formulário com as informações retornadas do servidor
+        document.getElementById("nomecorretor").value = data.nome || "";
+        document.getElementById("corretora").value = data.corretora || "";
+        document.getElementById("celularcorretor").value = data.telefone || "";
+      })
+      .catch((error) => {
+        alert(error.message);
+        console.error("Erro na requisição:", error);
+      });
+  }
+});
+
 });
 
 var nDependentes = document.querySelector('.nDependentes')

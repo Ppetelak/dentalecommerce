@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planos</title>
+  <link rel="icon" type="image/png" href="./img/faviconV2_mounthermon.png" sizes="32x32">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="navbardiv">
+    <%- include('navbar') %>
+  </div>
+  <div class="content">
+    <div class="container mt-4">
+      <h1 class="mb-4">Lista de Planos</h1>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nome do Plano</th>
+            <th>Logo</th>
+            <th>ANS</th>
+            <th>Editar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% planos.forEach(plano=> { %>
+            <tr class="plan-row" data-id="<%= plano.id %>">
+              <td><span class="field-value">
+                  <%= plano.nome_do_plano %>
+                </span></td>
+              <td>
+                <!-- Adicionar os atributos data-id, data-toggle e data-target à imagem da logo -->
+                <img src="<%= plano.logo %>" alt="Logo do Plano" style="max-width: 150px; max-height: 100px;"
+                  class="logo-image" data-id="<%= plano.id %>" data-toggle="modal" data-target="#imagemModal">
+              </td>
+              <td><span class="field-value">
+                  <%= plano.ans %>
+                </span></td>
+              <td>
+                <button class="btn btn-secondary btn-editar" data-id="<%= plano.id %>">Editar</button>
+              </td>
+            </tr>
+            <tr class="field-row d-none" data-id="<%= plano.id %>">
+              <td colspan="4">
+                <div class="form-group">
+                  <strong>Nome do Plano</strong>
+                  <input type="text" class="form-control field-edit" value="<%= plano.nome_do_plano %>" name="nome_do_plano">
+                  <strong>ANS</strong>
+                  <input type="text" class="form-control field-edit" value="<%= plano.ans %>" name="ans">
+                  <strong>Logo</strong>
+                  <img class="logo-preview form-control" src="<%= plano.logo %>" style="width: 10%;" data-name="logo" name="logo">
+                  <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
+                    data-target="#imagemModal" data-type="logo"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
+                  </br>
+                  <strong>Banner</strong>
+                  <img class="banner-preview form-control" src="<%= plano.banner %>" style="width: 10%;"
+                    data-name="banner" name="banner">
+                  <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
+                    data-target="#imagemModal" data-type="banner"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
+
+                </div>
+                <div class="form-group row">
+                  <div class="col-md-4">
+                    <strong>Pagamento 1:</strong>
+                    <input type="text" class="form-control" name="forma_pagamento1"
+                      value="<%= plano.forma_pagamento1 %>">
+                  </div>
+                  <div class="col-md-4">
+                    <strong>Pagamento 2:</strong>
+                    <input type="text" class="form-control" name="forma_pagamento2"
+                      value="<%= plano.forma_pagamento2 %>">
+                  </div>
+                  <div class="col-md-4">
+                    <strong>Pagamento 3:</strong>
+                    <input type="text" class="form-control" name="forma_pagamento3"
+                      value="<%= plano.forma_pagamento3 %>">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-md-4">
+                    <strong>Valor Pagamento 1:</strong>
+                    <input type="text" class="form-control" name="valor_pagamento1"
+                      value="<%= plano.valor_pagamento1 %>">
+                  </div>
+                  <div class="col-md-4">
+                    <strong>Valor Pagamento 2:</strong>
+                    <input type="text" class="form-control" name="valor_pagamento2"
+                      value="<%= plano.valor_pagamento2 %>">
+                  </div>
+                  <div class="col-md-4">
+                    <strong>Valor Pagamento 3:</strong>
+                    <input type="text" class="form-control" name="valor_pagamento3"
+                      value="<%= plano.valor_pagamento3 %>">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <strong>Descrição:</strong>
+                  <textarea class="form-control" name="descricao" rows="6"><%= plano.descricao %></textarea>
+                </div>
+                <div class="form-group">
+                  <strong>Observações:</strong>
+                  <textarea class="form-control" name="observacoes" rows="3"><%= plano.observacoes %></textarea>
+                </div>
+                <div class="form-group">
+                  <button class="btn btn-primary btn-salvar" data-id="<%= plano.id %>">Salvar</button>
+                </div>
+              </td>
+            </tr>
+            <% }); %>
+        </tbody>
+
+    </div>
+  </div>
+  <div class="modal fade" id="imagemModal" tabindex="-1" aria-labelledby="imagemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="imagemModalLabel">Selecionar Imagem</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <% files.forEach(file=> { %>
+              <div class="col-md-4">
+                <img src="/arquivos/<%= file %>" alt="Imagem" class="img-thumbnail image-selection"
+                  data-src="<%= file %>">
+              </div>
+              <% }) %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./js/scriptPlanos.js"></script>
+</body>
+
+</html>

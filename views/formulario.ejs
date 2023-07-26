@@ -22,7 +22,7 @@
                 <div class="container">
                     <% if (planoSelecionado) { %>
                     <h3>Plano escolhido</h3>
-                    <p><strong>Nome:</strong> <%= planoSelecionado.nome %></p> 
+                    <p><strong>Nome:</strong> <%= planoSelecionado.nome_do_plano %></p> 
                     <% } else { %>
                     <p>Nenhum plano selecionado ainda.</p>
                     <% } %>
@@ -31,7 +31,7 @@
                 </div>
                 <form action="/enviadados" method="post">
                     <% if (planoSelecionado) { %>
-                    <input type="hidden" value="<%= planoSelecionado.nome %>" name="planoSelecionado">
+                    <input type="hidden" value="<%= planoSelecionado.nome_do_plano %>" name="planoSelecionado">
                     <% } %>
                     <div class="progress mb-4">
                         <div class="progress-bar" role="progressbar" style="width: 10%;"
@@ -380,13 +380,17 @@
                                         <label for="cpfcorretor">CPF Corretor:</label>
                                         <input type="number" class="form-control required" id="cpfcorretor" name="cpfcorretor" rows="3"
                                             placeholder="Informe o cpf do corretor">
+                                            <div class="input-group-append">
+                                                <span> Digite o CPF e clique no ícone de pesquisa ao lado.</span>
+                                                <button class="btn btn-primary" type="button" id="btnBuscarCorretor"><i class="bi bi-search"></i></button>
+                                              </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="nomecorretor">Nome do corretor:</label>
                                         <input type="text" class="form-control required" id="nomecorretor" name="nomecorretor"
-                                            placeholder="Nome do corretor">
+                                            placeholder="Nome do corretor" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -395,14 +399,14 @@
                                     <div class="form-group">
                                         <label for="corretora">Corretora:</label>
                                         <input type="text" class="form-control required" id="corretora" name="corretora" rows="3"
-                                            placeholder="Corretora">
+                                            placeholder="Corretora" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="celularcorretor">Telefone(WhatsApp)</label>
                                         <input type="tel" class="form-control" id="celularcorretor" name="celularcorretor"
-                                            placeholder="Celular WhatsApp">
+                                            placeholder="Celular WhatsApp" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -517,12 +521,10 @@
                             <div class="form-group">
                                 <label for="formaPagamento">Forma de Pagamento:</label>
                                 <% if (planoSelecionado) { %>
-                                    <% planoSelecionado.pagamentos.forEach(function(pagamento, index) { %>
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" id="forma<%= index %>" name="formaPagamento" class="custom-control-input" value="<%= pagamento.forma %>">
-                                  <label class="custom-control-label" for="forma<%= index %>"><%= pagamento.forma %> - R$ <%= pagamento.valor %></label>
+                                  <input type="radio" id="pagamento" name="forma_pagamento1" class="custom-control-input" value="<%= planoSelecionado.forma_pagamento1 %>">
+                                  <label class="custom-control-label" for="pagamento"><%= planoSelecionado.forma_pagamento1 %> - R$ <%= planoSelecionado.valor_pagamento1 %></label>
                                 </div>
-                                <% }); %>
                                 <% } else { %>
                                     <p>Nenhum plano selecionado ainda.</p>
                                 <% } %>

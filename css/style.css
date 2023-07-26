@@ -9,6 +9,11 @@ body {
     font-family: 'Kanit', sans-serif;
 }
 
+.content{
+    width: auto;
+}
+
+
 #bodyLogin{
     display: flex;
     justify-content: center;
@@ -22,9 +27,7 @@ body {
 }
 
 #bodyImplantacoes {
-    background-color: var(--CorMHAmarelo);
-    background-image: url(/img/background.png);
-    background-repeat: no-repeat;
+    background-color: var(--Cinza);
     font-family: 'Kanit', sans-serif;
     padding: 20px;
 }
@@ -88,4 +91,9 @@ label {
     background-color: var(--Branco);
     border-color: var(--CorMHAmarelo);
     color: var(--CorMHAmarelo);
+}
+
+.existing-images {
+    max-height: 500px; 
+    overflow-y: auto; 
 }

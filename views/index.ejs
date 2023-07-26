@@ -16,14 +16,14 @@
 </head>
 
 <body>
-    <form action="/formulario" method="get">
+    <form action="/formulario" method="post">
         <div class="form-group">
           <label for="selectPlano">Selecione um Plano:</label>
           <select class="form-control" id="selectPlano" name="planoSelecionado">
             <option value="">Selecione...</option>
             <!-- Iterar sobre os planos e gerar as opções do select -->
             <% planos.forEach(function(plano) { %>
-              <option value="<%= plano.nome %>"><%= plano.nome %></option>
+              <option value="<%= plano.id %>"><%= plano.nome_do_plano %></option>
             <% }); %>
           </select>
           <button class="btn btn-primary" type="submit">Escolher este</button>

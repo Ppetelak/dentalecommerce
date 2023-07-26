@@ -1,0 +1,162 @@
+:root {
+    --CorMHAmarelo: #BE7512;
+    --CorMHAzul: #0E3178;
+    --Branco: #ffffff;
+    --Cinza: #DCDCDC;
+}
+
+body {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 20px;
+    font-family: 'Kanit', sans-serif;
+}
+
+h1 {
+    text-align: center;
+    font-size: 18px;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+a {
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    color: #333;
+    text-decoration: none;
+}
+
+.data-atualizacao-input,
+.data-proxima-atualizacao-input {
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
+}
+
+.custom-thead {
+    background-color: #ED7923;
+    color:#20325d;
+}
+
+.navbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 20%;
+    color: #ffffff;
+    background-color: var(--CorMHAmarelo);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2);
+}
+
+.navbar h1 {
+    background: #ffffff;
+    color: #20325d;
+    padding: 4px;
+    border-radius: 12px;
+}
+
+.navbar i{
+    color: var(--CorMHAzul);
+    font-size: 20px;
+}
+.navbar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    background: linear-gradient(to bottom, #BF7D2A, #ED7923, #2BB3B1);
+}
+
+.btn-primary {
+    background-color: #20325d!important ;
+}
+
+.navbar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar li {
+    padding: 10px;
+    
+}
+
+.navbar li a {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.content {
+    width: 80%;
+    margin-left: 20%; 
+}
+
+.inactive {
+    display: none;
+}
+
+.modal-dialog {
+    max-height: 80vh; /* Defina a altura máxima desejada, por exemplo, 80% da altura da viewport */
+    width: 80%;
+}
+
+.modal-body {
+    overflow-y: scroll;
+}
+
+.existing-images {
+    flex: 0 0 80%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.image-item {
+    flex: 0 0 calc(33.33% - 20px);
+    margin: 10px;
+    cursor: pointer;
+}
+
+.image-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 5px;
+    transition: opacity 0.2s;
+}
+
+.image-item.active img {
+    opacity: 0.8;
+}
+
+.image-details {
+    flex: 0 0 20%;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    color: #fff;
+    border-radius: 5px;
+}
+
+
+#exclusao {
+    margin-top: 10%;
+    border: red;
+    border-style: solid;
+    border-radius: 10px;
+    padding: 10%;
+}
