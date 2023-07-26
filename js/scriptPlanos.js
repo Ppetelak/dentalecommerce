@@ -44,6 +44,83 @@ $(document).ready(function () {
   });
 });
 
+$('#addPlano').click(function () {
+  console.log('clicou em adicionar plano');
+  const trPlanoExistente = document.querySelectorAll('tr.trPlanoInput');
+  const ultimoTr = trPlanoExistente[trPlanoExistente.length - 1];
+  const dataIdValue = parseInt(ultimoTr.getAttribute('data-id'));
+  const novoId = dataIdValue + 1;
+
+  const novoTrHTML = 
+  `
+    <tr class="field-row trPlanoInput" data-id="${novoId}">
+      <td colspan="4">
+        <div class="form-group">
+          <strong>Nome do Plano</strong>
+          <input type="text" class="form-control field-edit" value="" name="nome_do_plano">
+          <strong>ANS</strong>
+          <input type="text" class="form-control field-edit" value="" name="ans">
+          <strong>Logo</strong>
+          <img class="logo-preview form-control" src="" style="width: 10%;" data-name="logo" name="logo">
+          <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
+            data-target="#imagemModal" data-type="logo"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
+          </br>
+          <strong>Banner</strong>
+          <img class="banner-preview form-control" src="" style="width: 10%;"
+            data-name="banner" name="banner">
+          <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
+            data-target="#imagemModal" data-type="banner"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
+        </div>
+        <div class="form-group row">
+          <div class="col-md-4">
+            <strong>Pagamento 1:</strong>
+            <input type="text" class="form-control" name="forma_pagamento1" value="">
+          </div>
+          <div class="col-md-4">
+            <strong>Pagamento 2:</strong>
+            <input type="text" class="form-control" name="forma_pagamento2" value="">
+          </div>
+          <div class="col-md-4">
+            <strong>Pagamento 3:</strong>
+            <input type="text" class="form-control" name="forma_pagamento3" value="">
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-md-4">
+            <strong>Valor Pagamento 1:</strong>
+            <input type="text" class="form-control" name="valor_pagamento1" value="">
+          </div>
+          <div class="col-md-4">
+            <strong>Valor Pagamento 2:</strong>
+            <input type="text" class="form-control" name="valor_pagamento2" value="">
+          </div>
+          <div class="col-md-4">
+            <strong>Valor Pagamento 3:</strong>
+            <input type="text" class="form-control" name="valor_pagamento3" value="">
+          </div>
+        </div>
+        <div class="form-group">
+          <strong>Descrição:</strong>
+          <textarea class="form-control" name="descricao" rows="6"></textarea>
+        </div>
+        <div class="form-group">
+          <strong>Observações:</strong>
+          <textarea class="form-control" name="observacoes" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary btn-salvar" data-id="${novoId}">Salvar</button>
+        </div>
+      </td>
+    </tr>
+  `;
+
+  const tbody = document.querySelector('tbody');
+  // Adiciona o novoTrHTML ao <tbody> da tabela existente
+  tbody.innerHTML += novoTrHTML;
+  
+});
+
+
 $(".btn-salvar").click(function () {
   const trElement = $(this).closest("tr");
   const planoId = trElement.data("id");
@@ -81,20 +158,12 @@ $(".btn-salvar").click(function () {
       banner: bannerSrc,
     },
     success: function (response) {
-      if (response.success) {
-        //showMessage(response.message);
-        console.log(response.message);
-        location.reload(); // Atualizar a página após salvar os dados
-      } else {
-        //showMessageError(response.message);
-        console.error(response.message);
-      }
+      console.log(response.message)
+      location.reload()
     },
     error: function (xhr, status, error) {
       //showMessageError(error);
-      console.error('Erro ao salvar os dados do plano:', error);
+      console.error('Erro ao salvar os dados do plano:', status, error);
     },
   });
 });
-
-

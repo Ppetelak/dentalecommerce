@@ -52,7 +52,7 @@
                 <button class="btn btn-secondary btn-editar" data-id="<%= plano.id %>">Editar</button>
               </td>
             </tr>
-            <tr class="field-row d-none" data-id="<%= plano.id %>">
+            <tr class="field-row d-none trPlanoInput" data-id="<%= plano.id %>">
               <td colspan="4">
                 <div class="form-group">
                   <strong>Nome do Plano</strong>
@@ -120,8 +120,12 @@
             </tr>
             <% }); %>
         </tbody>
-
+      </table>
     </div>
+    <div class="NovoPlano" id="novoPlano">
+      
+    </div>
+    <button class="btn btn-success" id="addPlano">Adicionar novo plano</button>
   </div>
   <div class="modal fade" id="imagemModal" tabindex="-1" aria-labelledby="imagemModalLabel" aria-hidden="true">
     <div class="modal-dialog">
