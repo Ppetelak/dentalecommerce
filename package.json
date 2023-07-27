@@ -1,4 +1,6 @@
 {
+  "name": "Ecommerce Dental",
+  "version": "1.0.0",
   "dependencies": {
     "body-parser": "^1.20.2",
     "bootstrap-icons": "^1.10.5",
@@ -11,5 +13,11 @@
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.5.2",
     "path": "^0.12.7"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo 'No tests defined'",
+    "run": "node app.js"
   }
 }
+

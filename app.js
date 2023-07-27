@@ -11,6 +11,7 @@ const multer = require('multer');
 const fs = require('fs');
 const { format } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
+const porta = process.env.PORT || 3001; 
 
 /* Verificar se usuário está logado */
 const verificaAutenticacao = (req, res, next) => {
@@ -56,6 +57,14 @@ const db = mysql.createConnection({
   database: "mhdentalvendas",
   port: "3306",
 });
+
+/* const db = mysql.createConnection({
+  host: "localhost",
+  user: "mhdental",
+  password: "pmp078917",
+  database: "mhdentalvendas1",
+  port: "3306",
+}); */
 
 db.connect((error) => {
   if (error) {
@@ -568,4 +577,6 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.listen(8888);
+app.listen(porta, () => {
+  console.log(`Servidor rodando na porta ${porta}`);
+});
