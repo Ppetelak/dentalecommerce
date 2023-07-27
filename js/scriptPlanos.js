@@ -109,6 +109,7 @@ $('#addPlano').click(function () {
         </div>
         <div class="form-group">
           <button class="btn btn-primary btn-salvar" data-id="${novoId}">Salvar</button>
+          <button class="btn btn-secondary btn-cancelar" data-id="${novoId}">Cancelar</button>
         </div>
       </td>
     </tr>
@@ -117,12 +118,62 @@ $('#addPlano').click(function () {
   const tbody = document.querySelector('tbody');
   // Adiciona o novoTrHTML ao <tbody> da tabela existente
   tbody.innerHTML += novoTrHTML;
-  
+  $(".btn-salvar").click(function () {
+    const trElement = $(this).closest("tr");
+    salvarPlano(trElement);
+  }); 
+  $(".edit-image-btn").click(function () {
+
+    const dataName = $(this).data('type');
+
+    // Definir o id do plano no modal (para identificar qual imagem está sendo selecionada)
+    $("#imagemModal").data("dataName", dataName).modal('show');
+  });
+
+  $(".image-selection").click(function () {
+    const imageSrc = $(this).data("src");
+
+    const dataName = $("#imagemModal").data("dataName")
+
+    $(`.${dataName}-preview`).attr("src", `/arquivos/${imageSrc}`);
+
+    $("#imagemModal").modal("hide");
+  });
+  $(".btn-cancelar").click(function () {
+    const trElement = $(this).closest("tr");
+    trElement.remove(); // Remove a linha quando o botão "Cancelar" é clicado
+  });
 });
+
+$(".btn-excluir").click(function () {
+  const idPlano = $(this).data('id')
+  const confirmacao = confirm("Tem certeza que deseja excluir o Plano?")
+  if(confirmacao){
+    $.ajax ({
+      url: '/deleta-plano',
+      type:'POST',
+      data: {id: idPlano},
+      success: function(response) {
+        console.log(response.message)
+        location.reload()
+      },
+      error: function(response){
+        console.log(response.message)
+      }
+    })
+  } else {
+    console.log('Operação de exclusão cancelada')
+  }
+})
 
 
 $(".btn-salvar").click(function () {
   const trElement = $(this).closest("tr");
+  salvarPlano(trElement);
+});
+
+
+function salvarPlano(trElement) {
   const planoId = trElement.data("id");
 
   const nome_do_plano = trElement.find("input[name=nome_do_plano]").val();
@@ -166,4 +217,4 @@ $(".btn-salvar").click(function () {
       console.error('Erro ao salvar os dados do plano:', status, error);
     },
   });
-});
+}

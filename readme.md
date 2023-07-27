@@ -18,7 +18,7 @@ Projeto exclusivo para empresa Mount Hermon - Administradora de Benefícios <br/
 <br>
 
 <p align="center">
-  <img alt="projeto DevLinks" src=".github/printProject.png" width="100%">
+  <img alt="print Página Inicial - em desenvolvimento" src=".github/preview.png" width="100%">
 </p>
 
 ## 🚀 Tecnologias

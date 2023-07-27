@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquisição</title>
+    <link rel="icon" type="image/png" href="./img/faviconV2_mounthermon.png" sizes="32x32">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+    <form action="/formulario" method="post">
+        <div class="form-group">
+          <label for="selectPlano">Selecione um Plano:</label>
+          <select class="form-control" id="selectPlano" name="planoSelecionado">
+            <option value="">Selecione...</option>
+            <!-- Iterar sobre os planos e gerar as opções do select -->
+            <% planos.forEach(function(plano) { %>
+              <option value="<%= plano.id %>"><%= plano.nome_do_plano %></option>
+            <% }); %>
+          </select>
+          <button class="btn btn-primary" type="submit">Escolher este</button>
+        </div>
+      </form>
+</body>
+</html>

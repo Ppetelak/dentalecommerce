@@ -545,6 +545,18 @@ app.post('/atualiza-planos', (req, res) => {
   });
 })
 
+app.post('/deleta-plano', (req,res) => {
+  const idPlano = req.body.id;
+  const query = 'DELETE FROM planos WHERE id = ?';
+  db.query(query, [idPlano], (err, result) => {
+    if(err) {
+      console.error('Erro ao excluir plano, ou ID não existe, erro: ' , err);
+      return res.status(500).json({ message: 'Erro na exclusão do plano selecionado'});
+    }
+    res.status(200).json({ message: 'Plano excluído com sucesso '});
+  });
+})
+
 app.get("/logout", (req, res) => {
   // Remover as informações de autenticação da sessão
   req.session.destroy((err) => {
