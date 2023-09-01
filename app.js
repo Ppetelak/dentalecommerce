@@ -11,7 +11,7 @@ const multer = require('multer');
 const fs = require('fs');
 const { format } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
-const porta = process.env.PORT || 3001; 
+const porta = process.env.PORT || 5586; 
 
 /* Verificar se usuário está logado */
 const verificaAutenticacao = (req, res, next) => {
@@ -313,7 +313,7 @@ function insertDependentes(idImplantacao, dependentes, callback) {
     if (err) {
       callback(err);
     } else {
-      console.log("Dependente inserido na tabela dependentes:", dependente);
+      //console.log("Dependente inserido na tabela dependentes:", dependente);
       insertDependentes(idImplantacao, dependentes, callback);
     }
   });
@@ -404,6 +404,46 @@ app.get('/implantacao/:id', (req, res) => {
     });
   });
 });
+
+app.get('/gerarContrato/:id', (req, res) => {
+  const idImplantacao = req.params.id;
+  const queryImplantacoes = 'SELECT * FROM implantacoes WHERE id=?';
+  const queryPlano = 'SELECT * FROM planos WHERE id=?';
+
+  // Primeira consulta para obter dados da implantação
+  db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
+    if (err) {
+      console.log('Erro ao buscar implantação no BD', err);
+      res.status(500).send('Erro ao buscar implantação no BD');
+      return;
+    }
+
+    // Verifique se a consulta retornou algum resultado
+    if (resultImplantacoes.length === 0) {
+      res.status(404).send('Implantação não encontrada');
+      return;
+    }
+
+    // Segunda consulta para obter dados do plano vinculado à implantação
+    const planoId = resultImplantacoes[0].planoSelecionado;
+    db.query(queryPlano, [planoId], (err, resultPlano) => {
+      if (err) {
+        console.error('Erro ao buscar plano vinculado à implantação', err);
+        res.status(500).send('Erro ao buscar plano vinculado à implantação');
+        return;
+      }
+      const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
+      const dia = String(data_implantacao.getDate()).padStart(2, '0');
+      const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
+      const ano = data_implantacao.getFullYear();
+      const dataFormatada = `${dia}/${mes}/${ano}`;
+
+      // Renderize a página 'contrato' com os dados da implantação e do plano
+      res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada });
+    });
+  });
+});
+
 
 app.get('/corretores', (req, res) => {
   // Consulta no banco de dados para buscar os dados dos corretores

@@ -3,8 +3,8 @@
 
 <head>
   <title>Detalhes da Implantação</title>
-  <link rel="icon" type="image/png" href="./img/faviconV2_mounthermon.png" sizes="32x32">
-  <link rel="icon" type="image/png" href="./img/faviconV2_mounthermon.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/img/faviconV2_mounthermon.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/img/faviconV2_mounthermon.png" sizes="32x32">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
   <link rel="stylesheet" href="/css/style.css">
@@ -249,9 +249,9 @@
       </h1>
 
       <p class="text-center">Aqui ficará o contrato para ser impresso</p>
-      <button class="btn btn-success">Gerar PDF Contrato</button>
+      <a href="/gerarContrato/<%= implantacao.id %>" target="_blank"><button class="btn btn-success">Gerar PDF Contrato</button></a>
     </div>
   </div>
 </body>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 </html>

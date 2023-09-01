@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualização Contrato</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style-contrato.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main>
+        <div class="topo sticky-top">
+            <h2> Prévia do documento </h2>
+            <button type="button" class="btn btn-primary salvar"> IMPRIMIR/ SALVAR PDF </button>
+        </div>
+        <div class="content A4">
+            <div class="row align-items-center">
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <img class="mw-100" src="/img/logomounthermonoriginal.png">
+                        </div>
+                        <div class="col-sm-6">
+                            <img class="mw-100" src="<%= plano.logo %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row infos">
+                        <div class="col-6">
+                            Proposta <br>
+                            <span class="valores">
+                                Teste de informação
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            Data Criação <br>
+                            <span class="valores">
+                                <%= dataFormatada %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row dados titular">
+                <div class="col-sm-12">
+                    <h1>Contratante</h1>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Entidade de Classe: <span> entidade de classe </span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row  dados equipevendas">
+                <div class="col-sm-12">
+                    <h1> Equipe de venda </h1>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Empresa Corretora: <span> <%= implantacao.estadociviltitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>CNPJ Corretora: <span> <%= implantacao.profissaotitular %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Corretor: <span> <%= implantacao.estadociviltitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>CPF Corretor: <span> <%= implantacao.profissaotitular %> </span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <p> Este contrato só tem validade mediante pagamento comprovado</p>
+                <p> Pág 1/14 </p>
+            </div>
+        </div>
+        <div class="content A4">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <img class="mw-100" src="/img/logomounthermonoriginal.png">
+                        </div>
+                        <div class="col-sm-6">
+                            <img class="mw-100" src="<%= plano.logo %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="row infos">
+                        <div class="col-sm-6">
+                            Proposta <br>
+                            <span class="valores">
+                                Teste de informação
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            Data Criação <br>
+                            <span class="valores">
+                                <%= dataFormatada %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row dados titular">
+                <div class="col-sm-12">
+                    <h1>Contratante</h1>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Entidade de Classe: <span> entidade de classe </span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row  dados equipevendas">
+                <div class="col-sm-12">
+                    <h1> Equipe de venda </h1>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Empresa Corretora: <span> <%= implantacao.estadociviltitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>CNPJ Corretora: <span> <%= implantacao.profissaotitular %> </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p>Corretor: <span> <%= implantacao.estadociviltitular %></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p>CPF Corretor: <span> <%= implantacao.profissaotitular %> </span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <p> Este contrato só tem validade mediante pagamento comprovado</p>
+                <p> Pág 2/14 </p>
+            </div>
+        </div>
+    </main>
+    
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+</html>
