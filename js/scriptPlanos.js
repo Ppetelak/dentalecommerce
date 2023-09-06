@@ -1,5 +1,4 @@
 $(document).ready(function () {
-  console.log('Apareceu algo')
   // Selecionar todos os botões de editar
   const btnEditar = document.querySelectorAll('.btn-editar');
 
@@ -53,66 +52,108 @@ $('#addPlano').click(function () {
 
   const novoTrHTML = 
   `
-    <tr class="field-row trPlanoInput" data-id="${novoId}">
-      <td colspan="4">
-        <div class="form-group">
-          <strong>Nome do Plano</strong>
-          <input type="text" class="form-control field-edit" value="" name="nome_do_plano">
-          <strong>ANS</strong>
-          <input type="text" class="form-control field-edit" value="" name="ans">
-          <strong>Logo</strong>
-          <img class="logo-preview form-control" src="" style="width: 10%;" data-name="logo" name="logo">
+  <tr class="field-row trPlanoInput" data-id="${novoId}">
+  <td colspan="4">
+    <div class="form-group">
+      <div class="row">
+        <div class="col-6">
+          <label for="nome_do_plano">Nome do Plano:</label>
+          <input type="text" class="form-control field-edit" value="" name="nome_do_plano" id="nome_do_plano">
+        </div>
+        <div class="col-6">
+          <label for="ans">ANS</label>
+          <input type="text" class="form-control field-edit" value="" name="ans" id="ans">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <label for="logo">Logo</label>
+          <img class="logo-preview form-control" src="" style="width: 50%;" data-name="logo" name="logo" id="logo">
           <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
             data-target="#imagemModal" data-type="logo"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
           </br>
-          <strong>Banner</strong>
-          <img class="banner-preview form-control" src="" style="width: 10%;"
-            data-name="banner" name="banner">
+        </div>
+        <div class="col-6">
+          <label for="banner">Banner</label>
+          <img class="banner-preview form-control" src="" style="width: 50%;"
+        data-name="banner" name="banner" id="banner">
           <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
-            data-target="#imagemModal" data-type="banner"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
+        data-target="#imagemModal" data-type="banner"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
         </div>
-        <div class="form-group row">
-          <div class="col-md-4">
-            <strong>Pagamento 1:</strong>
-            <input type="text" class="form-control" name="forma_pagamento1" value="">
-          </div>
-          <div class="col-md-4">
-            <strong>Pagamento 2:</strong>
-            <input type="text" class="form-control" name="forma_pagamento2" value="">
-          </div>
-          <div class="col-md-4">
-            <strong>Pagamento 3:</strong>
-            <input type="text" class="form-control" name="forma_pagamento3" value="">
+      </div>
+    </div>
+    <div class="formasdepagamento">
+      <h4 class="text-center">Formas de pagamento</h4>
+      <div class="row">
+        <div class="col-7">
+          <label>Descrição</label>
+        </div>
+        <div class="col-3">
+          <label>Valor</label>
+        </div>
+      </div>
+      <div class="row pagamento">
+        <div class="col-7">
+          <input type="text" class="form-control field-edit" value="" name="formadePagamento">
+        </div>
+        <div class="col-3">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">R$</span>
+            </div>
+            <input type="number" class="form-control field-edit" value="" name="valorPagamento">
           </div>
         </div>
-        <div class="form-group row">
-          <div class="col-md-4">
-            <strong>Valor Pagamento 1:</strong>
-            <input type="text" class="form-control" name="valor_pagamento1" value="">
-          </div>
-          <div class="col-md-4">
-            <strong>Valor Pagamento 2:</strong>
-            <input type="text" class="form-control" name="valor_pagamento2" value="">
-          </div>
-          <div class="col-md-4">
-            <strong>Valor Pagamento 3:</strong>
-            <input type="text" class="form-control" name="valor_pagamento3" value="">
-          </div>
+        <div class="col-2">
+          <button class="btn btn-danger excluirPagamento" type="button">Remover</button>
+        </div>
+      </div>
+      <button class="btn btn-secondary addPagamento" type="button">Adicionar Forma de Pgamento</button>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        <div class="form-group">
+          <label for="descricao">Descrição:</label>
+          <textarea class="form-control" name="descricao" rows="16" id="descricao"></textarea>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group">
+          <label for="">Observações:</label>
+          <textarea class="form-control" name="observacoes" rows="6" id="observacoes"></textarea>
         </div>
         <div class="form-group">
-          <strong>Descrição:</strong>
-          <textarea class="form-control" name="descricao" rows="6"></textarea>
+          <label for="contratacao">Contratação</label>
+          <select class="form-control" name="contratacao" id="contratacao">
+            <option disabled selected value="">Selecione</option>
+            <option value="Adesão">Adesão</option>
+            <option value="Outro">Outro</option>
+          </select>
         </div>
         <div class="form-group">
-          <strong>Observações:</strong>
-          <textarea class="form-control" name="observacoes" rows="3"></textarea>
+          <label for="coparticipacao">Coparticipação</label>
+          <select class="form-control" name="coparticipacao" id="coparticipacao">
+            <option disabled selected value="">Selecione</option>
+            <option value="Sim">Sim</option>
+            <option value="Não">Não</option>
+          </select>
         </div>
         <div class="form-group">
-          <button class="btn btn-primary btn-salvar" data-id="${novoId}">Salvar</button>
-          <button class="btn btn-secondary btn-cancelar" data-id="${novoId}">Cancelar</button>
+          <label for="abrangencia">Abrangência</label>
+          <select class="form-control" name="abrangencia" id="abrangencia">
+            <option disabled selected value="">Selecione</option>
+            <option value="Nacional">Nacional</option>
+            <option value="Regional">Regional</option>
+          </select>
         </div>
-      </td>
-    </tr>
+      </div>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary btn-salvar" data-id="${novoId}">Salvar Plano</button>
+      <button class="btn btn-secondary btn-cancelar" >Cancelar</button>
+    </div>
+  </td>
+</tr>
   `;
 
   const tbody = document.querySelector('tbody');
@@ -141,7 +182,8 @@ $('#addPlano').click(function () {
   });
   $(".btn-cancelar").click(function () {
     const trElement = $(this).closest("tr");
-    trElement.remove(); // Remove a linha quando o botão "Cancelar" é clicado
+    trElement.remove();
+    window.location.reload()
   });
 });
 
@@ -172,49 +214,114 @@ $(".btn-salvar").click(function () {
   salvarPlano(trElement);
 });
 
-
 function salvarPlano(trElement) {
   const planoId = trElement.data("id");
+  let formasDePagamento = [];
 
-  const nome_do_plano = trElement.find("input[name=nome_do_plano]").val();
-  const ans = trElement.find("input[name=ans]").val();
-  const forma_pagamento1 = trElement.find("input[name=forma_pagamento1]").val();
-  const forma_pagamento2 = trElement.find("input[name=forma_pagamento2]").val();
-  const forma_pagamento3 = trElement.find("input[name=forma_pagamento3]").val();
-  const valor_pagamento1 = trElement.find("input[name=valor_pagamento1]").val();
-  const valor_pagamento2 = trElement.find("input[name=valor_pagamento2]").val();
-  const valor_pagamento3 = trElement.find("input[name=valor_pagamento3]").val();
-  const descricao = trElement.find("textarea[name=descricao]").val();
-  const observacoes = trElement.find("textarea[name=observacoes]").val();
-  const logoSrc = trElement.find(".logo-preview").attr("src");
-  const bannerSrc = trElement.find(".banner-preview").attr("src");
+  trElement.find('.pagamento').each(function () {
+    const pagamentosData = {
+      descricao: $(this).find('[name="formadePagamento"]').val(),
+      valor: $(this).find('[name="valorPagamento"]').val()
+    }
+    formasDePagamento.push(pagamentosData)
+  })
 
+  let plano = {
+    id: planoId,
+    nome_do_plano: trElement.find("input[name=nome_do_plano]").val(),
+    ans: trElement.find("input[name=ans]").val(),
+    descricao: trElement.find("textarea[name=descricao]").val(),
+    observacoes: trElement.find("textarea[name=observacoes]").val(),
+    logoSrc: trElement.find(".logo-preview").attr("src"),
+    bannerSrc: trElement.find(".banner-preview").attr("src"),
+    contratacao: trElement.find("select[name=contratacao]").val(),
+    coparticipacao: trElement.find("select[name=coparticipacao]").val(),
+    abrangencia: trElement.find("select[name=abrangencia]").val(),
+  }
+
+  console.log(formasDePagamento)
+  console.log(plano)
 
   $.ajax({
     url: '/atualiza-planos',
     type: 'POST',
-    data: {
-      id: planoId,
-      nome_do_plano,
-      ans,
-      forma_pagamento1,
-      forma_pagamento2,
-      forma_pagamento3,
-      valor_pagamento1,
-      valor_pagamento2,
-      valor_pagamento3,
-      descricao,
-      observacoes,
-      logo: logoSrc,
-      banner: bannerSrc,
-    },
+    contentType: 'application/json', 
+    data: JSON.stringify({ plano: plano , formasDePagamento: formasDePagamento }),
     success: function (response) {
       console.log(response.message)
       location.reload()
     },
     error: function (xhr, status, error) {
-      //showMessageError(error);
+      showMessageError(error);
       console.error('Erro ao salvar os dados do plano:', status, error);
     },
   });
 }
+
+$(document).on('click', '.addPagamento', function () {
+  const button = $(this);
+
+  const novaLinha = `<div class="row pagamento">
+  <div class="col-7">
+    <input type="text" class="form-control field-edit" value="" name="formadePagamento">
+  </div>
+  <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">R$</span>
+        </div>
+        <input type="number" class="form-control field-edit" value="" name="valorPagamento">
+      </div>
+    </div>
+  <div class="col-2">
+    <button class="btn btn-danger excluirPagamento" type="button">Remover</button>
+  </div>
+</div>`
+
+  button.before(novaLinha);
+});
+
+$(document).on('click', '.excluirPagamento', function () {
+  console.log('Clicou em cancelar excluir pagamento')
+  const linhaRemovida = $(this).closest('.pagamento');
+  linhaRemovida.remove();
+});
+
+function getCookieValue(name) {
+  const cookieName = `${name}=`;
+  const cookies = document.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+      let cookie = cookies[i].trim();
+      if (cookie.startsWith(cookieName)) {
+          return cookie.substring(cookieName.length, cookie.length);
+      }
+  }
+  return '';
+}
+
+if (document.cookie.includes('alertSuccess')) {
+  const alertSucess = getCookieValue('alertSuccess');
+  showMessage(alertSucess);
+  document.cookie = 'alertSuccess=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+
+if (document.cookie.includes('alertError')) {
+  const alertError = getCookieValue('alertError');
+  showMessageError(alertError);
+  document.cookie = 'alertError=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+
+function showMessage(message) {
+  const Mensagem = document.getElementById('Message')
+  Mensagem.innerHTML = `${decodeURIComponent(message)} 
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>`
+  Mensagem.style.display = 'block';
+}
+
+function showMessageError(message) {
+  const Mensagem = document.getElementById('MessageError')
+  Mensagem.innerHTML = `ALERTA: ${decodeURIComponent(message)} 
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>`
+  Mensagem.style.display = 'block';
+}
+

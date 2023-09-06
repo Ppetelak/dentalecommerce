@@ -22,6 +22,12 @@
   <div class="navbardiv">
     <%- include('navbar') %>
   </div>
+  <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message" style="display:none">
+    Sucesso!
+  </div>
+  <div class="alert alert-danger alert-dismissible fade show fixed-top" role="alert" id="MessageError" style="display:none">
+    Erro!
+  </div>
   <div class="content">
     <div class="container mt-4">
       <h1 class="mb-4">Lista de Planos</h1>
@@ -55,67 +61,106 @@
             <tr class="field-row d-none trPlanoInput" data-id="<%= plano.id %>">
               <td colspan="4">
                 <div class="form-group">
-                  <strong>Nome do Plano</strong>
-                  <input type="text" class="form-control field-edit" value="<%= plano.nome_do_plano %>" name="nome_do_plano">
-                  <strong>ANS</strong>
-                  <input type="text" class="form-control field-edit" value="<%= plano.ans %>" name="ans">
-                  <strong>Logo</strong>
-                  <img class="logo-preview form-control" src="<%= plano.logo %>" style="width: 10%;" data-name="logo" name="logo">
-                  <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
-                    data-target="#imagemModal" data-type="logo"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
-                  </br>
-                  <strong>Banner</strong>
-                  <img class="banner-preview form-control" src="<%= plano.banner %>" style="width: 10%;"
-                    data-name="banner" name="banner">
-                  <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
+                  <div class="row">
+                    <div class="col-6">
+                      <label for="nome_do_plano">Nome do Plano:</label>
+                      <input type="text" class="form-control field-edit" value="<%= plano.nome_do_plano %>" name="nome_do_plano" id="nome_do_plano">
+                    </div>
+                    <div class="col-6">
+                      <label for="ans">ANS</label>
+                      <input type="text" class="form-control field-edit" value="<%= plano.ans %>" name="ans" id="ans">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-6">
+                      <label for="logo">Logo</label>
+                      <img class="logo-preview form-control" src="<%= plano.logo %>" style="width: 50%;" data-name="logo" name="logo" id="logo">
+                      <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
+                        data-target="#imagemModal" data-type="logo"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
+                      </br>
+                    </div>
+                    <div class="col-6">
+                      <label for="banner">Banner</label>
+                      <img class="banner-preview form-control" src="<%= plano.banner %>" style="width: 50%;"
+                    data-name="banner" name="banner" id="banner">
+                      <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
                     data-target="#imagemModal" data-type="banner"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
-
-                </div>
-                <div class="form-group row">
-                  <div class="col-md-4">
-                    <strong>Pagamento 1:</strong>
-                    <input type="text" class="form-control" name="forma_pagamento1"
-                      value="<%= plano.forma_pagamento1 %>">
-                  </div>
-                  <div class="col-md-4">
-                    <strong>Pagamento 2:</strong>
-                    <input type="text" class="form-control" name="forma_pagamento2"
-                      value="<%= plano.forma_pagamento2 %>">
-                  </div>
-                  <div class="col-md-4">
-                    <strong>Pagamento 3:</strong>
-                    <input type="text" class="form-control" name="forma_pagamento3"
-                      value="<%= plano.forma_pagamento3 %>">
+                    </div>
                   </div>
                 </div>
-                <div class="form-group row">
-                  <div class="col-md-4">
-                    <strong>Valor Pagamento 1:</strong>
-                    <input type="text" class="form-control" name="valor_pagamento1"
-                      value="<%= plano.valor_pagamento1 %>">
+                <div class="formasdepagamento">
+                  <h4 class="text-center">Formas de pagamento</h4>
+                  <div class="row">
+                    <div class="col-7">
+                      <label>Descrição</label>
+                    </div>
+                    <div class="col-3">
+                      <label>Valor</label>
+                    </div>
                   </div>
-                  <div class="col-md-4">
-                    <strong>Valor Pagamento 2:</strong>
-                    <input type="text" class="form-control" name="valor_pagamento2"
-                      value="<%= plano.valor_pagamento2 %>">
+                    <% pagamentos.forEach(function (pagamento) { %>
+                      <% if(pagamento.id_plano === plano.id) { %>
+                        <div class="row pagamento">
+                          <div class="col-7">
+                            <input type="text" class="form-control field-edit" value="<%= pagamento.descricao %>" name="formadePagamento">
+                          </div>
+                          <div class="col-3">
+                            <div class="input-group">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text">R$</span>
+                              </div>
+                              <input type="number" class="form-control field-edit" value="<%= pagamento.valor %>" name="valorPagamento">
+                            </div>
+                          </div>
+                          <div class="col-2">
+                            <button class="btn btn-danger excluirPagamento" type="button">Remover</button>
+                          </div>
+                        </div>
+                      <% } %>
+                    <% }); %>
+                  <button class="btn btn-secondary addPagamento" type="button">Adicionar Forma de Pgamento</button>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="form-group">
+                      <label for="descricao">Descrição:</label>
+                      <textarea class="form-control" name="descricao" rows="16" id="descricao"><%= plano.descricao %></textarea>
+                    </div>
                   </div>
-                  <div class="col-md-4">
-                    <strong>Valor Pagamento 3:</strong>
-                    <input type="text" class="form-control" name="valor_pagamento3"
-                      value="<%= plano.valor_pagamento3 %>">
+                  <div class="col-6">
+                    <div class="form-group">
+                      <label for="">Observações:</label>
+                      <textarea class="form-control" name="observacoes" rows="6" id="observacoes"><%= plano.observacoes %></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label for="contratacao">Contratação</label>
+                      <select class="form-control" name="contratacao">
+                        <option disabled selected value="">Selecione</option>
+                        <option value="Adesão">Adesão</option>
+                        <option value="Outro">Outro</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="coparticipacao">Coparticipação</label>
+                      <select class="form-control" name="coparticipacao" id="coparticipacao">
+                        <option disabled selected value="">Selecione</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="abrangencia">Abrangência</label>
+                      <select class="form-control" name="abrangencia" id="abrangencia">
+                        <option disabled selected value="">Selecione</option>
+                        <option value="Nacional">Nacional</option>
+                        <option value="Regional">Regional</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group">
-                  <strong>Descrição:</strong>
-                  <textarea class="form-control" name="descricao" rows="6"><%= plano.descricao %></textarea>
-                </div>
-                <div class="form-group">
-                  <strong>Observações:</strong>
-                  <textarea class="form-control" name="observacoes" rows="3"><%= plano.observacoes %></textarea>
-                </div>
-                <div class="form-group">
-                  <button class="btn btn-primary btn-salvar" data-id="<%= plano.id %>">Salvar</button>
-                  <button class="btn btn-danger btn-excluir" data-id="<%= plano.id %>">Excluir</button>
+                  <button class="btn btn-primary btn-salvar" data-id="<%= plano.id %>">Salvar Alterações</button>
+                  <button class="btn btn-danger btn-excluir" data-id="<%= plano.id %>">Excluir Plano</button>
                 </div>
               </td>
             </tr>

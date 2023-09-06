@@ -67,12 +67,6 @@ CREATE TABLE planos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome_do_plano VARCHAR(100) NOT NULL,
     logo VARCHAR(255),
-    forma_pagamento1 VARCHAR(50) NOT NULL,
-    valor_pagamento1 DECIMAL(10, 2) NOT NULL,
-    forma_pagamento2 VARCHAR(50) NOT NULL,
-    valor_pagamento2 DECIMAL(10, 2) NOT NULL,
-    forma_pagamento3 VARCHAR(50) NOT NULL,
-    valor_pagamento3 DECIMAL(10, 2) NOT NULL,
     descricao TEXT,
     ans VARCHAR(20),
     observacoes TEXT

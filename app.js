@@ -516,93 +516,136 @@ app.delete('/corretores/:id', (req, res) => {
 });
 
 app.get('/planos', (req, res) => {
-  const query = 'SELECT * FROM planos';
+  const queryPlanos = 'SELECT * FROM planos';
+  const queryPagamentos = 'SELECT * FROM formasdepagamento';
   const files = fs.readdirSync('arquivos/');
 
-  db.query(query, (err, result) => {
+  db.query(queryPlanos, (err, resultPlanos) => {
     if (err) {
       console.error('Erro ao consultar o banco de dados:', err);
       res.status(500).send('Erro ao consultar os planos');
-    } else {
-      // Renderize a página EJS e passe os planos como parâmetro
-      res.render('planos', { planos: result, files:files });
-    }
-  });
-})
+    } 
+    db.query(queryPagamentos, (err, resultPagamentos) => {
+      if(err){
+        console.error('Erro ao consultar os pagamentos:', err);
+        res.status(500).send('Erro ao consultar os pagamentos');
+      }
+      res.render('planos', { planos: resultPlanos, pagamentos: resultPagamentos, files:files });
+    }) 
+  })
+});
 
 app.post('/atualiza-planos', (req, res) => {
-  const { id, nome_do_plano, ans, forma_pagamento1, forma_pagamento2, forma_pagamento3, valor_pagamento1, valor_pagamento2, valor_pagamento3, descricao, observacoes, logo, banner } = req.body;
+  const { plano, formasDePagamento } = req.body;
 
-  const query = 'SELECT * FROM planos WHERE id = ?';
-  // Consultar o banco de dados para verificar se o ID já existe
-  db.query(query, [id], (err, rows) => {
+  // Inicie a transação
+  db.beginTransaction((err) => {
     if (err) {
-      console.error('Erro ao consultar plano:', err);
+      console.error('Erro ao iniciar a transação:', err);
       return res.status(500).json({ message: 'Erro interno do servidor' });
     }
 
-    if (rows.length > 0) {
-      // O ID existe, realizar a atualização
-      // Iniciar uma transação
-      db.beginTransaction((err) => {
-        if (err) {
-          console.error('Erro ao iniciar a transação:', err);
-          return res.status(500).json({ message: 'Erro interno do servidor' });
-        }
+    // Verifique se o plano já existe no banco de dados
+    const selectQuery = 'SELECT id FROM planos WHERE id = ?';
+    db.query(selectQuery, [plano.id], (err, rows) => {
+      if (err) {
+        console.error('Erro ao consultar plano:', err);
+        return rollbackAndRespond(res, 'Erro interno do servidor');
+      }
 
-        const updateQuery = 'UPDATE planos SET nome_do_plano = ?, ans = ?, forma_pagamento1 = ?, forma_pagamento2 =?, forma_pagamento3 = ?, valor_pagamento1 = ?, valor_pagamento2 = ?, valor_pagamento3 = ?, descricao = ?, observacoes = ?, logo = ?, banner = ?  WHERE id = ?';
-        db.query(updateQuery, [nome_do_plano, ans, forma_pagamento1, forma_pagamento2, forma_pagamento3, valor_pagamento1, valor_pagamento2, valor_pagamento3, descricao, observacoes, logo, banner, id], (err, result) => {
+      if (rows.length > 0) {
+        // O plano existe, atualize-o
+        const updateQuery = 'UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ? WHERE id = ?';
+        db.query(updateQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia, plano.id], (err, result) => {
           if (err) {
-            console.error('Erro ao atualizar operadora:', err);
-
-            // Reverter a transação em caso de erro
-            db.rollback(() => {
-              console.error('Transação revertida.');
-              return res.status(500).json({ message: 'Erro interno do servidor' });
-            });
+            console.error('Erro ao atualizar plano:', err);
+            return rollbackAndRespond(res, 'Erro interno do servidor');
           }
 
-          // Confirmar a transação
-          db.commit((err) => {
-            if (err) {
-              console.error('Erro ao confirmar a transação:', err);
-
-              // Reverter a transação em caso de erro
-              db.rollback(() => {
-                console.error('Transação revertida.');
-                return res.status(500).json({ message: 'Erro interno do servidor' });
-              });
-            }
-
-            // Transação bem-sucedida
-            res.status(200).json({ message: 'Plano atualizado com sucesso' });
-          });
+          // Agora você pode prosseguir com a exclusão e inserção das formas de pagamento
+          deleteAndInsertFormasDePagamento(plano.id, formasDePagamento, res);
+          res.cookie('alertSuccess', 'Plano atualizado com sucesso', {maxAge: 3000});
         });
-      });
-    } else {
-      // O ID não existe, criar uma nova operadora
-      const createQuery = 'INSERT INTO planos (nome_do_plano, ans, forma_pagamento1, forma_pagamento2, forma_pagamento3, valor_pagamento1, valor_pagamento2, valor_pagamento3, descricao, observacoes, logo, banner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-      db.query(createQuery, [nome_do_plano, ans, forma_pagamento1, forma_pagamento2, forma_pagamento3, valor_pagamento1, valor_pagamento2, valor_pagamento3, descricao, observacoes, logo, banner], (err, result) => {
-        if (err) {
-          console.error('Erro ao criar plano:', err);
-          return res.status(500).json({ message: 'Erro interno do servidor' });
-        }
-        //res.cookie('alertSucess', 'Plano criado com Sucesso', { maxAge: 3000 });
-        res.status(200).json({ message: 'Nova plano criado com sucesso' });
-      });
-    }
+      } else {
+        // O plano não existe, crie-o
+        const createQuery = 'INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        db.query(createQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia], (err, result) => {
+          if (err) {
+            console.error('Erro ao criar plano:', err);
+            return rollbackAndRespond(res, 'Erro interno do servidor');
+          }
+
+          // Obtenha o ID do plano recém-criado
+          const novoPlanoId = result.insertId;
+
+          // Agora você pode prosseguir com a exclusão e inserção das formas de pagamento
+          deleteAndInsertFormasDePagamento(novoPlanoId, formasDePagamento, res);
+          res.cookie('alertSuccess', 'Plano inserido com sucesso', {maxAge: 3000});
+        });
+      }
+    });
   });
-})
+});
+
+function deleteAndInsertFormasDePagamento(planoId, formasDePagamento, res) {
+  // Exclua as formas de pagamento existentes para o plano
+  const deleteQuery = 'DELETE FROM formasdepagamento WHERE id_plano = ?';
+  db.query(deleteQuery, [planoId], (err, deleteResult) => {
+    if (err) {
+      console.error('Erro ao excluir formas de pagamento:', err);
+      return rollbackAndRespond(res, 'Erro interno do servidor');
+    }
+
+    // Insira as novas formas de pagamento associadas ao plano
+    const insertQuery = 'INSERT INTO formasdepagamento (descricao, valor, id_plano) VALUES (?, ?, ?)';
+    if (Array.isArray(formasDePagamento)) {
+      for (const pagamento of formasDePagamento) {
+        db.query(insertQuery, [pagamento.descricao, pagamento.valor, planoId], (err, insertResult) => {
+          if (err) {
+            console.error('Erro ao inserir forma de pagamento:', err);
+            return rollbackAndRespond(res, 'Erro interno do servidor');
+          }
+        });
+      }
+    }
+
+    // Confirmar a transação após a exclusão e inserção bem-sucedidas
+    db.commit((err) => {
+      if (err) {
+        console.error('Erro ao confirmar a transação:', err);
+        return rollbackAndRespond(res, 'Erro interno do servidor');
+      }
+
+      // Transação bem-sucedida
+      res.status(200).json({ message: 'Plano atualizado com sucesso' });
+    });
+  });
+}
+
+function rollbackAndRespond(res, message) {
+  // Reverter a transação em caso de erro
+  db.rollback(() => {
+    console.error('Transação revertida.');
+    res.status(500).json({ message });
+  });
+}
 
 app.post('/deleta-plano', (req,res) => {
   const idPlano = req.body.id;
   const query = 'DELETE FROM planos WHERE id = ?';
-  db.query(query, [idPlano], (err, result) => {
-    if(err) {
-      console.error('Erro ao excluir plano, ou ID não existe, erro: ' , err);
-      return res.status(500).json({ message: 'Erro na exclusão do plano selecionado'});
+  const queryDeletePagamentos = 'DELETE FROM formasdepagamento WHERE id_plano = ?';
+  db.query(queryDeletePagamentos, [idPlano], (err, result) =>{
+    if(err){
+      console.error('Erro ao excluir Pagamentos')
+      return res.status(500).json({ message: 'Erro na exclusão do Pagamento'});
     }
-    res.status(200).json({ message: 'Plano excluído com sucesso '});
+    db.query(query, [idPlano], (err, result) => {
+      if(err) {
+        console.error('Erro ao excluir plano, ou ID não existe, erro: ' , err);
+        return res.status(500).json({ message: 'Erro na exclusão do plano selecionado'});
+      }
+      res.status(200).json({ message: 'Plano excluído com sucesso '});
+    })
   });
 })
 

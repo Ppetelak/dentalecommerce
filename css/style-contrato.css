@@ -8,11 +8,18 @@
 
 body {
     font-family: 'Open Sans', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     background: var(--Cinza);
+}
+
+main{
+    display: flex;
+    width: 21cm;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--Branco);
+    margin: auto;
+    padding: 3rem;
+    border: 1px solid rgba(0, 0, 0, 0.096);
 }
 
 .topo {
@@ -22,6 +29,7 @@ body {
     background: var(--Cinza);
     padding-bottom: 1rem;
     padding-top: 1rem;
+    width: 100%;
 }
 
 button{
@@ -31,15 +39,8 @@ button{
 .content{
     display: flex;
     flex-direction: column;
-    width: 21cm; /* Largura de uma folha A4 */
-    height: 29.7cm; /* Altura de uma folha A4 */
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.096);
-    padding: 20px;
     box-sizing: border-box;
-    padding: 3rem;
     gap: 10px;
-    position: relative;
 }
 
 .infos{
@@ -72,11 +73,16 @@ h1 {
 .dados{
     line-height: 1;
 }
-.A4{
-    margin-top: 2rem;
+
+.a4 {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 0;
+    page-break-after: always;
 }
 
-.footer {
+footer {
     position: absolute;
     display: flex;
     flex-direction: row;
@@ -87,32 +93,6 @@ h1 {
     text-align: end;
     justify-content: space-between;
     font-size: 12px;
-}
-
-@media print {
-    body {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-        -webkit-transform-style: preserve-3d;
-        transform-style: preserve-3d;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        margin: 0;
-        padding: 0;
-    }
-
-    main{
-        margin: 0;
-        padding: 0;
-    }
-    .content {
-        width: 100%;
-        margin: 0;
-        padding: 1rem;
-    }
-    .A4 {
-        page-break-before: always;
-    }
 }
 
 @page {
