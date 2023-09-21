@@ -146,15 +146,19 @@ app.post('/salvarLogo', (req, res) => {
 /* FIM DE SEÇÃO DE UPLOAD   */
 
 app.get("/", (req, res) => {
-  const query = 'SELECT * FROM planos'
-  db.query(query, (err, result) =>{
+  const queryPlanos = 'SELECT * FROM planos'
+  const queryPagamentos =  'SELECT * FROM formasdepagamento'
+  db.query(queryPlanos, (err, resultPlanos) =>{
     if(err) {
       console.error('Erro ao consultar o banco de dados:', err);
       return res.status(500).json({ error: 'Erro ao processar consulta ao BD'})
     }
-    else {
-      res.render("index", { planos: result });
-    }
+    db.query(queryPagamentos, (err, resultPagamentos) => {
+      if(err) {
+        console.error('Erro ao consultar o banco de dados:', err)
+      }
+      res.render("index", { planos: resultPlanos, pagamentos: resultPagamentos });
+    })
   })
 });
 
@@ -444,8 +448,7 @@ app.get('/gerarContrato/:id', (req, res) => {
   });
 });
 
-
-app.get('/corretores', (req, res) => {
+/* app.get('/corretores', (req, res) => {
   // Consulta no banco de dados para buscar os dados dos corretores
   db.query('SELECT * FROM corretores', (error, results) => {
     if (error) {
@@ -461,7 +464,65 @@ app.get('/corretores', (req, res) => {
     // Renderiza a página "corretores" e passa os dados dos corretores para o template
     res.render('corretores', { corretores });
   });
+}); */
+
+/* app.get('/corretores', (req, res) => {
+  // Consulta no banco de dados para buscar os dados dos corretores
+  db.query('SELECT * FROM corretores', (error, corretoresResult) => {
+    if (error) {
+      console.error('Erro ao consultar o banco de dados de corretores:', error);
+      return res.status(500).send('Erro ao consultar o banco de dados de corretores.');
+    }
+
+    // Consulta no banco de dados para buscar os dados das corretoras
+    db.query('SELECT * FROM corretoras', (error, corretorasResult) => {
+      if (error) {
+        console.error('Erro ao consultar o banco de dados de corretoras:', error);
+        return res.status(500).send('Erro ao consultar o banco de dados de corretoras.');
+      }
+
+      // Mapeie os resultados das consultas para criar arrays de corretores e corretoras
+      const corretores = corretoresResult.map(corretor => {
+        return { ...corretor, editing: false };
+      });
+
+      const corretoras = corretorasResult;
+
+      // Renderize a página "corretores" e passe os dados de corretores e corretoras para o template
+      res.render('corretores', { corretores, corretoras });
+    });
+  });
+}); */
+
+app.get('/corretores', (req, res) => {
+  // Consulta no banco de dados para buscar os dados dos corretores juntamente com as informações das corretoras vinculadas
+  db.query('SELECT c.*, co.nomeFantasia AS corretoraNome FROM corretores c LEFT JOIN corretoras co ON c.corretora = co.id', (error, results) => {
+    if (error) {
+      console.error('Erro ao consultar o banco de dados de corretores:', error);
+      return res.status(500).send('Erro ao consultar o banco de dados de corretores.');
+    }
+
+    // Mapeie os resultados da consulta para criar um objeto de corretores com as informações das corretoras vinculadas
+    const corretores = results.map(corretor => {
+      return { ...corretor, editing: false };
+    });
+
+    // Consulta no banco de dados para buscar os dados das corretoras separadamente
+    db.query('SELECT * FROM corretoras', (error, corretorasResult) => {
+      if (error) {
+        console.error('Erro ao consultar o banco de dados de corretoras:', error);
+        return res.status(500).send('Erro ao consultar o banco de dados de corretoras.');
+      }
+
+      const corretoras = corretorasResult;
+
+      // Renderize a página "corretores" e passe os dados de corretores e corretoras para o template
+      res.render('corretores', { corretores, corretoras });
+    });
+  });
 });
+
+
 
 app.post('/edit/:id', (req, res) => {
   const idCorretor = req.params.id;
@@ -481,6 +542,38 @@ app.post('/edit/:id', (req, res) => {
   );
 });
 
+app.post('/editCorretora/:id', (req, res) => {
+  const idCorretora = req.params.id;
+  const { cnpj, razaoSocial, nomeFantasia } = req.body;
+  db.query(
+    'UPDATE corretoras SET cnpj=?, razaoSocial=?, nomeFantasia=? WHERE id=?',
+    [cnpj, razaoSocial, nomeFantasia, idCorretora],
+    (error, results) => {
+      if (error) {
+        console.error('Erro ao atualizar a corretora no banco de dados:', error);
+        return res.status(500).send('Erro ao atualizar a corretora no banco de dados.');
+      }
+      console.log('Corretora atualizado com sucesso!');
+      res.sendStatus(200); // Resposta de sucesso (status 200) para o cliente
+    }
+  );
+});
+
+app.get('/corretoras', (req,res) => {
+  db.query('SELECT * FROM corretoras', (error, results) => {
+    if (error) {
+      console.error('Erro ao consultar o banco de dados:', error);
+      return res.status(500).send('Erro ao consultar o banco de dados.');
+    }
+
+    // Adicione a propriedade "editing: false" a cada corretor do resultado da consulta
+    const corretoras = results.map(corretora => {
+      return { ...corretora, editing: false };
+    });
+  res.render('corretoras', { corretoras });
+  });
+})
+
 app.post('/cadastrar-corretor', (req, res) => {
   const { cpf, nome, telefone, email, corretora } = req.body;
   // Consulta SQL para inserir o novo corretor na tabela corretores
@@ -498,6 +591,23 @@ app.post('/cadastrar-corretor', (req, res) => {
   });
 });
 
+app.post('/cadastrar-corretora', (req, res) => {
+  const { cnpj, razaoSocial, nomeFantasia } = req.body;
+  // Consulta SQL para inserir o novo corretor na tabela corretores
+  const sql = 'INSERT INTO corretoras (cnpj, razaoSocial, nomeFantasia) VALUES (?, ?, ?)';
+
+  // Executar a consulta SQL com os valores do novo corretor
+  db.query(sql, [cnpj, razaoSocial, nomeFantasia], (error, result) => {
+    if (error) {
+      console.error('Erro ao cadastrar a corretora:', error);
+      return res.status(500).send('Erro ao cadastrar a corretora no banco de dados.');
+    }
+
+    // Se a inserção foi bem-sucedida, retornar uma resposta de sucesso
+    res.status(200).send('Corretora cadastrada com sucesso.');
+  });
+});
+
 app.delete('/corretores/:id', (req, res) => {
   const corretorId = req.params.id;
   // Consulta SQL para excluir o corretor pelo ID
@@ -512,6 +622,23 @@ app.delete('/corretores/:id', (req, res) => {
 
     // Se a exclusão foi bem-sucedida, retornar uma resposta de sucesso
     res.status(200).send('Corretor excluído com sucesso.');
+  });
+});
+
+app.delete('/corretoras/:id', (req, res) => {
+  const corretorId = req.params.id;
+  // Consulta SQL para excluir o corretor pelo ID
+  const sql = 'DELETE FROM corretoras WHERE id = ?';
+
+  // Executar a consulta SQL com o ID do corretor a ser excluído
+  db.query(sql, corretorId, (error, result) => {
+    if (error) {
+      console.error('Erro ao excluir a corretora:', error);
+      return res.status(500).send('Erro ao excluir a corretora do banco de dados.');
+    }
+
+    // Se a exclusão foi bem-sucedida, retornar uma resposta de sucesso
+    res.status(200).send('Corretora excluída com sucesso.');
   });
 });
 
@@ -648,6 +775,99 @@ app.post('/deleta-plano', (req,res) => {
     })
   });
 })
+
+app.get('/entidades', verificaAutenticacao, (req, res) => {
+  db.query('SELECT * FROM entidades', (error, results) => {
+    if (error) throw error;
+    res.render('entidades', { entidades: results });
+  })
+})
+
+app.post('/editar-entidade/:id', verificaAutenticacao, (req, res) => {
+  const idEntidade = req.params.id;
+  const {
+    nome,
+    descricao,
+    publico,
+    documentos,
+    taxa,
+  } = req.body;
+
+  const sql =
+    'UPDATE entidades SET nome=?, descricao=?, publico=?, documentos=?, taxa=? WHERE id=?';
+
+  db.query(
+    sql,
+    [
+      nome,
+      descricao,
+      publico,
+      documentos,
+      taxa,
+      idEntidade,
+    ],
+    (error, result) => {
+      if (error) {
+        console.error('Erro ao atualizar operadora:', error);
+        res.cookie('alertError', 'Erro ao atualizar Entidade, verifique e tente novamente', {
+          maxAge: 3000,
+        });
+        res.status(500).json({ message: 'Erro interno do servidor' });
+      } else {
+        res.cookie('alertSuccess', 'Entidade atualizada com Sucesso', { maxAge: 3000 });
+        res.status(200).json({ message: 'Entidade atualizada com sucesso' });
+      }
+    }
+  );
+});
+
+app.delete('/excluir-entidade/:id', verificaAutenticacao, (req, res) => {
+  const idEntidade = req.params.id;
+
+  // Verifique se existem registros na tabela "formularios_entidades" vinculados a esta entidade
+  const sqlCheckRelacionamento = 'SELECT COUNT(*) AS count FROM formularios_entidades WHERE entidade_id = ?';
+
+  db.query(sqlCheckRelacionamento, [idEntidade], (error, result) => {
+    if (error) {
+      console.error('Erro ao verificar relacionamentos:', error);
+      res.status(500).json({ message: 'Erro interno do servidor' });
+    } else {
+      const countRelacionamentos = result[0].count;
+
+      if (countRelacionamentos > 0) {
+        // Se houver relacionamentos, não é possível excluir a entidade
+        res.status(400).json({ message: 'Não é possível excluir a entidade, pois existem formulários vinculados a ela' });
+      } else {
+        // Se não houver relacionamentos, é seguro excluir a entidade
+        const sqlExcluirEntidade = 'DELETE FROM entidades WHERE id = ?';
+
+        db.query(sqlExcluirEntidade, [idEntidade], (error, result) => {
+          if (error) {
+            console.error('Erro ao excluir a entidade:', error);
+            res.status(500).json({ message: 'Erro interno do servidor' });
+          } else {
+            res.cookie('alertSuccess', 'Entidade excluída com sucesso', { maxAge: 3000 })
+            res.status(200).json({ message: 'Entidade excluída com sucesso' });
+          }
+        });
+      }
+    }
+  });
+});
+
+app.post('/cadastrar-entidade', verificaAutenticacao, (req, res) => {
+  const { nome, descricao, publico, documentos, taxa } = req.body;
+  const sql = 'INSERT INTO entidades (nome, descricao, publico, documentos, taxa) VALUES (?, ?, ?, ?, ?)'
+  db.query(sql, [nome, descricao, publico, documentos, taxa], (error, result) => {
+    if (error) {
+      console.error('Erro ao cadastrar entidade:', error);
+      res.cookie('alertError', 'Erro ao cadastrar Entidade, verifique e tente novamente', { maxAge: 3000 });
+      res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+    res.cookie('alertSuccess', 'Entidade criada com Sucesso', { maxAge: 3000 });
+    res.status(200).json({ message: 'Nova entidade criada com sucesso' });
+  })
+});
 
 app.get("/logout", (req, res) => {
   // Remover as informações de autenticação da sessão

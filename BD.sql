@@ -83,4 +83,27 @@ CREATE TABLE corretores (
     corretora VARCHAR(255)
 );
 
+CREATE TABLE corretoras (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nomefantasia VARCHAR(100),
+    razaosocial VARCHAR(100),
+    cnpj NUMBER, 
+)
+
+CREATE TABLE entidades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(30),
+    descricao VARCHAR(40),
+    publico VARCHAR(60),
+    documentos VARCHAR (100),
+    taxa DECIMAL(10, 2) NOT NULL,
+)
+
+CREATE TABLE profissoes_entidades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(30),
+    id_entidade INT
+)
+
+
 

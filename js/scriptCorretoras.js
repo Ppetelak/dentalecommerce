@@ -1,14 +1,14 @@
 $(document).ready(function () {
     // Mostra todas as linhas da tabela quando a página é carregada
-    //$("tbody tr").removeClass("d-none");
+    $("tbody tr").removeClass("d-none");
 
     // Função para lidar com a busca do corretor
-    $("#searchCpf").on("input", function () {
+    $("#searchCnpj").on("input", function () {
         var searchText = $(this).val().trim().toLowerCase();
         // Exibe somente os corretores que correspondem ao CPF digitado
         $("tbody tr").each(function () {
-            var cpf = $(this).find(".cpf").text().trim().toLowerCase();
-            if (cpf.includes(searchText)) {
+            var cnpj = $(this).find(".cnpj").text().trim().toLowerCase();
+            if (cnpj.includes(searchText)) {
                 $(this).removeClass("d-none"); // Exibe o elemento
             } else {
                 $(this).addClass("d-none"); // Oculta o elemento
@@ -23,8 +23,6 @@ $(document).ready(function () {
         $row.find(".btn-edit").addClass("d-none");
         $row.find(".btn-save").removeClass("d-none");
         $row.find(".btn-cancel").removeClass("d-none");
-        var corretoraId = $row.data("operadora-id");
-        $row.find("select.edit-input").val(corretoraId);
     });
 
     // Botão "Cancelar" - Reverte para os campos de texto originais
@@ -40,18 +38,16 @@ $(document).ready(function () {
     // Botão "Salvar" - Envia os novos dados para o servidor e atualiza a tabela
     $(".btn-save").on("click", function () {
         var $row = $(this).closest("tr");
-        var idCorretor = $row.data("id"); // Defina um atributo 'data-id' no <tr> com o ID do corretor
+        var idCorretora = $row.data("id"); // Defina um atributo 'data-id' no <tr> com o ID do corretor
         var dadosAtualizados = {
-            cpf: $row.find(".edit-input:eq(0)").val(),
-            nome: $row.find(".edit-input:eq(1)").val(),
-            telefone: $row.find(".edit-input:eq(2)").val(),
-            email: $row.find(".edit-input:eq(3)").val(),
-            corretora: $row.find("select.edit-input").val()
+            cnpj: $row.find(".edit-input:eq(0)").val(),
+            razaoSocial: $row.find(".edit-input:eq(1)").val(),
+            nomeFantasia: $row.find(".edit-input:eq(2)").val(),
         };
 
         // Enviar a requisição AJAX para atualizar os dados no servidor
         $.ajax({
-            url: "/edit/" + idCorretor,
+            url: "/editCorretora/" + idCorretora,
             type: "POST",
             data: dadosAtualizados,
             success: function () {
@@ -59,28 +55,41 @@ $(document).ready(function () {
                 location.reload();
             },
             error: function () {
-                alert("Erro ao editar o corretor.");
+                alert("Erro ao editar a corretora.");
             }
         });
     });
 
+    $('.adicionar-corretora').on('click', function () {
+        const newRow = `
+          <tr>
+            <td><input type="text" class="form-control new-cnpj" placeholder="CNPJ"></td>
+            <td><input type="text" class="form-control new-razaoSocial" placeholder="Razão Social"></td>
+            <td><input type="text" class="form-control new-nomeFantasia" placeholder="Nome Fantasia"></td>
+            <td>
+              <div class="d-flex justify-content-between">
+                <button class="btn btn-success btn-save-new">Salvar</button>
+                <button class="btn btn-secondary btn-cancel-new">Cancelar</button>
+              </div>
+            </td>
+          </tr>
+        `;
+        $('tbody').prepend(newRow);
+    });
+
     $(document).on('click', '.btn-save-new', function () {
         const newRow = $(this).closest('tr');
-        const newCpf = newRow.find('.new-cpf').val();
-        const newNome = newRow.find('.new-nome').val();
-        const newTelefone = newRow.find('.new-telefone').val();
-        const newEmail = newRow.find('.new-email').val();
-        const newCorretora = newRow.find('.new-corretora').val();
+        const newCnpj = newRow.find('.new-cnpj').val();
+        const newRazaoSocial = newRow.find('.new-razaoSocial').val();
+        const newNomeFantasia = newRow.find('.new-nomeFantasia').val();
 
         $.ajax({
             type: 'POST',
-            url: '/cadastrar-corretor',
+            url: '/cadastrar-corretora',
             data: {
-                cpf: newCpf,
-                nome: newNome,
-                telefone: newTelefone,
-                email: newEmail,
-                corretora: newCorretora
+                cnpj: newCnpj,
+                razaoSocial: newRazaoSocial,
+                nomeFantasia: newNomeFantasia,
             },
             success: function (response) {
                 // Aqui você pode lidar com a resposta do servidor, se necessário
@@ -89,7 +98,7 @@ $(document).ready(function () {
             },
             error: function (error) {
                 // Aqui você pode lidar com erros, se ocorrer algum
-                console.error('Erro ao cadastrar o corretor:', error);
+                console.error('Erro ao cadastrar a corretora:', error);
             }
         });
 
@@ -100,11 +109,6 @@ $(document).ready(function () {
         newRow.find('.btn-cancel-new').addClass('d-none');
     });
 
-    $('.adicionar-corretor').on('click', function () {
-        const newRow = document.querySelector('.new-corretor');
-        newRow.classList.remove("d-none")
-    });
-
     // Cancelar novo corretor
     $(document).on('click', '.btn-cancel-new', function () {
         $(this).closest('tr').remove();
@@ -113,11 +117,11 @@ $(document).ready(function () {
     // Excluir corretor
     $(document).on('click', '.btn-delete', function () {
         const row = $(this).closest('tr');
-        const corretorId = row.data('id');
+        const corretoraId = row.data('id');
 
         $.ajax({
             type: 'DELETE',
-            url: `/corretores/${corretorId}`,
+            url: `/corretoras/${corretoraId}`,
             success: function (response) {
                 // Aqui você pode lidar com a resposta do servidor, se necessário
                 // Por exemplo, você pode atualizar a página para mostrar os dados atualizados após a exclusão
@@ -125,8 +129,10 @@ $(document).ready(function () {
             },
             error: function (error) {
                 // Aqui você pode lidar com erros, se ocorrer algum
-                console.error('Erro ao excluir o corretor:', error);
+                console.error('Erro ao excluir a corretora:', error);
             }
         });
     });
+
+
 });

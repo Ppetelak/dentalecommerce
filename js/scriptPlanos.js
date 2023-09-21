@@ -24,6 +24,27 @@ $(document).ready(function () {
     });
   });
 
+  $('.trPlanoInput').each(function () {
+    const contratacaoSelected = $(this).find('[name="contratacaoValue"]').val();
+    $(this).find('[name="contratacao"] option').each(function () {
+        if ($(this).val() === contratacaoSelected) {
+            $(this).prop('selected', true);
+        }
+    });
+    const abrangenciaSelected = $(this).find('[name="abrangencia-value"]').val()
+    $(this).find('[name="abrangencia"] option').each(function () {
+        if ($(this).val() === abrangenciaSelected) {
+            $(this).prop('selected', true);
+        }
+    });
+    const cooparticipacaoSelected = $(this).find('[name="cooparticipacao-value"]').val()
+    $(this).find('[name="coparticipacao"] option').each(function () {
+        if ($(this).val() === cooparticipacaoSelected) {
+            $(this).prop('selected', true);
+        }
+    });
+  });
+
   $(".edit-image-btn").click(function () {
 
     const dataName = $(this).data('type');

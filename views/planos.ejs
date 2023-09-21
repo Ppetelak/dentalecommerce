@@ -133,8 +133,9 @@
                       <textarea class="form-control" name="observacoes" rows="6" id="observacoes"><%= plano.observacoes %></textarea>
                     </div>
                     <div class="form-group">
+                      <input type="hidden" value="<%= plano.contratacao %>" name="contratacaoValue">
                       <label for="contratacao">Contratação</label>
-                      <select class="form-control" name="contratacao">
+                      <select class="form-control" name="contratacao" >
                         <option disabled selected value="">Selecione</option>
                         <option value="Adesão">Adesão</option>
                         <option value="Outro">Outro</option>
@@ -142,7 +143,8 @@
                     </div>
                     <div class="form-group">
                       <label for="coparticipacao">Coparticipação</label>
-                      <select class="form-control" name="coparticipacao" id="coparticipacao">
+                      <input type="hidden" value="<%= plano.coparticipacao %>" name="cooparticipacao-value">
+                      <select class="form-control" name="coparticipacao">
                         <option disabled selected value="">Selecione</option>
                         <option value="Sim">Sim</option>
                         <option value="Não">Não</option>
@@ -150,7 +152,8 @@
                     </div>
                     <div class="form-group">
                       <label for="abrangencia">Abrangência</label>
-                      <select class="form-control" name="abrangencia" id="abrangencia">
+                      <input type="hidden" value="<%= plano.abrangencia %>" name="abrangencia-value">
+                      <select class="form-control" name="abrangencia">
                         <option disabled selected value="">Selecione</option>
                         <option value="Nacional">Nacional</option>
                         <option value="Regional">Regional</option>
@@ -194,6 +197,7 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/jsActiveLink.js"></script>
   <script src="./js/scriptPlanos.js"></script>
 </body>
 

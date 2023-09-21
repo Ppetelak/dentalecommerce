@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Entidades</title>
+    <link rel="icon" type="image/png" href="./img/faviconV2_mounthermon.png" sizes="32x32">
+
+    <!-- IMPORTAÇÕES JQUERY  -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.js" integrity="sha512-0XDfGxFliYJPFrideYOoxdgNIvrwGTLnmK20xZbCAvPfLGQMzHUsaqZK8ZoH+luXGRxTrS46+Aq400nCnAT0/w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- IMPORTAÇÕES BOOTSTRAP  -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+        crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- IMPORTAÇÕES FONTES GOOGLE -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/bootstrap-icons/font/bootstrap-icons.css">
+
+</head>
+
+<body>
+    <%- include('navbar') %>
+    <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message"
+        style="display:none">
+        Sucesso!
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show fixed-top" role="alert" id="MessageError"
+        style="display:none">
+        Erro!
+    </div>
+    <div class="container mt-5 content" id="novaoperadora">
+        <h2>Cadastro de Entidades</h2>
+        <form>
+            <div class="row">
+                <!-- Primeira coluna -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome: <span>Sigla ou abreviação</span></label>
+                        <input type="text" class="form-control" id="nome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição: <span>Nome por extenso da
+                                entidade</span></label>
+                        <input type="text" class="form-control" id="descricao" name="descricao" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="publico" class="form-label">Público: <span>Público alvo da entidade</span></label>
+                        <input type="text" class="form-control" id="publico" name="publico" required>
+                    </div>
+                </div>
+                <!-- Segunda coluna -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="documentos" class="form-label">Documentos: <span>Documentos necessários para a
+                                inclusão do beneficiário na entidade</span></label>
+                        <textarea class="form-control" id="documentos" name="documentos" rows="4"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taxa" class="form-label">Taxa: <span>Valor mensal para inclusão
+                                beneficiário</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="text" class="form-control" id="taxa" name="taxa" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary cadastrar">Cadastrar</button>
+        </form>
+    </div>
+
+    <div class="container mt-5 content">
+        <h2>Entidades Cadastradas</h2>
+
+        <!-- Tabela de operadoras -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% entidades.forEach(function(entidade) { %>
+                    <tr>
+                        <td>
+                            <%= entidade.nome %>
+                        </td>
+                        <td>
+                            <%= entidade.descricao %>
+                        </td>
+                        <td>
+                            <!-- Botão "Editar" -->
+                            <button type="button" class="btn btn-primary editar-btn" data-bs-toggle="collapse"
+                                data-bs-target="#editar<%= entidade.id %>" aria-expanded="false"
+                                aria-controls="editar<%= entidade.id %>">
+                                Editar
+                            </button>
+                            <button type="button" class="btn btn-secondary cancelar-btn d-none">Cancelar</button>
+                        </td>
+                    </tr>
+                    <!-- Formulário de edição (colapsado por padrão) -->
+                    <tr class="collapse editar-form-container" id="editar<%= entidade.id %>"
+                        data-id="<%= entidade.id %>">
+                        <td colspan="4">
+                            <form class="editar-form" data-id="<%= entidade.id %>">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <!-- Primeira coluna com os primeiros campos de edição -->
+                                        <td>
+                                            <div class="mb-3">
+                                                <label for="nome" class="form-label">Nome: <span>Sigla ou
+                                                        abreviação</span></label>
+                                                <input type="text" class="form-control" id="nome" name="nome"
+                                                    value="<%= entidade.nome %>" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="descricao" class="form-label">Descrição: <span>Nome por
+                                                        extenso da entidade</span></label>
+                                                <input type="text" class="form-control" id="descricao" name="descricao"
+                                                    value="<%= entidade.descricao %>" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="publico" class="form-label">Publico: <span>Público alvo da
+                                                        entidade</span></label>
+                                                <input type="textarea" class="form-control" id="publico" name="publico"
+                                                    value="<%= entidade.publico %>" required>
+                                            </div>
+                                        </td>
+                                        <!-- Segunda coluna com os campos restantes de edição -->
+                                        <td>
+
+                                            <div class="mb-3">
+                                                <label for="documentos" class="form-label">Documentos: <span>Documentos
+                                                        necessários para a inclusão do beneficiário na
+                                                        entidade</span></label>
+                                                <textarea class="form-control" id="documentos" name="documentos"
+                                                    rows="4" required><%= entidade.documentos %></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="taxa" class="form-label">Taxa: <span>Valor mensal para
+                                                        inclusão beneficiário</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">R$</span>
+                                                    <input type="text" class="form-control" id="taxa" name="taxa"
+                                                        value="<%= entidade.taxa %>" required>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <!-- Botões "Salvar" e "Cancelar" -->
+                                            <button type="submit" class="btn btn-success salvar-btn">Salvar</button>
+                                            <button type="button" class="btn btn-danger excluir-btn"
+                                                data-id="<%= entidade.id %>">Excluir</button>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                        </td>
+                        </form>
+                    </tr>
+
+                    <% }); %>
+            </tbody>
+        </table>
+
+    </div>
+    <script src="/js/jsActiveLink.js"></script>
+    <script src="/js/jsEntidade.js"></script>
+</body>
+
+</html>

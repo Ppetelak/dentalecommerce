@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Detalhes da Implantação</title>
+    <title>Corretores</title>
     <link rel="icon" type="image/png" href="./img/faviconV2_mounthermon.png" sizes="32x32">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
@@ -12,11 +12,9 @@
 </head>
 
 <body>
-    <div class="navbardiv">
-        <%- include('navbar') %>
-    </div>
+    <%- include('navbar') %>
     <div class="content">
-        <div class="sticky-top bg-light p-3">
+        <div class="cabecalho">
             <div class="row">
                 <div class="col-6">
                     <label> Filtrar Corretor por CPF </label>
@@ -39,13 +37,37 @@
               </tr>
             </thead>
             <tbody>
+              <tr class="new-corretor d-none">
+                <td><input type="text" class="form-control new-cpf" placeholder="CPF"></td>
+                <td><input type="text" class="form-control new-nome" placeholder="Nome"></td>
+                <td><input type="text" class="form-control new-telefone" placeholder="Telefone"></td>
+                <td><input type="text" class="form-control new-email" placeholder="Email"></td>
+                <td>
+                  <select class="form-control new-corretora">
+                  <% corretoras.forEach((corretora) => { %>
+                      <option value="<%= corretora.id %>"><%= corretora.nomeFantasia %></option>
+                  <% }); %>
+                  </select></td>
+                <td>
+                  <div class="d-flex justify-content-between">
+                    <button class="btn btn-success btn-save-new">Salvar</button>
+                    <button class="btn btn-secondary btn-cancel-new">Cancelar</button>
+                  </div>
+                </td>
+              </tr>
               <% corretores.forEach((corretor) => { %>
-              <tr data-id="<%= corretor.id %>">
+              <tr data-id="<%= corretor.id %>" data-operadora-id="<%= corretor.corretora %>">
                 <td class="cpf"><span class="edit-field"><%= corretor.cpf %></span><input class="edit-input d-none" value="<%= corretor.cpf %>"></td>
                 <td><span class="edit-field"><%= corretor.nome %></span><input class="edit-input d-none" value="<%= corretor.nome %>"></td>
                 <td><span class="edit-field"><%= corretor.telefone %></span><input class="edit-input d-none" value="<%= corretor.telefone %>"></td>
                 <td><span class="edit-field"><%= corretor.email %></span><input class="edit-input d-none" value="<%= corretor.email %>"></td>
-                <td><span class="edit-field"><%= corretor.corretora %></span><input class="edit-input d-none" value="<%= corretor.corretora %>"></td>
+                <td>
+                    <span class="edit-field"><%= corretor.corretoraNome %></span>
+                    <select class="edit-input d-none">
+                    <% corretoras.forEach((corretora) => { %>
+                        <option value="<%= corretora.id %>"><%= corretora.nomeFantasia %></option>
+                    <% }); %>
+                    </select>
                 <td>
                   <div class="d-flex justify-content-between">
                     <% if (corretor.editing) { %>
@@ -67,7 +89,7 @@
             </tbody>
           </table>
     </div>
-
+    <script src="/js/jsActiveLink.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/js/scriptCorretores.js"></script>
       
