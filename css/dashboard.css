@@ -18,6 +18,60 @@ h1 {
     font-size: 18px;
 }
 
+.divTag{
+    background: var(--CorMHAmarelo);
+    width: fit-content;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    color: var(--Branco);
+    border-radius: 10px;
+}
+
+.removerTag{
+    background: var(--CorMHAmarelo);
+    width: fit-content;
+    height: fit-content;
+    border: none;
+    color: var(--Branco);
+}
+
+.inputProfissoes {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 1rem 1rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    margin-bottom: 12px;
+    gap: 12px;
+}
+
+
+.add{
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+}
+
+.tag {
+    background:#BE7512;
+    border-radius: 10px;
+    padding: 2px;
+}
+
+.bootstrap-tagsinput{
+    line-height: 42px;
+    padding: 20px 20px;
+}
+
 .input-container {
     display: flex;
     align-items: center;
@@ -205,6 +259,11 @@ a {
     padding: 10px;
     color: #fff;
     border-radius: 5px;
+}
+
+span{
+    font-weight: 300;
+    font-size: 12px;
 }
 
 

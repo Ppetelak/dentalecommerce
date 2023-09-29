@@ -1,5 +1,14 @@
+function mascaras() {
+  $('[name="pgtoAnualCartao"]').mask('0000.00', { reverse: true });
+  $('[name="pgtoAnualCartao3x"]').mask('0000.00', { reverse: true });
+  $('[name="pgtoAnualAvista"]').mask('0000.00', { reverse: true });
+}
+
+
+
 $(document).ready(function () {
   // Selecionar todos os botões de editar
+  mascaras();
   const btnEditar = document.querySelectorAll('.btn-editar');
 
   // Adicionar o evento de clique em cada botão de editar
@@ -107,29 +116,51 @@ $('#addPlano').click(function () {
       <h4 class="text-center">Formas de pagamento</h4>
       <div class="row">
         <div class="col-7">
-          <label>Descrição</label>
+          <label><strong>Descrição</strong></label>
         </div>
         <div class="col-3">
-          <label>Valor</label>
+          <label><strong>Valor</strong></label>
         </div>
       </div>
       <div class="row pagamento">
-        <div class="col-7">
-          <input type="text" class="form-control field-edit" value="" name="formadePagamento">
-        </div>
-        <div class="col-3">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text">R$</span>
-            </div>
-            <input type="number" class="form-control field-edit" value="" name="valorPagamento">
-          </div>
-        </div>
-        <div class="col-2">
-          <button class="btn btn-danger excluirPagamento" type="button">Remover</button>
-        </div>
-      </div>
-      <button class="btn btn-secondary addPagamento" type="button">Adicionar Forma de Pgamento</button>
+                    <div class="row">
+                      <div class="col-7">
+                        <label for="pgtoAnualAvista"> Valor anual á vista <span> (Válido para pgto no boleto, pix ou cartão de crédito)</span>  </label> 
+                      </div>
+                      <div class="col-3">
+                        <div class="input-group">
+                          <span class="input-group-text">R$</span>
+                          <input type="text" class="form-control" id="pgtoAnualAvista" name="pgtoAnualAvista"
+                              value="" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-7">
+                        <label for="pgtoAnualCartao"> Valor anual no cartão de crédito <span>(em até 12x)</span> </label>   
+                      </div>
+                      <div class="col-3">
+                        <div class="input-group">
+                          <span class="input-group-text">R$</span>
+                          <input type="text" class="form-control" id="pgtoAnualCartao" name="pgtoAnualCartao"
+                              value="" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-7">
+                        <label for="pgtoAnualCartao3x"> Valor anual no cartão de crédito <span>(em até 12x)</span> </label>   
+                      </div>
+                      <div class="col-3">
+                        <div class="input-group">
+                          <span class="input-group-text">R$</span>
+                          <input type="text" class="form-control" id="pgtoAnualCartao3x" name="pgtoAnualCartao3x"
+                              value="" required>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
     </div>
     <div class="row">
       <div class="col-6">
@@ -180,6 +211,7 @@ $('#addPlano').click(function () {
   const tbody = document.querySelector('tbody');
   // Adiciona o novoTrHTML ao <tbody> da tabela existente
   tbody.innerHTML += novoTrHTML;
+  mascaras();
   $(".btn-salvar").click(function () {
     const trElement = $(this).closest("tr");
     salvarPlano(trElement);
@@ -237,15 +269,6 @@ $(".btn-salvar").click(function () {
 
 function salvarPlano(trElement) {
   const planoId = trElement.data("id");
-  let formasDePagamento = [];
-
-  trElement.find('.pagamento').each(function () {
-    const pagamentosData = {
-      descricao: $(this).find('[name="formadePagamento"]').val(),
-      valor: $(this).find('[name="valorPagamento"]').val()
-    }
-    formasDePagamento.push(pagamentosData)
-  })
 
   let plano = {
     id: planoId,
@@ -258,16 +281,18 @@ function salvarPlano(trElement) {
     contratacao: trElement.find("select[name=contratacao]").val(),
     coparticipacao: trElement.find("select[name=coparticipacao]").val(),
     abrangencia: trElement.find("select[name=abrangencia]").val(),
+    pgtoAnualAvista: trElement.find("input[name=pgtoAnualAvista]").val(),
+    pgtoAnualCartao: trElement.find("input[name=pgtoAnualCartao]").val(),
+    pgtoAnualCartao3x: trElement.find("input[name=pgtoAnualCartao3x]").val(),
   }
 
-  console.log(formasDePagamento)
   console.log(plano)
 
   $.ajax({
     url: '/atualiza-planos',
     type: 'POST',
     contentType: 'application/json', 
-    data: JSON.stringify({ plano: plano , formasDePagamento: formasDePagamento }),
+    data: JSON.stringify({ plano: plano }),
     success: function (response) {
       console.log(response.message)
       location.reload()
@@ -279,50 +304,9 @@ function salvarPlano(trElement) {
   });
 }
 
-$(document).on('click', '.addPagamento', function () {
-  const button = $(this);
-
-  const novaLinha = `<div class="row pagamento">
-  <div class="col-7">
-    <input type="text" class="form-control field-edit" value="" name="formadePagamento">
-  </div>
-  <div class="col-3">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text">R$</span>
-        </div>
-        <input type="number" class="form-control field-edit" value="" name="valorPagamento">
-      </div>
-    </div>
-  <div class="col-2">
-    <button class="btn btn-danger excluirPagamento" type="button">Remover</button>
-  </div>
-</div>`
-
-  button.before(novaLinha);
-});
-
-$(document).on('click', '.excluirPagamento', function () {
-  console.log('Clicou em cancelar excluir pagamento')
-  const linhaRemovida = $(this).closest('.pagamento');
-  linhaRemovida.remove();
-});
-
-function getCookieValue(name) {
-  const cookieName = `${name}=`;
-  const cookies = document.cookie.split(';');
-  for (let i = 0; i < cookies.length; i++) {
-      let cookie = cookies[i].trim();
-      if (cookie.startsWith(cookieName)) {
-          return cookie.substring(cookieName.length, cookie.length);
-      }
-  }
-  return '';
-}
-
 if (document.cookie.includes('alertSuccess')) {
-  const alertSucess = getCookieValue('alertSuccess');
-  showMessage(alertSucess);
+  const alertSuccess = getCookieValue('alertSuccess');
+  showMessage(alertSuccess);
   document.cookie = 'alertSuccess=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 }
 

@@ -112,16 +112,8 @@
                         </p>
 
                         <div class="valores">
-                            <% if(pagamentos.length > 0) { %> 
-                                <% pagamentos.forEach(function(pagamento) { %>
-                                    <% if(pagamento.id_plano === plano.id) { %>
-                                        <p> <%= pagamento.descricao %> </p>
-                                        <h4 class="planoValor"> R$ <%= pagamento.valor %> </h4>
-                                    <% } %>
-                                <% }) %>
-                            <% } else { %>
-                                <p> Não existem formas de pagamento vinculados a esse plano</p>
-                            <% } %>
+                                        <p> Á partir de 12x de </p>
+                                        <h4 class="planoValor"> R$ <%= (plano.pgtoAnualAvista / 12).toFixed(2) %> </h4>
                         </div>
                         <p class="planoPgmento">
                             <%= plano.observacoes %>

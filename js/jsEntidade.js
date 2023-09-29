@@ -4,7 +4,81 @@ function mascaras() {
 
 $(document).ready(function () {
     mascaras();
+    $('#tags').tagsinput();
+    
 });
+
+$('.tags').on('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Impede o envio do formulário
+        $('.addTag').click(); // Aciona o clique no botão addTag
+    }
+});
+
+
+$('.addTag').click(function () {
+    console.log('clicou em adicionar tag');
+    var $container = $(this).closest('.profissoesDiv');
+    var value = $container.find('.tags').val();
+    var inputProfissoes = $container.find('.inputProfissoes') // Use jQuery para obter o valor do input
+
+    // Verifique se o campo está vazio
+    if (value.trim() === '') {
+        showMessageError('Insira uma Profissão depois aperte enter ou clique no botão "+" ');
+        return; // Sai da função se o campo estiver vazio
+    }
+
+    // Crie um novo elemento divTag usando jQuery
+    var divTag = `
+    <div class="divTag">
+        ${value}
+        <button type="button" class="removerTag"> <i class="bi bi-x"></i> </button>
+    </div>
+    `;
+
+    // Adicione divTag à div.inputProfissoes usando jQuery
+    inputProfissoes.append(divTag);
+
+    // Limpe o valor do campo de entrada
+    $container.find('.tags').val('');
+})
+
+
+$('.inputProfissoes').on('click', '.removerTag', function() {
+    $(this).parent('.divTag').remove();
+});
+
+function renderizarProfissoes(profissoes) {
+    const inputProfissoes = $('.inputProfissoes');
+    inputProfissoes.empty(); // Limpa o conteúdo atual
+
+    // Itera sobre as profissões e cria as divs
+    profissoes.forEach(function(profissao) {
+        const divTag = `
+            <div class="divTag">
+                ${profissao.nome} <!-- Renderiza o nome da profissão -->
+                <button type="button" class="removerTag"> <i class="bi bi-x"></i> </button>
+            </div>
+        `;
+        inputProfissoes.append(divTag);
+    });
+}
+
+function getProfissoes (idEntidade) {
+    fetch(`/api/profissoes/${idEntidade}`)
+    .then(response => {
+        if (!response.ok) {
+        throw new Error('Erro ao buscar profissões');
+        }
+        return response.json();
+    })
+    .then(data => {
+        renderizarProfissoes(data);
+    })
+    .catch(error => {
+        console.error('Erro ao buscar dados das profissões:', error);
+    });
+}
 
 function getCookieValue(name) {
     const cookieName = `${name}=`;
@@ -35,6 +109,9 @@ function showMessage(message) {
     Mensagem.innerHTML = `${decodeURIComponent(message)} 
      <button type="button" class="btn btn-close" data-bs-dismiss="alert" aria-label="Fechar"> X </button>`
     Mensagem.style.display = 'block';
+    setTimeout(function() {
+        Mensagem.style.display = 'none';
+    }, 6000);
 }
 
 function showMessageError(message) {
@@ -42,10 +119,15 @@ function showMessageError(message) {
     Mensagem.innerHTML = `ALERTA: ${decodeURIComponent(message)} 
      <button type="button" class="btn btn-close" data-bs-dismiss="alert" aria-label="Fechar"> X </button>`
     Mensagem.style.display = 'block';
+    setTimeout(function() {
+        Mensagem.style.display = 'none';
+    }, 6000);
 }
 
 let formularioAberto = false;
 $('.editar-btn').click(function () {
+    const idEntidade = $(this).closest('tr').next('.editar-form-container').data('id');
+    getProfissoes(idEntidade);
     const tr = $(this).closest('tr');
     const formContainer = tr.next('.editar-form-container');
     const form = formContainer.find('.editar-form');
@@ -68,18 +150,30 @@ $('.editar-btn').click(function () {
 
 $('.editar-form').submit(function (e) {
     e.preventDefault();
-    console.log('clicou em salvar')
     const form = $(this);
+    const idEntidade = form.data('id');
+    console.log('clicou em salvar')
+    const tags = [];
+
+    const divTags = form.find('.divTag');
+
+    if (divTags.length > 0) {
+        divTags.each(function () {
+            const tagText = $(this).text().trim();
+            tags.push(tagText);
+        });
+    }
+
     const formData = {
         nome: form.find('#nome').val(),
         descricao: form.find('#descricao').val(),
         publico: form.find('#publico').val(),
         documentos: form.find('#documentos').val(),
         taxa: form.find('#taxa').val(),
+        profissoes: tags
     };
     console.log(formData);
 
-    const idEntidade = form.data('id');
     $.ajax({
         type: 'POST',
         url: `/editar-entidade/${idEntidade}`,
@@ -87,7 +181,6 @@ $('.editar-form').submit(function (e) {
         success: function (response) {
             console.log('Sucesso', response)
             location.reload();
-
         },
         error: function (err) {
             showMessageError('Erro ao enviar os dados:', err);
@@ -95,6 +188,7 @@ $('.editar-form').submit(function (e) {
         },
     });
 });
+
 
 $('.excluir-btn').click(function () {
     const form = $(this);
@@ -122,13 +216,24 @@ $('.cadastrar').click(function (e) {
         showMessageError('Por favor, preencha todos os campos obrigatórios.');
         return;
     }
+
+    const tags = [];
+
+    $('.divTag').each(function () {
+        const tagText = $(this).text().trim();
+        tags.push(tagText);
+    });
+
     const formData = {
         nome: $('#nome').val(),
         descricao: $('#descricao').val(),
         publico: $('#publico').val(),
         documentos: $('#documentos').val(),
         taxa: $('#taxa').val(),
+        profissoes: tags
     };
+
+    console.log(formData)
 
     // Envie os dados do formulário para a rota no servidor
     $.ajax({

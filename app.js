@@ -9,6 +9,7 @@ const crypto = require("crypto");
 const cookie = require('cookie-parser');
 const multer = require('multer');
 const fs = require('fs');
+const uuid = require('uuid');
 const { format } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
 const porta = process.env.PORT || 5586; 
@@ -147,36 +148,34 @@ app.post('/salvarLogo', (req, res) => {
 
 app.get("/", (req, res) => {
   const queryPlanos = 'SELECT * FROM planos'
-  const queryPagamentos =  'SELECT * FROM formasdepagamento'
   db.query(queryPlanos, (err, resultPlanos) =>{
-    if(err) {
-      console.error('Erro ao consultar o banco de dados:', err);
-      return res.status(500).json({ error: 'Erro ao processar consulta ao BD'})
-    }
-    db.query(queryPagamentos, (err, resultPagamentos) => {
-      if(err) {
-        console.error('Erro ao consultar o banco de dados:', err)
-      }
-      res.render("index", { planos: resultPlanos, pagamentos: resultPagamentos });
-    })
+  if(err) {
+    console.error('Erro ao consultar o banco de dados:', err);
+    return res.status(500).json({ error: 'Erro ao processar consulta ao BD'})
+  }
+    res.render("index", { planos: resultPlanos });
   })
 });
 
 app.post("/formulario", (req, res) => {
   const planoId = req.body.planoSelecionado;
   const query = 'SELECT * FROM planos WHERE id = ?';
+  const queryProfissoes = 'SELECT * FROM profissoes'
   db.query(query, [planoId], (err, result) => {
     if (err) {
       console.error('Erro ao consultar o banco de dados:', err);
       return res.status(500).json({ error: 'Erro ao processar consulta ao BD' });
     } else {
-      // Verifica se foi encontrado algum plano com o ID informado
       if (result.length === 0) {
         return res.status(404).json({ error: 'Plano não encontrado' });
       }
-
-      const planoCompleto = result[0];
-      res.render("formulario", { planoSelecionado: planoCompleto });
+      db.query(queryProfissoes, (err, resultProfissoes) => {
+        if(err){
+          console.error('Erro ao resgatar profissoes do BD')
+        }
+        const planoCompleto = result[0];
+        res.render("formulario", { planoSelecionado: planoCompleto, profissoes: resultProfissoes });
+      })
     }
   });
 });
@@ -200,9 +199,55 @@ app.get("/buscar-corretor", (req, res) => {
   });
 });
 
-app.post("/enviadados", (req, res) => {
+function generateRandomDigits(length) {
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += Math.floor(Math.random() * 10);
+  }
+  return result;
+}
+
+async function generateUniqueProposalNumber() {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Mês com 2 dígitos
+  const day = currentDate.getDate().toString().padStart(2, '0'); // Dia com 2 dígitos
+  let randomPart;
+
+  // Tente gerar um número único até encontrar um que não exista no banco de dados
+  while (true) {
+    randomPart = generateRandomDigits(4); // 4 dígitos aleatórios
+    const proposalNumber = `${year}${month}${day}${randomPart}`;
+
+    const exists = await checkProposalExists(proposalNumber);
+    if (!exists) {
+      return proposalNumber; // Retorna o número único
+    }
+  }
+}
+
+function checkProposalExists(proposalNumber) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      'SELECT * FROM implantacoes WHERE numeroProposta = ?',
+      [proposalNumber],
+      (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(results.length > 0);
+        }
+      }
+    );
+  });
+}
+
+app.post("/enviadados", async (req, res) => {
   const dados = req.body;
   const dependentes = [];
+
+  const numeroProposta = await generateUniqueProposalNumber();
+
   for (let i = 0; i < dados.cpfdependente.length; i++) {
     dependentes.push({
       cpfdependente: dados.cpfdependente[i],
@@ -270,6 +315,7 @@ app.post("/enviadados", (req, res) => {
     formaPagamento: dados.formaPagamento,
     aceitoTermos: dados.aceitoTermos,
     aceitoPrestacaoServicos: dados.aceitoPrestacaoServicos,
+    numeroProposta: numeroProposta
   };
 
   db.query(
@@ -413,8 +459,10 @@ app.get('/gerarContrato/:id', (req, res) => {
   const idImplantacao = req.params.id;
   const queryImplantacoes = 'SELECT * FROM implantacoes WHERE id=?';
   const queryPlano = 'SELECT * FROM planos WHERE id=?';
+  const queryProfissao = 'SELECT * FROM profissoes WHERE nome= ?';
+  const queryEntidade = 'SELECT * FROM entidades WHERE id=?';
 
-  // Primeira consulta para obter dados da implantação
+ 
   db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
     if (err) {
       console.log('Erro ao buscar implantação no BD', err);
@@ -422,77 +470,43 @@ app.get('/gerarContrato/:id', (req, res) => {
       return;
     }
 
-    // Verifique se a consulta retornou algum resultado
     if (resultImplantacoes.length === 0) {
       res.status(404).send('Implantação não encontrada');
       return;
     }
 
-    // Segunda consulta para obter dados do plano vinculado à implantação
-    const planoId = resultImplantacoes[0].planoSelecionado;
-    db.query(queryPlano, [planoId], (err, resultPlano) => {
-      if (err) {
-        console.error('Erro ao buscar plano vinculado à implantação', err);
-        res.status(500).send('Erro ao buscar plano vinculado à implantação');
-        return;
-      }
-      const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
-      const dia = String(data_implantacao.getDate()).padStart(2, '0');
-      const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
-      const ano = data_implantacao.getFullYear();
-      const dataFormatada = `${dia}/${mes}/${ano}`;
+    const nomeProfissao = resultImplantacoes[0].profissaotitular;
 
-      // Renderize a página 'contrato' com os dados da implantação e do plano
-      res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada });
-    });
+    db.query(queryProfissao, [nomeProfissao], (err, resultProfissao) => {
+      if(err){
+        console.error('Erro ao buscar dados da entidade relacionada a profissão')
+      }
+      const entidadeId = resultProfissao[0].idEntidade;
+
+      db.query(queryEntidade, [entidadeId], (err, resultEntidade) => {
+        if(err){
+          console.error('Erro puxar entidade relacionada', err)
+        }
+        const planoId = resultImplantacoes[0].planoSelecionado;
+        db.query(queryPlano, [planoId], (err, resultPlano) => {
+          if (err) {
+            console.error('Erro ao buscar plano vinculado à implantação', err);
+            res.status(500).send('Erro ao buscar plano vinculado à implantação');
+            return;
+          }
+          const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
+          const dia = String(data_implantacao.getDate()).padStart(2, '0');
+          const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
+          const ano = data_implantacao.getFullYear();
+          const dataFormatada = `${dia}/${mes}/${ano}`;
+  
+          // Renderize a página 'contrato' com os dados da implantação e do plano
+          res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade:resultEntidade[0], profissao: resultProfissao[0] });
+        });
+      })
+    })    
   });
 });
-
-/* app.get('/corretores', (req, res) => {
-  // Consulta no banco de dados para buscar os dados dos corretores
-  db.query('SELECT * FROM corretores', (error, results) => {
-    if (error) {
-      console.error('Erro ao consultar o banco de dados:', error);
-      return res.status(500).send('Erro ao consultar o banco de dados.');
-    }
-
-    // Adicione a propriedade "editing: false" a cada corretor do resultado da consulta
-    const corretores = results.map(corretor => {
-      return { ...corretor, editing: false };
-    });
-
-    // Renderiza a página "corretores" e passa os dados dos corretores para o template
-    res.render('corretores', { corretores });
-  });
-}); */
-
-/* app.get('/corretores', (req, res) => {
-  // Consulta no banco de dados para buscar os dados dos corretores
-  db.query('SELECT * FROM corretores', (error, corretoresResult) => {
-    if (error) {
-      console.error('Erro ao consultar o banco de dados de corretores:', error);
-      return res.status(500).send('Erro ao consultar o banco de dados de corretores.');
-    }
-
-    // Consulta no banco de dados para buscar os dados das corretoras
-    db.query('SELECT * FROM corretoras', (error, corretorasResult) => {
-      if (error) {
-        console.error('Erro ao consultar o banco de dados de corretoras:', error);
-        return res.status(500).send('Erro ao consultar o banco de dados de corretoras.');
-      }
-
-      // Mapeie os resultados das consultas para criar arrays de corretores e corretoras
-      const corretores = corretoresResult.map(corretor => {
-        return { ...corretor, editing: false };
-      });
-
-      const corretoras = corretorasResult;
-
-      // Renderize a página "corretores" e passe os dados de corretores e corretoras para o template
-      res.render('corretores', { corretores, corretoras });
-    });
-  });
-}); */
 
 app.get('/corretores', (req, res) => {
   // Consulta no banco de dados para buscar os dados dos corretores juntamente com as informações das corretoras vinculadas
@@ -521,8 +535,6 @@ app.get('/corretores', (req, res) => {
     });
   });
 });
-
-
 
 app.post('/edit/:id', (req, res) => {
   const idCorretor = req.params.id;
@@ -644,7 +656,6 @@ app.delete('/corretoras/:id', (req, res) => {
 
 app.get('/planos', (req, res) => {
   const queryPlanos = 'SELECT * FROM planos';
-  const queryPagamentos = 'SELECT * FROM formasdepagamento';
   const files = fs.readdirSync('arquivos/');
 
   db.query(queryPlanos, (err, resultPlanos) => {
@@ -652,18 +663,12 @@ app.get('/planos', (req, res) => {
       console.error('Erro ao consultar o banco de dados:', err);
       res.status(500).send('Erro ao consultar os planos');
     } 
-    db.query(queryPagamentos, (err, resultPagamentos) => {
-      if(err){
-        console.error('Erro ao consultar os pagamentos:', err);
-        res.status(500).send('Erro ao consultar os pagamentos');
-      }
-      res.render('planos', { planos: resultPlanos, pagamentos: resultPagamentos, files:files });
-    }) 
+    res.render('planos', { planos: resultPlanos, files:files });
   })
 });
 
 app.post('/atualiza-planos', (req, res) => {
-  const { plano, formasDePagamento } = req.body;
+  const { plano } = req.body;
 
   // Inicie a transação
   db.beginTransaction((err) => {
@@ -682,72 +687,30 @@ app.post('/atualiza-planos', (req, res) => {
 
       if (rows.length > 0) {
         // O plano existe, atualize-o
-        const updateQuery = 'UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ? WHERE id = ?';
-        db.query(updateQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia, plano.id], (err, result) => {
+        const updateQuery = 'UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ?, pgtoAnualAvista = ?, pgtoAnualCartao =? , pgtoAnualCartao3x = ? WHERE id = ?';
+        db.query(updateQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia, plano.pgtoAnualAvista, plano.pgtoAnualCartao, plano.pgtoAnualCartao3x, plano.id], (err, result) => {
           if (err) {
             console.error('Erro ao atualizar plano:', err);
             return rollbackAndRespond(res, 'Erro interno do servidor');
           }
-
-          // Agora você pode prosseguir com a exclusão e inserção das formas de pagamento
-          deleteAndInsertFormasDePagamento(plano.id, formasDePagamento, res);
           res.cookie('alertSuccess', 'Plano atualizado com sucesso', {maxAge: 3000});
+          res.status(200).json({ message: 'Plano atualizado com sucesso' });
         });
       } else {
         // O plano não existe, crie-o
-        const createQuery = 'INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        db.query(createQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia], (err, result) => {
+        const createQuery = 'INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia, pgtoAnualAvista, pgtoAnualCartao, pgtoAnualCartao3x) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        db.query(createQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia, plano.pgtoAnualAvista, plano.pgtoAnualCartao, plano.pgtoAnualCartao3x], (err, result) => {
           if (err) {
             console.error('Erro ao criar plano:', err);
             return rollbackAndRespond(res, 'Erro interno do servidor');
           }
-
-          // Obtenha o ID do plano recém-criado
-          const novoPlanoId = result.insertId;
-
-          // Agora você pode prosseguir com a exclusão e inserção das formas de pagamento
-          deleteAndInsertFormasDePagamento(novoPlanoId, formasDePagamento, res);
           res.cookie('alertSuccess', 'Plano inserido com sucesso', {maxAge: 3000});
+          res.status(200).json({ message: 'Plano inserido com sucesso' });
         });
       }
     });
   });
 });
-
-function deleteAndInsertFormasDePagamento(planoId, formasDePagamento, res) {
-  // Exclua as formas de pagamento existentes para o plano
-  const deleteQuery = 'DELETE FROM formasdepagamento WHERE id_plano = ?';
-  db.query(deleteQuery, [planoId], (err, deleteResult) => {
-    if (err) {
-      console.error('Erro ao excluir formas de pagamento:', err);
-      return rollbackAndRespond(res, 'Erro interno do servidor');
-    }
-
-    // Insira as novas formas de pagamento associadas ao plano
-    const insertQuery = 'INSERT INTO formasdepagamento (descricao, valor, id_plano) VALUES (?, ?, ?)';
-    if (Array.isArray(formasDePagamento)) {
-      for (const pagamento of formasDePagamento) {
-        db.query(insertQuery, [pagamento.descricao, pagamento.valor, planoId], (err, insertResult) => {
-          if (err) {
-            console.error('Erro ao inserir forma de pagamento:', err);
-            return rollbackAndRespond(res, 'Erro interno do servidor');
-          }
-        });
-      }
-    }
-
-    // Confirmar a transação após a exclusão e inserção bem-sucedidas
-    db.commit((err) => {
-      if (err) {
-        console.error('Erro ao confirmar a transação:', err);
-        return rollbackAndRespond(res, 'Erro interno do servidor');
-      }
-
-      // Transação bem-sucedida
-      res.status(200).json({ message: 'Plano atualizado com sucesso' });
-    });
-  });
-}
 
 function rollbackAndRespond(res, message) {
   // Reverter a transação em caso de erro
@@ -760,28 +723,32 @@ function rollbackAndRespond(res, message) {
 app.post('/deleta-plano', (req,res) => {
   const idPlano = req.body.id;
   const query = 'DELETE FROM planos WHERE id = ?';
-  const queryDeletePagamentos = 'DELETE FROM formasdepagamento WHERE id_plano = ?';
-  db.query(queryDeletePagamentos, [idPlano], (err, result) =>{
-    if(err){
-      console.error('Erro ao excluir Pagamentos')
-      return res.status(500).json({ message: 'Erro na exclusão do Pagamento'});
+  db.query(query, [idPlano], (err, result) => {
+    if(err) {
+      console.error('Erro ao excluir plano, ou ID não existe, erro: ' , err);
+      return res.status(500).json({ message: 'Erro na exclusão do plano selecionado'});
     }
-    db.query(query, [idPlano], (err, result) => {
-      if(err) {
-        console.error('Erro ao excluir plano, ou ID não existe, erro: ' , err);
-        return res.status(500).json({ message: 'Erro na exclusão do plano selecionado'});
-      }
-      res.status(200).json({ message: 'Plano excluído com sucesso '});
-    })
+    res.status(200).json({ message: 'Plano excluído com sucesso '});
   });
 })
 
 app.get('/entidades', verificaAutenticacao, (req, res) => {
-  db.query('SELECT * FROM entidades', (error, results) => {
+  db.query('SELECT * FROM entidades', (error, resultsEntidades) => {
     if (error) throw error;
-    res.render('entidades', { entidades: results });
+    res.render('entidades', { entidades: resultsEntidades});
   })
 })
+
+app.get('/api/profissoes/:id', verificaAutenticacao, (req, res) => {
+  var idEntidade = req.params.id
+  db.query('SELECT * FROM profissoes WHERE idEntidade = ?',[idEntidade], (error, resultsProfissoes) => {
+    if (error) {
+      res.status(500).json({ error: 'Erro ao buscar profissões' });
+    } else {
+      res.json(resultsProfissoes);
+    }
+  });
+});
 
 app.post('/editar-entidade/:id', verificaAutenticacao, (req, res) => {
   const idEntidade = req.params.id;
@@ -791,34 +758,53 @@ app.post('/editar-entidade/:id', verificaAutenticacao, (req, res) => {
     publico,
     documentos,
     taxa,
+    profissoes
   } = req.body;
 
   const sql =
     'UPDATE entidades SET nome=?, descricao=?, publico=?, documentos=?, taxa=? WHERE id=?';
-
-  db.query(
-    sql,
-    [
-      nome,
-      descricao,
-      publico,
-      documentos,
-      taxa,
-      idEntidade,
-    ],
-    (error, result) => {
+  const sqlDeleteProfissoes = 'DELETE FROM profissoes WHERE idEntidade = ?'
+  const sqlInsertProfissoes = 'INSERT INTO profissoes (nome, idEntidade) VALUES (?, ?)';
+  
+  // Verifique se há algo dentro de profissoes
+  if (Array.isArray(profissoes) && profissoes.length > 0) {
+    db.query(sqlDeleteProfissoes, [idEntidade], (err, result) => {
+      if(err){
+        console.error('Erro ao deletar profissões relacionadas', err)
+      }
+      db.query( sql, [nome, descricao, publico, documentos, taxa, idEntidade],(error, result) => {
+        if (error) {
+          console.error('Erro ao atualizar entidade:', error);
+          res.cookie('alertError', 'Erro ao atualizar Entidade, verifique e tente novamente', {
+            maxAge: 3000,
+          });
+          res.status(500).json({ message: 'Erro interno do servidor' });
+        }
+        profissoes.forEach((profissao) => {
+          db.query(sqlInsertProfissoes, [profissao, idEntidade], (err, result) => {
+            if(err){
+              console.error('Erro ao CADASTRAR profissões relacionadas', err)
+            }
+            res.cookie('alertSuccess', 'Entidade atualizada com Sucesso', { maxAge: 3000 });
+            res.status(200).json({ message: 'Entidade atualizada com sucesso' });
+          });
+        })
+      })  
+    });
+  } else {
+    // Se profissoes estiver vazio, continue sem excluir ou inserir
+    db.query( sql, [nome, descricao, publico, documentos, taxa, idEntidade],(error, result) => {
       if (error) {
-        console.error('Erro ao atualizar operadora:', error);
+        console.error('Erro ao atualizar entidade:', error);
         res.cookie('alertError', 'Erro ao atualizar Entidade, verifique e tente novamente', {
           maxAge: 3000,
         });
         res.status(500).json({ message: 'Erro interno do servidor' });
-      } else {
-        res.cookie('alertSuccess', 'Entidade atualizada com Sucesso', { maxAge: 3000 });
-        res.status(200).json({ message: 'Entidade atualizada com sucesso' });
       }
-    }
-  );
+      res.cookie('alertSuccess', 'Entidade atualizada com Sucesso', { maxAge: 3000 });
+      res.status(200).json({ message: 'Entidade atualizada com sucesso' });
+    });
+  }
 });
 
 app.delete('/excluir-entidade/:id', verificaAutenticacao, (req, res) => {
@@ -856,13 +842,26 @@ app.delete('/excluir-entidade/:id', verificaAutenticacao, (req, res) => {
 });
 
 app.post('/cadastrar-entidade', verificaAutenticacao, (req, res) => {
-  const { nome, descricao, publico, documentos, taxa } = req.body;
+  const { nome, descricao, publico, documentos, taxa, profissoes } = req.body;
   const sql = 'INSERT INTO entidades (nome, descricao, publico, documentos, taxa) VALUES (?, ?, ?, ?, ?)'
+  const sqlProfissoes = 'INSERT INTO profissoes (nome, idEntidade) VALUES(?, ?)'
   db.query(sql, [nome, descricao, publico, documentos, taxa], (error, result) => {
     if (error) {
       console.error('Erro ao cadastrar entidade:', error);
       res.cookie('alertError', 'Erro ao cadastrar Entidade, verifique e tente novamente', { maxAge: 3000 });
       res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+
+    const idEntidade = result.insertId;
+
+    if (Array.isArray(profissoes)){
+      profissoes.forEach((profissao) => {
+        db.query(sqlProfissoes, [profissao, idEntidade], (err, result) => {
+          if(err){
+            comsole.error('Erro ao cadastrar profissao relacionada', err)
+          }     
+        })
+      })
     }
     res.cookie('alertSuccess', 'Entidade criada com Sucesso', { maxAge: 3000 });
     res.status(200).json({ message: 'Nova entidade criada com sucesso' });

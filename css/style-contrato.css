@@ -4,6 +4,12 @@
     --Branco: #ffffff;
     --Cinza: #DCDCDC;
     --Preto: #000000;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 92%;
+    font: inherit;
+    vertical-align: baseline;
 }
 
 body {
@@ -15,11 +21,20 @@ main{
     display: flex;
     width: 21cm;
     flex-direction: column;
-    min-height: 100vh;
     background: var(--Branco);
     margin: auto;
     padding: 3rem;
     border: 1px solid rgba(0, 0, 0, 0.096);
+}
+
+.row {
+    margin-left: 0;
+    margin-right: 0;
+    font: inherit;
+}
+
+.header{
+    width: 100%;
 }
 
 .topo {
@@ -53,7 +68,7 @@ button{
     color: var(--Preto);
 }
 
-h1 {
+h6 {
     background: var(--CorMHAmarelo);
     color: var(--Branco);
     font-size: 18px;
@@ -61,25 +76,164 @@ h1 {
     font-variant: small-caps;
 }
 
+h3 {
+    font-size:12px
+}
+
+.pagamento p {
+    font-size: 12px;
+    line-height: 0;
+}
+
 .dados p{
     font-weight: bold;
     font-size: 12px;
     padding: 0;
 }
-.dados span{
+.dados span, .plano span{
     font-weight: 400;
+    font-size: 12px;
 }
 
 .dados{
     line-height: 1;
 }
 
-.a4 {
-    width: 210mm;
-    height: 297mm;
-    margin: 0;
-    padding: 0;
-    page-break-after: always;
+.titulo {
+    background: var(--CorMHAmarelo);
+}
+
+.titulo label{
+    font-size: 12px;
+    line-height: 1;
+    color: var(--Branco);
+}
+
+.manual {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 10px;
+}
+
+.manual h1{
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.manual p{
+    font-size: 10px;
+    font-weight: 300;
+}
+
+.table-contrato tr td:nth-child(1), .table-contrato tr th:nth-child(1) {
+    background: #000;
+    color: #fff;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    vertical-align: middle;
+}
+
+.table-contrato tr td:nth-child(2), .table-contrato tr th:nth-child(2){
+    background: #A2A1A1;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.table-contrato tr td:nth-child(3), .table-contrato tr th:nth-child(3){
+    background: #E0E0DF;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.table-contrato h2{
+    background: #000;
+    color: #fff;
+    font-size: 10px;
+}
+
+.interna{
+    background: #fff;
+}
+
+.rodape{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rodapeAns {
+    width: 80%; 
+    height: 150px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center; 
+    border-bottom: 1px solid #000;
+}
+  
+.rodapeAns p {
+    margin: 0; 
+}
+
+.rodapeAns img {
+    width: 200px; 
+    height: auto; 
+    margin: 10px; 
+}
+
+.rodapeManual{
+    background:#000;
+    color: #fff;
+    padding: 8px;
+}
+.rodapeManual p:nth-child(2){
+    font-weight: bold;
+    text-align: center;
+}
+
+.table-contratoGerais {
+    border: 1px solid #0E3178;
+}
+
+.table-contratoGerais tr td, .table-contratoGerais th{
+    font-size: 10px;
+    font-weight: 400;
+}
+
+.table-contratoGerais thead {
+    background:#0E3178;
+    color: #fff;
+}
+
+.table-glc tr td:nth-child(1), .table-glc tr th:nth-child(1) {
+    background: #A2A1A1;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    vertical-align: middle;
+}
+
+.table-glc tr td:nth-child(2), .table-glc tr th:nth-child(2){
+    background: #E0E0DF;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.propostaAssociativa {
+    font-size: 10px;
+    border: 1px solid #000;
+}
+
+.propostaAssociativa label{
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+ol li{
+    font-size: 10px;
+    text-align: justify;
+    margin-bottom: 8px;
 }
 
 footer {

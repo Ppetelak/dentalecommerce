@@ -163,16 +163,9 @@
                                                     <select class="form-control required" id="profissaotitular"
                                                         name="profissaotitular">
                                                         <option disabled selected value="">Selecione ...</option>
-                                                        <option value="Comerciário">Comerciário</option>
-                                                        <option value="Estudante">Estudante</option>
-                                                        <option value="Profissional Liberal">Profissional Liberal
-                                                        </option>
-                                                        <option value="Funcionário Público">Funcionário Público</option>
-                                                        <option value="Funcionário Correios">Funcionário Correios
-                                                        </option>
-                                                        <option value="Profissional de Sãlão de Beleza">Profissional de
-                                                            Sãlão de
-                                                            Beleza</option>
+                <% profissoes.forEach(function(profissao) { %>
+                    <option value="<%= profissao.idEntidade %>"><%= profissao.nome %></option>
+                <% }); %>
                                                     </select>
                                                 </div>
                                             </div>
@@ -563,21 +556,27 @@
                                     <h1>Pagamento e Aceito dos Termos</h1>
                                     <div class="form-group">
                                         <label for="formaPagamento">Forma de Pagamento:</label>
-                                        <% if (planoSelecionado) { %>
-                                            <% for (let i=1; i <=3; i++) { %>
                                                 <div class="custom-control custom-radio">
-                                                    <input type="radio" id="pagamento<%= i %>" name="formaPagamento"
+                                                    <input type="radio" id="pgtoAnualAvista" name="formaPagamento"
                                                         class="custom-control-input"
-                                                        value="<%= planoSelecionado['forma_pagamento' + i] %>">
-                                                    <label class="custom-control-label" for="pagamento<%= i %>">
-                                                        <%= planoSelecionado['forma_pagamento' + i] %> - R$ <%=
-                                                                planoSelecionado['valor_pagamento' + i] %>
+                                                        value="1">
+                                                    <label class="custom-control-label" for="pgtoAnualAvista"> Valor anual á vista para pgto no boleto, pix ou cartão de crédito <strong>R$ <%= planoSelecionado.pgtoAnualAvista %> </strong>
+                                                    </label> 
+                                                </div>
+                                                <div class="custom-control custom-radio">
+                                                    <input type="radio" name="formaPagamento" id="pgtoAnualCartao"
+                                                        class="custom-control-input"
+                                                        value="2"> 
+                                                    <label class="custom-control-label" for="pgtoAnualCartao">Valor anual no cartão de crédito em 12x de <strong> R$ <%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %> </strong>
                                                     </label>
                                                 </div>
-                                                <% } %>
-                                                    <% } else { %>
-                                                        <p>Nenhum plano selecionado ainda.</p>
-                                                        <% } %>
+                                                <div class="custom-control custom-radio">
+                                                    <input type="radio" name="formaPagamento" id="pgtoAnualCartao3x"
+                                                        class="custom-control-input"
+                                                        value="3">
+                                                    <label class="custom-control-label" for="pgtoAnualCartao3x"> Anual cartão em 3x de <strong> R$ <%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %> </strong>
+                                                    </label>
+                                                </div>
                                     </div>
                                     <div class="form-group">
                                         <h5>Aceite da Política de Privacidade e LGPD</h5>

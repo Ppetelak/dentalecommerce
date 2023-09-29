@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,35 +9,38 @@
     <link rel="stylesheet" href="/css/style-contrato.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Open+Sans:wght@300;400;600&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <div class="topo sticky-top">
-            <h2> Prévia do documento </h2>
-            <button type="button" class="btn btn-primary salvar" id="gerar-pdf"> IMPRIMIR/ SALVAR PDF </button>
+        <h2> Prévia do documento </h2>
+        <button type="button" class="btn btn-primary salvar" id="gerar-pdf"> IMPRIMIR/ SALVAR PDF </button>
     </div>
     <main>
         <header class="header">
-            <div class="row align-items-center">
+            <div class="row">
                 <div class="col-6">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-6">
                             <img class="mw-100" src="/img/logomounthermonoriginal.png">
                         </div>
-                        <div class="col-sm-6">
-                            <!-- <img class="mw-100" src="<%= plano.logo %>"> -->
+                        <div class="col-6">
+                            <img class="mw-100" src="<%= plano.logo %>">
                         </div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="row infos">
-                        <div class="col-4">
+                        <div class="col-6">
                             Proposta <br>
                             <span class="valores">
-                                Teste de informação
+                                <%= implantacao.numeroProposta %>
                             </span>
                         </div>
-                        <div class="col-4">
+                        <div class="col-6">
                             Data Criação <br>
                             <span class="valores">
                                 <%= dataFormatada %>
@@ -48,821 +52,1235 @@
         </header>
         <div class="content">
             <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
+                <div class="col-12">
+                    <h6>Contratante</h6>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
+                        <div class="col-6">
+                            <p>CPF: <span>
+                                    <%= implantacao.cpftitular %>
+                                </span></p>
                         </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
+                        <div class="col-6">
+                            <p>RG: <span>
+                                    <%= implantacao.rgtitular %>
+                                </span></p>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
+                        <div class="col-6">
+                            <p>Nome completo: <span>
+                                    <%= implantacao.nomecompleto %>
+                                </span></p>
                         </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
+                        <div class="col-6">
+                            <p>Data de Nascimento: <span>
+                                    <%= implantacao.datanascimento %>
+                                </span></p>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
+                        <div class="col-12">
+                            <p>Endereço Completo: <span>
+                                    <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%=
+                                                implantacao.bairro %>, <%= implantacao.cidade %> - <%=
+                                                        implantacao.estados %>, CEP: <%= implantacao.cep %>
+                                </span></p>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
+                        <div class="col-6">
+                            <p>Nome da Mãe: <span>
+                                    <%= implantacao.nomemaetitular %>
+                                </span></p>
                         </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
+                        <div class="col-6">
+                            <p>Sexo: <span>
+                                    <%= implantacao.sexotitular %>
+                                </span></p>
                         </div>
                     </div>
-                    
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-6">
+                            <p>Email: <span>
+                                    <%= implantacao.emailtitular %>
+                                </span></p>
+                        </div>
+                        <div class="col-6">
+                            <p>Telefone Contato: <span>
+                                    <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %>
+                                </span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <p>Estado Civil: <span>
+                                    <%= implantacao.estadociviltitular %>
+                                </span></p>
+                        </div>
+                        <div class="col-6">
+                            <p>Profissão: <span>
+                                    <%= implantacao.profissaotitular %>
+                                </span></p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
                             <p>Entidade de Classe: <span> entidade de classe </span></p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row  dados equipevendas">
-                <div class="col-sm-12">
-                    <h1> Equipe de venda </h1>
+                <div class="col-12">
+                    <h6> Equipe de venda </h6>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>Empresa Corretora: <span> <%= implantacao.estadociviltitular %></span></p>
+                        <div class="col-6">
+                            <p>Empresa Corretora: <span>
+                                    <%= implantacao.estadociviltitular %>
+                                </span></p>
                         </div>
-                        <div class="col-sm-6">
-                            <p>CNPJ Corretora: <span> <%= implantacao.profissaotitular %> </span></p>
+                        <div class="col-6">
+                            <p>CNPJ Corretora: <span>
+                                    <%= implantacao.profissaotitular %>
+                                </span></p>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>Corretor: <span> <%= implantacao.estadociviltitular %></span></p>
+                        <div class="col-6">
+                            <p>Corretor: <span>
+                                    <%= implantacao.estadociviltitular %>
+                                </span></p>
                         </div>
-                        <div class="col-sm-6">
-                            <p>CPF Corretor: <span> <%= implantacao.profissaotitular %> </span></p>
+                        <div class="col-6">
+                            <p>CPF Corretor: <span>
+                                    <%= implantacao.profissaotitular %>
+                                </span></p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
+            <div class="row dados">
+                <div class="col-12">
+                    <h6> Plano </h6>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
+                        <div class="col-6">
+                            <p>PLANOS: <span>
+                                    <%= plano.nome_do_plano %>
+                                </span> </p>
                         </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
+                        <div class="col-6">
+                            <p>COD. ANS: <span>
+                                    <%= plano.ans %>
+                                </span> </p>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
+                        <div class="col-6">
+                            <p>COBERTURA: </p>
                         </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
+                        <div class="col-6">
+                            <p>COPARTICIPAÇÃO: <span>
+                                    <%= plano.coparticipacao %>
+                                </span></p>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
+                        <div class="col-6">
+                            <p>ABRANGÊNCIA: <span>
+                                    <%= plano.abrangencia %>
+                                </span> </p>
                         </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
+                        <div class="col-6">
+                            <p>CONTRATAÇÃO: <span>
+                                    <%= plano.contratacao %>
+                                </span> </p>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="row dados">
+                <div class="col-12">
+                    <h6> Informações Sobre o Pagamento </h6>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
+                        <div class="col-12">
+                            <p> <strong> RESUMO </strong></p>
+                            <p>
+                                Valor do plano contratado: 
+                                
+                                    <% if(implantacao.formaPagamento === 1) { %>
+                                        <span> 
+                                           R$ <%= plano.pgtoAnualAvista %> - Pago á vista via boleto, PIX ou cartão de crédito.
+                                        </span>
+                                        <%  } else if (implantacao.formaPagamento === 2) { %>
+                                        <span>
+                                           R$ <%= plano.pgtoAnualCartao %> - Pago em 12x de R$ <%= (plano.pgtoAnualCartao / 12).toFixed(2) %> no cartão de crédito.
+                                        </span>
+                                        <%  } else { %>
+                                        <span>
+                                            R$ <%= plano.pgtoAnualCartao3x %> - Pago em 3x de R$ <%= (plano.pgtoAnualCartao3x / 3).toFixed(2) %> no cartão de crédito.
+                                         </span>
+                                         <% } %>        
+                            </p>
+                            <p>Valor do taxa associativa: <span> R$ <%= entidade.taxa %></span></p>
+                            <p>Valor da taxa de cadastro:</p>
+                            <p>Total da cobrança:</p>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="row dados">
+                <div class="col-12">
+                    <h6> Manual de Orientação para Contratação de Planos de Saúde</h6>
+                    <div class="row manual">
+                        <h1> Diferenças entre planos individuais e coletivos </h1>
+                        <p>
+                            Os planos com contratação individual ou familiar são aqueles contratados diretamente da
+                            operadora de plano de saúde: é o próprio beneficiário quem escolhe as características do
+                            plano a ser contratado.
+                        </p>
+
+                        <p>
+                            Os planos com contratação coletiva são aqueles em que o beneficiário ingressa no plano de
+                            saúde contratado por uma empresa ou órgão público (coletivo empresarial); associação
+                            profissional, sindicato ou entidade assemelhada (coletivo por adesão). Nos planos coletivos
+                            é um representante dessas pessoas jurídicas contratantes, com a participação ou não de uma
+                            administradora de benefícios, que negocia e define as características do plano a ser
+                            contratado. Assim, é importante que o beneficiário antes de vincular-se a um plano coletivo,
+                            em especial o por adesão, avalie a compatibilidade entre os seus interesses e os interesses
+                            da pessoa jurídica contratante.
+                        </p>
+                        <h1> Aspectos a serem observados na contratação ou ingresso em um plano de saúde
+                        </h1>
+
+                        <table class=" table table-contrato">
+                            <thead>
+                                <th class="col-1"></th>
+                                <th class="col-4"> PLANOS INDIVUDAIS OU FAMILIARES</th>
+                                <th class="col-7"> PLANOS COLETIVOS</th>
+                            </thead>
+                            <tr>
+                                <td> CARÊNCIA </td>
+                                <td>
+                                    É permitida a exigência de cumprimento de período de carência nos prazos máximos
+                                    estabelecidos pela Lei nº 9.656/1998:24h para urgência/emergência, até300 dias para
+                                    parto a termo e até 180 dias para demais procedimentos.
+                                </td>
+                                <td>
+                                    <div class="interna">
+                                        <h2> COLETIVO EMPRESARIAL</h2>
+                                        <p>
+                                            Com 30 participantes ou mais Não é permitida a exigência de cumprimento de
+                                            carência, desde que o beneficiário formalize o pedido de ingresso em até
+                                            trinta dias da celebração do contrato coletivo ou de sua vinculação a pessoa
+                                            jurídica contratante.
+                                        </p>
+                                        Com menos de 30 participantes É permitida a exigência de cumprimento de carência
+                                        nos mesmos prazos máximos estabelecidos pela lei.
+                                        <p>
+                                        <h2> COLETIVO POR ADESÃO </h2>
+                                        <p>
+                                            Não é permitida a exigência de cumprimento de carência desde que o
+                                            beneficiário ingresse no plano em até trinta dias da celebração do contrato
+                                            firmado entre a pessoa jurídica contratante e a operadora de plano de saúde.
+                                            A cada aniversário do contrato será permitida a adesão de novos
+                                            beneficiários sem o cumprimento de carência, desde que: (1) os mesmos tenham
+                                            se vinculado à pessoa jurídica contratante após os 30 dias da celebração do
+                                            contrato e (2) tenham formalizado a proposta de adesão até 30 dias da data
+                                            de aniversário do contrato.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td> COBERTURA PARCIAL TEMPORÁRIA(CPT)
+                                </td>
+                                <td>
+                                    Sendo constatado no ato da contratação que o beneficiário tem conhecimento de doença
+                                    ou lesão preexistente (DLP), conforme declaração de saúde, perícia médica ou
+                                    entrevista qualificada e Carta de Orientação ao Beneficiário de entrega obrigatória,
+                                    a operadora poderá oferecer a cobertura total, após cumpridas eventuais carências,
+                                    sem qualquer ônus adicional para o beneficiário. Caso a operadora opte pelo não
+                                    oferecimento de cobertura total, deverá neste momento, oferecer a Cobertura Parcial
+                                    Temporária (CPT) que é a suspensão, por até 24 meses, das coberturas para
+                                    procedimentos de alta complexidade, internações cirúrgicas ou em leitos de alta
+                                    tecnologia, relacionados exclusivamente à DLP declarada. Como alternativa a CPT é
+                                    facultado à operadora oferecer o Agravo, que é um acréscimo no valor da mensalidade
+                                    paga ao plano privado de assistência à saúde para que o mesmo tenha acesso regular à
+                                    cobertura total, desde que cumpridas as eventuais carências. A operadora de planos
+                                    de saúde não pode negar a cobertura de procedimentos relacionados a DLP não
+                                    declaradas pelo beneficiário antes do julgamento de processo administrativo na forma
+                                    prevista pela RN 162/2007
+                                </td>
+                                <td>
+                                    <div class="interna">
+                                        <h2> COLETIVO EMPRESARIAL</h2>
+                                        <p>
+                                            Com menos de 30 participantes: Não é permitida a aplicação de Cobertura
+                                            Parcial Temporária (CPT) ou Agravo, desde que o beneficiário formalize o
+                                            pedido de ingresso em até trinta dias da celebração do contrato coletivo ou
+                                            de sua vinculação a pessoa jurídica contratante
+                                        </p>
+                                        Com menos de 30 participantes: É permitida a aplicação de Cobertura Parcial
+                                        Temporária (CPT) ou Agravo
+                                        <p>
+                                        <h2> COLETIVO POR ADESÃO </h2>
+                                        <p>
+                                            É permitida a aplicação de Cobertura Parcial Temporária (CPT) ou Agravo,
+                                            independente do número de participantes
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    MECANISMOS DE REGULAÇÃO
+                                </td>
+                                <td colspan="2">
+                                    É importante que o beneficiário verifique: (1) se o plano a ser contratado possui
+                                    coparticipação e/ou franquia. Em caso positivo, é obrigatório constar no contrato
+                                    quais os serviços de saúde e como será a sua participação financeira. (2) como é o
+                                    acesso aos serviços de saúde, no plano que deseja contratar. Exigência de perícia
+                                    por profissional de saúde, autorização administrativa prévia e/ou direcionamento a
+                                    prestadores só são permitidas se houver previsão no contrato.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    REAJUSTE
+                                </td>
+                                <td>
+                                    Os planos individuais ou familiares precisam de autorização prévia da ANS para
+                                    aplicação de reajuste anual, exceto para os de cobertura exclusivamente odontológica
+                                    que devem ter cláusula clara elegendo um índice de preços divulgado por instituição
+                                    externa. A variação da mensalidade por mudança de faixa etária é o aumento
+                                    decorrente de alteração de idade do beneficiário, segundo faixas e percentuais de
+                                    variação dispostos em contrato e atendendo a RN 63/2003.
+                                </td>
+                                <td>
+                                    Os planos coletivos não precisam de autorização prévia da ANS para aplicação de
+                                    reajuste anual. Assim, nos reajustes aplicados às mensalidades dos contratos
+                                    coletivos, prevalecerá o disposto no contrato ou índice resultante de negociação
+                                    entre as partes contratantes (operadora de plano de saúde e pessoa jurídica),
+                                    devendo a operadora obrigatoriamente comunicar os reajustes à ANS. O beneficiário
+                                    deverá ficar atento à periodicidade do reajuste que não poderá ser inferior a 12
+                                    meses, que serão contados da celebração do contrato ou do último reajuste aplicado e
+                                    não do ingresso do beneficiário ao plano. Embora não haja a necessidade de prévia
+                                    autorização da ANS, esta faz um monitoramento dos reajustes aplicados nos contratos
+                                    coletivos. A variação da mensalidade por mudança de faixa etária é o aumento
+                                    decorrente da alteração de idade do beneficiário, segundo faixas e percentuais de
+                                    variação dispostos em contrato e atendendo a RN nº 63/2003.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    ALTERAÇÕES NA REDE ASSISTENCIAL DO PLANO
+                                </td>
+                                <td colspan="2">
+                                    Alterações na rede de prestadores de serviço devem ser informadas pela operadora,
+                                    inclusive as inclusões. No caso de redimensionamento por redução de prestador
+                                    hospitalar, a alteração necessita ser autorizada pela ANS antes da comunicação aos
+                                    beneficiários. Esta comunicação deve observar 30 dias de antecedência no caso de
+                                    substituição de prestador hospitalar para que a equivalência seja analisada pela
+                                    ANS.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    VIGÊNCIA
+                                </td>
+                                <td>
+                                    A vigência mínima do contrato individual ou familiar é 12 meses com renovação
+                                    automática.
+                                </td>
+                                <td>
+                                    A vigência mínima do contrato coletivo é negociada e tem renovação automática.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    REGRAS DE RESCISÃO E/OU SUSPENSÃO
+                                </td>
+                                <td>
+                                    Nos planos individuais ou familiares a rescisão ou suspensão contratual unilateral
+                                    por parte da Operadora somente pode ocorrer em duas hipóteses: por fraude; e/ou por
+                                    não pagamento da mensalidade por período superior a sessenta dias, consecutivos ou
+                                    não, nos últimos doze meses de vigência do contrato, desde que o beneficiário seja
+                                    comprovadamente notificado até o 50º dia de inadimplência.
+                                </td>
+                                <td>
+                                    Nos planos coletivos as regras para rescisão ou suspensão contratual unilateral são
+                                    negociadas entre a pessoa jurídica contratante e a operadora de plano de saúde. É
+                                    importante que o beneficiário fique atento às regras estabelecidas no seu contrato.
+                                    A rescisão unilateral imotivada, por qualquer das partes, somente poderá ocorrer
+                                    após a vigência do período de 12 meses e mediante prévia notificação da outra parte
+                                    com antecedência mínima de 60 dias. Na vigência do contrato e sem anuência da pessoa
+                                    jurídica contratante, a operadora só pode excluir ou suspender assistência à saúde
+                                    de beneficiário em caso de fraude ou perda do vínculo de titular ou de dependência.
+                                </td>
+                            </tr>
+
+                        </table>
+                        <h1>
+                            Perda da condição de beneficiário nos planos coletivos
+                        </h1>
+                        <p>
+                            Nos planos coletivos os beneficiários titulares e seus dependentes podem ser excluídos do
+                            plano de saúde, que continua vigente, quando perdem o vínculo com a pessoa jurídica
+                            contratante, ou seja, com o sindicato, associação profissional ou congênere, órgão público
+                            ou empresa.
+                        </p>
+
+                        <h1>
+                            Direitos dos artigos 30 e 31, da Lei n.º 9656/1998, nos planos coletivos empresariais
+                        </h1>
+                        <p>
+                            Nos planos coletivos empresariais em que há participação financeira do beneficiário no
+                            pagamento da mensalidade, regular é não vinculada à coparticipação em eventos, é assegurado
+                            ao mesmo o direito de permanência neste plano coletivo no caso de demissão sem justa causa
+                            ou aposentadoria. No caso de morte do titular demitido ou aposentado em gozo de benefício
+                            decorrente dos artigos 30 e 31, é assegurada a permanência do grupo familiar.
+                        </p>
+                        <p>
+                            O beneficiário tem um prazo máximo de 30 dias, após seu desligamento, para se manifestar
+                            junto à empresa/órgão público, com a qual mantinha vínculo empregatício ou estatutário,
+                            sobre a sua vontade de permanecer no plano de saúde. O beneficiário assume integralmente o
+                            pagamento da mensalidade quando opta pela permanência. O período de manutenção da condição
+                            de beneficiário do plano é de 6 meses no mínimo, e proporcional ao período em que o mesmo
+                            permaneceu vinculado e contribuindo para o plano de saúde como empregado ou servidor
+                        </p>
+                        <p>
+                            Salientamos que o beneficiário perde o direito de permanência no plano de saúde do seu
+                            ex-empregador ou órgão público quando da sua admissão em um novo emprego ou cargo
+                        </p>
+
+                        <h1>
+                            Direito de migrar para plano individual ou familiar aproveitando carência do plano coletivo
+                            empresarial
+                        </h1>
+                        <p>
+                            Os beneficiários de planos coletivos empresariais que tiverem o benefício de plano de saúde
+                            extinto, terão o direito de se vincular a um plano da mesma operadora com contratação
+                            individual ou familiar, sem a necessidade de cumprimento de novos prazos de carência. Essa
+                            prerrogativa não se aplica aos planos de autogestões.
+                        </p>
+                        <p>
+                            A condição para exercer esse direito é que a operadora comercialize plano individual ou
+                            familiar.
+                        </p>
+                        <p>
+                            O beneficiário tem um prazo máximo de 30 dias, após a extinção do benefício, para contratar,
+                            junto à operadora, o plano individual ou familiar.
+                        </p>
+                        <p>
+                            Este direito não existe caso tenha havido apenas a troca de operadora por parte do
+                            contratante (órgão público ou empresa)
+                        </p>
+
+                        <h1>
+                            Cobertura e segmentação assistencial
+                        </h1>
+                        <p>
+                            Define o tipo de assistência à qual o beneficiário terá direito. Os planos podem ter
+                            assistência ambulatorial, hospitalar, obstétrica e odontológica. Essas assistências à saúde
+                            isoladas ou combinadas definem a segmentação assistencial do plano de saúde a ser contratado
+                            pelo beneficiário. A Lei nº 9.656/1998 definiu como referência o plano com assistência
+                            ambulatorial, hospitalar, obstétrica e urgência/emergência integral após 24h, em acomodação
+                            padrão enfermaria. O contrato pode prever coberturas mais amplas do que as exigidas pela
+                            legislação, mas as exclusões devem estar limitadas às previstas na Lei nº 9.656/1998.
+                        </p>
+                        <p>
+                            A cobertura para acidente do trabalho ou doença profissional em planos coletivos
+                            empresariais é adicional e depende de contratação específica.
+                        </p>
+
+                        <h1>
+                            Abrangência geográfica
+                        </h1>
+                        <p>
+                            Aponta para o beneficiário a área em que a operadora de plano de saúde se compromete a
+                            garantir todas as coberturas de assistência à saúde contratadas. A abrangência geográfica
+                            pode ser nacional, estadual, grupo de estados, municipal ou grupo de municípios.
+                        </p>
+
+                        <h1>
+                            Área de atuação
+                        </h1>
+                        <p>
+                            É a especificação nominal do(s) estado(s) ou município(s) que compõem as áreas de
+                            abrangência estadual, grupo de estados, grupo de municípios ou municipal
+                        </p>
+                        <p>
+                            É importante que o beneficiário fique atento a estas informações, uma vez que as
+                            especificações da área de abrangência e da área de atuação do plano, obrigatoriamente, devem
+                            constar no contrato de forma clara.
+                        </p>
+
+                        <h1>
+                            Administradora de Benefícios
+                        </h1>
+                        <p>
+                            Quando houver participação Administradora de Benefícios na contratação de plano coletivo
+                            empresarial, a verificação do número de participantes para fins de carência ou CPT
+                            considerará a totalidade de participantes eventualmente já vinculados ao plano estipulado.
+                        </p>
+                        <p>
+                            Se a contratação for de plano coletivo por adesão, para fins de carência considerar-se-á
+                            como data de celebração do contrato coletivo a data do ingresso da pessoa jurídica
+                            contratante ao contrato estipulado pela Administradora de Benefícios
+                        </p>
+                        <div class="rodape">
+                            <div class="rodapeManual">
+                                <p>
+                                    Para informar-se sobre estes e outros detalhes da contratação de planos de saúde, o
+                                    beneficiário deve contatar a operadora. Permanecendo dúvidas, pode consultar a ANS
+                                    pelo site www.ans.gov.br ou pelo Disque ANS (0800-701-9656).
+                                </p>
+                                <p>
+                                    ESTE MANUAL NÃO SUBSTITUI O CONTRATO
+                                </p>
+                            </div>
+                            <div class="rodapeAns">
+                                <p>
+                                    O Manual de Orientação para Contratação de Planos de Saúde é uma exigência da
+                                    Resolução Normativa 195/2009, da Agência Nacional de Saúde Suplementar
+                                </p>
+                                <div class="row">
+                                    <img src="/img/Anslogo.png">
+                                    <img src="/img/ministerio-da-saude.png">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p>
+                                        Agência Nacional de Saúde Suplementar </br>
+                                        Av. Augusto Severo, 84 - Glória - CEP: 20021-040</br>
+                                        Rio de Janeiro - RJ
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <p>
+                                        Disque-ANS: 0800 701 9656 </br>
+                                        www.ans.gov.br </br>
+                                        ouvidoria@ans.gov.br
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row dados">
+                <div class="col-12">
+                    <h6> Condições Gerais do Contrato</h6>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
+                        <p>
+                            Pelo presente, declaro expressamente que li e compreendi o “Manual de Orientação para
+                            Contratação de Planos de Saúde” (MPS), editado pela Agência de Saúde Suplementar (ANS),
+                            CONCORDO E ESTOU CIENTE QUE:
+                        </p>
+                        <ol>
+                            <li>
+                                Este instrumento é a Proposta de Adesão, doravante denominada simplesmente “Proposta”,
+                                ao plano coletivo por adesão, doravante denominado simplesmente “benefício”, estipulado
+                                pela Mount Hermon Administradora de Benefícios Ltda., doravante denominada simplesmente
+                                “Administradora de Benefícios”, com a ODONTOGROUP., doravante denominada simplesmente
+                                “Operadora”, e destinada à população que mantenha vínculo com a minha entidade de
+                                classe, doravante denominada simplesmente “Entidade”, indicada na página 1 desta
+                                Proposta.
+                            </li>
+                            <li>
+                                Mantenho vínculo com a Entidade indicada na página 1 desta Proposta, sendo que a
+                                documentação comprobatória desse vínculo está sendo entregue por mim ao angariador, no
+                                ato da assinatura desta, para que seja conferida pela Administradora de Benefícios,
+                                podendo ser recusada em razão da falta de minha elegibilidade. Em caso de recusa da
+                                adesão, a taxa de angariação será devolvida a mim pelo angariador que a recebeu.
+                            </li>
+                            <li>
+                                Serão aceitos como meus dependentes o meu cônjuge ou companheiro(a); filhos(as) e/ou
+                                enteados(as) de qualquer idade; netos(as) de qualquer idade; e os(as) menor(es) sob a
+                                minha guarda ou tutela judicial. Cessados os efeitos da guarda ou tutela, será analisada
+                                a possibilidade de permanência do(a) dependente no benefício. Poderão ser aceitos ainda
+                                os Beneficiários Agregados, que são os indivíduos que possuem com o Beneficiário Titular
+                                relação de parentesco até o terceiro grau consanguíneo ou até o segundo grau por
+                                afinidade, a seguir elencados: Pai, Mãe, Avôs(ós),Bisavôs(ós), Bisnetos(as), Irmãos(ãs),
+                                Tios(as), Sobrinhos(as), Sogro(a), Cunhados(as), desde que devidamente contratados
+                            </li>
+                            <li>
+                                A responsabilidade pelos documentos e informações fornecidos por mim e por meu(s)
+                                dependente(s) sobre toda e qualquer circunstância que possa influir na aceitação desta
+                                Proposta, na permanência e/ou no valor mensal do benefício é única e exclusivamente
+                                minha; Omissões ou dados errôneos acarretarão na perda de todos os meus direitos, bem
+                                como os do(s) meu(s) dependente(s), decorrentes do benefício.
+                            </li>
+                            <li>
+                                Efetivada a análise dos documentos e das informações prestadas nesta Proposta, de acordo
+                                com a legislação vigente, será implantada pela Operadora e o benefício terá início na
+                                data indicada no campo “Início da vigência”, na página 1 da presente; tanto eu quanto
+                                meu(s) dependente(s) passaremos a ser denominados “beneficiários”.
+                            </li>
+                            <li>
+                                Assim que eu assumir a condição de beneficiário titular, ficam outorgados à
+                                Administradora de Benefícios amplos poderes para me representar, perante a Operadora e
+                                outros órgãos, em especial a ANS, no cumprimento e/ou nas alterações deste benefício,
+                                bem como na negociação dos reajustes dos valores mensais.
+                            </li>
+                            <li>
+                                O contrato do plano odontológico coletivo por adesão firmado entre a Administradora de
+                                Benefícios e a Operadora, no qual passarei a integrar, vigorará pelo prazo mínimo de 12
+                                (doze) meses, podendo ser renovado, automaticamente, por prazo indeterminado, desde que
+                                não ocorra denúncia, por escrito, no prazo de 60 (sessenta) dias, de qualquer das
+                                partes, seja pela Administradora de Benefícios ou pela Operadora. A vigência do
+                                benefício indicada na página 1 desta Proposta não se confunde com a vigência do contrato
+                                do plano odontológico coletivo por adesão. Em caso de rescisão desse contrato do plano
+                                odontológico coletivo por adesão, a Administradora de Benefícios me fará a comunicação
+                                desse fato em prazo não inferior a 30 (trinta) dias.
+                            </li>
+                            <li>
+                                O benefício cobrirá as despesas com serviços odontológicos relacionados no “Rol de
+                                Procedimentos e Eventos em Saúde”, instituído pela ANS, observadas as condições gerais
+                                deste benefício
+                            </li>
+                            <li>
+                                Além das coberturas referidas no item 8, este benefício pode oferecer, conforme as
+                                condições de cada plano, coberturas e/ou benefícios adicionais.
+                            </li>
+                            <li>
+                                As coberturas excluídas do benefício são aquelas que não se incluem no “Rol de
+                                Procedimentos e eventos em Saúde”, da ANS, nem nas coberturas adicionais eventualmente
+                                oferecidas por este benefício, bem como as despesas não cobertas citadas na Lei nº
+                                9.656/98 e nas normas regulamentares da ANS
+                            </li>
+                            <li>
+                                Os prazos de carência são os períodos nos quais nem eu nem meu(s) beneficiário(s)
+                                dependente(s) teremos direito a determinadas coberturas, mesmo que em dia com o
+                                pagamento do benefício. Há prazos de carência para utilização do benefício, conforme
+                                tabela indicativa a seguir. Para efeitos de isenção de carências, devemse observar as
+                                normas regulamentares da ANS e a legislação em vigor
+                            </li>
+
+                            <table class="table table-contratoGerais">
+                                <thead>
+                                    <th class="col-8"> COBERTURAS </th>
+                                    <th class="col-4"> CARÊNCIA CONTRATUAL </th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            URGÊNCIA/EMERGÊNCIA (curativos, suturas, reparos e alívio da dor)
+                                        </td>
+                                        <td>
+                                            24 horas
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            DIAGNÓSTICO (consulta inicial e exames)
+                                        </td>
+                                        <td>
+                                            30 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            RADIOLOGIA (levantamento radiográfico, radiografias periapical, oclusal e
+                                            panorâmicas)
+                                        </td>
+                                        <td>
+                                            60 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            PREVENÇÃO (orientação, aplicação de flúor, controle de placa bacteriana,
+                                            polimentos e limpeza)
+                                        </td>
+                                        <td>
+                                            60 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            ODONTOPEDIATRIA (Tratamento infantil)
+                                        </td>
+                                        <td>
+                                            60 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            ENDODONTIA (tratamento de canal, clareamento de dente desvitalizado,
+                                            curativos)
+                                        </td>
+                                        <td>
+                                            90 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            PERIODONTIA (tratamento de gengiva, gengivite, raspagens, dessensibilizarão
+                                            dentária)
+                                        </td>
+                                        <td>
+                                            90 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            CIRURGIAS (realizadas em consultórios odontológicos – biopsias e extrações,
+                                            ex.: de siso)
+                                        </td>
+                                        <td>
+                                            90 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            DENTÍSTICA (restaurações)
+                                        </td>
+                                        <td>
+                                            60 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            PRÓTESE (somente os eventos exigidos pela ANS como a coroa provisória)
+                                        </td>
+                                        <td>
+                                            180 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            DOC (documentação ortodôntica completa, inicial e final. Incluindo os
+                                            slides, radiografias, teleradiografias, fotos e modelos ortodônticos +
+                                            instalação do aparelho convencional metálico)*
+                                        </td>
+                                        <td>
+                                            60 dias
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            ORTODONTIA COMPLETA(documentação ortodônticacompleta, incluindo os slides,
+                                            radiografias, tele radiografias, fotos e modelos ortodônticos, instalação e
+                                            manutenção de aparelho).**
+                                        </td>
+                                        <td>
+                                            60 dias
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2">
+                                            * Cobertura exclusiva para o plano "Odonto Doc"
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            ** Cobertura exclusiva para o plano "Odonto Orto (Coletivo Adesão Mais)"
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                            <li>
+                                O pagamento do benefício será na forma indicada na página 2 desta Proposta, sendo que a
+                                falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao
+                                mês (0,033% ao dia) e à multa de 2% sobre o valor do débito em atraso, calculados
+                                proporcionalmente ao tempo de inadimplência. No período de inadimplência, poderá ocorrer
+                                a suspensão automática do benefício a partir do 10º dia do vencimento, cuja utilização
+                                somente será restabelecida a partir da quitação do(s) valor(es) pendente(s),
+                                acrescido(s) dos encargos supracitados, observada a possibilidade de cancelamento,
+                                conforme disposto no item 15 desta Proposta. No caso de inadimplência do valor devido ao
+                                benefício por período superior a 90 (noventa) dias, a contar da data de seu vencimento,
+                                a Administradora de Benefícios adotará medidas para a cobrança dos valores em atraso,
+                                acarretando, inclusive o envio das informações do beneficiário titular, ou de seu
+                                responsável legal, aos órgãos de serviço de proteção ao crédito, mediante prévia
+                                comunicação, conforme determina o Código de Defesa do Consumidor
+                            </li>
+                            <li>
+                                Independentemente da data da minha Proposta, o valor mensal do benefício poderá sofrer
+                                os seguintes reajustes: (i) reajuste anual (financeiro e/ou por índice de
+                                sinistralidade), que ocorre quando há alteração de custos, utilização dos serviços
+                                médicos e uso de novas tecnologias, nunca ocorrendo, porém, em periodicidade inferior a
+                                12 (doze) meses, contados da data de assinatura do plano odontológico coletivo por
+                                adesão ou da última aplicação do reajuste anual; (ii) reajuste(s) em outra(s)
+                                hipótese(s), que venha(m) a ser autorizado(s) pela ANS, contratado(s) entre a
+                                Administradora de Benefícios e a Operadora, além de previamente comunicado(s) ao
+                                beneficiário
+                            </li>
+                            <li>
+                                Devo solicitar e informar expressamente à Administradora de Benefícios toda e qualquer
+                                alteração cadastral, tal como a eventual perda de elegibilidade.
+                            </li>
+                            <li>
+                                Poderei solicitar o cancelamento do benefício à Administradora de Benefícios, de acordo
+                                com os normativos da legislação em vigor. O benefício poderá ser cancelado
+                                unilateralmente, conforme as regras e prazos previstos em contrato, nas seguintes
+                                situações (i) por uma das pessoas jurídicas contratantes (Operadora, Administradora de
+                                Benefícios ou Entidade); (ii) em caso de perda da elegibilidade, se constatada fraude no
+                                uso do plano ou nas informações prestadas na contratação; (iii) pela falta de pagamento
+                                do valor do benefício na data do seu vencimento, mediante comunicado prévio. No caso de
+                                cancelamento do benefício, haverá minha exclusão e a de meu(s) beneficiário(s)
+                                dependente(s), sem prejuízo da cobrança do(s) valor(es) não pago(s), incluídos juros e
+                                multa.
+                            </li>
+                            <li>
+                                No caso de cancelamento do benefício, devolverei imediatamente à Administradora de
+                                Benefícios os cartões de identificação do(s) beneficiário(s), assumindo todas as
+                                responsabilidades civis, criminais e financeiras por toda e qualquer utilização indevida
+                                do benefício, incluindo a utilização por terceiros, com ou sem o meu conhecimento.
+                            </li>
+                            <li>
+                                Não haverá nenhuma continuidade deste benefício nas hipóteses previstas nos artigos 30 e
+                                31 da Lei nº 9.656/98, que cuidam da continuidade assistencial em casos de demissão e
+                                aposentadoria em contratos coletivos empresariais, hipóteses essas totalmente diversas
+                                das que se aplicam a este benefício.
+                            </li>
+                            <li>
+                                Poderei postular nova adesão ao benefício, após ser feita nova análise e aceitação das
+                                condições de minha elegibilidade e após ter quitado eventuais débitos anteriores. A nova
+                                adesão estará sujeita ao cumprimento de novos prazos de carências parciais ou totais, de
+                                acordo com os normativos da legislação em vigor
+                            </li>
+                            <li>
+                                Poderei desistir desta Proposta, sem nenhum ônus, desde que tal decisão seja comunicada
+                                por escrito à Administradora de Benefícios no prazo máximo de 7(sete) dias, contados a
+                                partir da data de minha assinatura neste instrumento,autorizando a cobrança da taxa de
+                                angariação e do valor mensal do benefício, caso esse prazo não seja observado.
+                                espeitando o prazo para desistência, a taxa de angariação será devolvida a mim pelo
+                                angariador que a recebeu
+                            </li>
+                            <li>
+                                A minha manifestação de vontade, ao aceitar esta Proposta, não poderá ser questionada
+                                pelo mero fato de ter sido assinada por meio eletrônico e, para todos os fins de
+                                direito, esta Proposta equivale a um documento particular. Declaro, ainda, aceitar como
+                                válido o meio tecnológico adotado pela Administradora de Benefícios para a celebração
+                                desta Proposta, uma vez que garantidas a autoria e integridade do documento em forma
+                                eletrônica, nos termos da legislação em vigor.
+                            </li>
+                            <li>
+                                O Foro para dirimir quaisquer questões oriundas da presente Proposta é o do meu
+                                domicílio
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row dados">
+                <div class="col-12">
+                    <h6> Guia de Leitura Contratual (GLC)</h6>
+                    <div class="row manual">
+                        <table class="table table-glc">
+                            <tr>
+                                <td>
+                                    CONTRATAÇÃO
+                                </td>
+                                <td colspan="2">
+                                    Determina se o plano destina-se à pessoa física ou jurídica. A contratação pode ser
+                                    Individual/ Familiar, Coletivo por Adesão ou Coletivo Empresarial.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    SEGMENTAÇÃO ASSISTENCIAL
+                                </td>
+                                <td>
+                                    Define a amplitude da cobertura assistencial do plano de saúde. A segmentação
+                                    assistencial é categorizada em: referência, hospitalar com obstetrícia, hospitalar
+                                    sem obstetrícia, ambulatorial, odontológica e suas combinações.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    PADRÃO DE ACOMODAÇÃO
+                                </td>
+                                <td>
+                                    Define o padrão de acomodação para o leito de internação nos planos hospitalares:
+                                    pode ser coletiva ou individual.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    ÁREA GEOGRÁFICA DE ABRANGÊNCIA E ATUAÇÃO
+                                </td>
+                                <td>
+                                    Área em que a operadora de plano de saúde se compromete a garantir todas as
+                                    coberturas de assistência à saúde contratadas. A exceção da nacional, é obrigatória
+                                    a especificação nominal do(s) estado(s) ou município(s) que compõem as áreas de
+                                    abrangência estadual, grupo de estados, grupo de municípios ou municipal
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    COBERTURAS E PROCEDIMENTOS GARANTIDOS
+                                </td>
+                                <td>
+                                    É o conjunto de procedimentos a que o beneficiário tem direito, previsto na
+                                    legislação de saúde suplementar pelo Rol de Procedimentos e Eventos cm Saúde, que
+                                    constitui a referência básica para cobertura mínima obrigatória, e no contrato
+                                    firmado com a operadora, conforme a segmentação assistencial do plano contratado. O
+                                    beneficiário deve analisar detalhadamente as coberturas a que tem direito.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    EXCLUSÕES DE COBERTURAS
+                                </td>
+                                <td>
+                                    E o conjunto de procedimentos a que o beneficiário não tem direito, previsto na
+                                    legislação de saúde suplementar, conforme a segmentação assistencial do plano
+                                    contratado.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    DOENÇAS E LESÕES PREEXISTENTES (DLP)
+                                </td>
+                                <td>
+                                    Doenças e lesões preexistentes - DLP - são aquelas existentes antes da contratação
+                                    do plano de saúde, e que o beneficiário ou seu responsável saiba ser portador
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    CARÊNCIAS
+                                </td>
+                                <td>
+                                    Carência é o período em que o beneficiário não tem direito a cobertura após a
+                                    contratação do plano. Quando a operadora exigir cumprimento de carência, este
+                                    período deve estar obrigatoriamente escrito, de forma clara, no contrato. Após
+                                    cumprida a carência, o beneficiário terá acesso a todos os procedimentos previstos
+                                    em seu contrato e na legislação, exceto eventual cobertura parcial temporária por
+                                    DLP.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    CARÊNCIAS MECANISMOS DE REGULAÇÃO
+                                </td>
+                                <td>
+                                    São os mecanismos financeiros (franquia e/ou coparticipação), assistenciais
+                                    (direcionamento e/ou perícia profissional) e/ou administrativos (autorização prévia)
+                                    que a operadora utiliza para gerenciar a demanda e/ou utilização dos serviços de
+                                    saúde.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    VIGÊNCIAS
+                                </td>
+                                <td>
+                                    Define o período em que vigorará o contrato.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    RESCISÃO/ SUSPENSÃO
+                                </td>
+                                <td>
+                                    A rescisão põe fim definitivamente à vigência do contrato. A suspensão descontinua a
+                                    vigência do contrato.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    REAJUSTE
+                                </td>
+                                <td>
+                                    O reajuste por variação de custos é o aumento anual de mensalidade do plano de saúde
+                                    em ramo de alteração nos custos, ocasionada por fatores tais como inflação, uso de
+                                    novas tecnologias e nível de utilização dos serviços. A variação da mensalidade por
+                                    mudança de faixa etária é o aumento decorrente da alteração de idade do
+                                    beneficiário.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    CONTINUIDADE NO PLANO COLETIVO EMPRESARIAL (ART. 30 E 31 DA LEI Nº 9.656/1998)
+                                </td>
+                                <td>
+                                    A existência da contribuição do empregado para o pagamento da mensalidade do plano
+                                    de saúde, regular e não vinculada à coparticipação em eventos, habilita ao direito
+                                    de continuar vinculado por determinados períodos ao plano coletivo empresarial, nos
+                                    casos de demissão sem justa causa ou aposentadoria, observadas as regras para
+                                    oferecimento, opção e gozo, previstas na Lei e sua regulamentação.
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="rodape">
+                            <div class="rodapeManual">
+                                <p>
+                                    Para informar-se sobre estes e outros detalhes da contratação de planos de saúde, o
+                                    beneficiário deve contatar a operadora. Permanecendo dúvidas, pode consultar a ANS
+                                    pelo site www.ans.gov.br ou pelo Disque ANS (0800-701-9656).
+                                </p>
+                                <p>
+                                    ESTE MANUAL NÃO SUBSTITUI O CONTRATO
+                                </p>
+                            </div>
+                            <div class="rodapeAns">
+                                <p>
+                                    O Manual de Orientação para Contratação de Planos de Saúde é uma exigência da
+                                    Resolução Normativa 195/2009, da Agência Nacional de Saúde Suplementar
+                                </p>
+                                <div class="row">
+                                    <img src="/img/Anslogo.png">
+                                    <img src="/img/ministerio-da-saude.png">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p>
+                                        Agência Nacional de Saúde Suplementar </br>
+                                        Av. Augusto Severo, 84 - Glória - CEP: 20021-040</br>
+                                        Rio de Janeiro - RJ
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <p>
+                                        Disque-ANS: 0800 701 9656 </br>
+                                        www.ans.gov.br </br>
+                                        ouvidoria@ans.gov.br
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="row dados">
+                <div class="col-12">
+                    <h6> Aditivo de Redução de Carências</h6>
+                    <div class="row">
+                        <p>
+                            Válido para pagamento em cartão de crédito, débito ou em boleto único
+                        </p>
+                        <p>
+                            Administradora de Benefícios
+                        </p>
+                        <p>
+                            Este Aditivo de Redução de Carências é parte integrante da Proposta acima referida e visa
+                            conceder prazos de carência reduzidos, contados a partir do início de vigência do benefício,
+                            aos proponentes elegíveis a essa redução.
+                        </p>
+                    </div>
+                    <table class="table table-contratoGerais">
+                        <thead>
+                            <th class="col-8"> COBERTURAS </th>
+                            <th class="col-2"> CARÊNCIA CONTRATUAL </th>
+                            <th class="col-2"> CARÊNCIA REDUZIDA </th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    URGÊNCIA/EMERGÊNCIA (curativos, suturas, reparos e alívio da dor)
+                                </td>
+                                <td>
+                                    24 horas
+                                </td>
+                                <td>
+                                    0 horas
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    DIAGNÓSTICO (consulta inicial e exames)
+                                </td>
+                                <td>
+                                    30 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    RADIOLOGIA (levantamento radiográfico, radiografias periapical, oclusal e
+                                    panorâmicas)
+                                </td>
+                                <td>
+                                    60 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    PREVENÇÃO (orientação, aplicação de flúor, controle de placa bacteriana, polimentos
+                                    e limpeza)
+                                </td>
+                                <td>
+                                    60 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    ODONTOPEDIATRIA (Tratamento infantil)
+                                </td>
+                                <td>
+                                    60 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    ENDODONTIA (tratamento de canal, clareamento de dente desvitalizado, curativos)
+                                </td>
+                                <td>
+                                    90 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    PERIODONTIA (tratamento de gengiva, gengivite, raspagens, dessensibilizarão
+                                    dentária)
+                                </td>
+                                <td>
+                                    90 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    CIRURGIAS (realizadas em consultórios odontológicos – biopsias e extrações, ex.: de
+                                    siso)
+                                </td>
+                                <td>
+                                    90 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    DENTÍSTICA (restaurações)
+                                </td>
+                                <td>
+                                    60 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    PRÓTESE (somente os eventos exigidos pela ANS como a coroa provisória)
+                                </td>
+                                <td>
+                                    180 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    DOC (documentação ortodôntica completa, inicial e final. Incluindo os slides,
+                                    radiografias, teleradiografias, fotos e modelos ortodônticos + instalação do
+                                    aparelho convencional metálico)*
+                                </td>
+                                <td>
+                                    60 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    ORTODONTIA COMPLETA(documentação ortodônticacompleta, incluindo os slides,
+                                    radiografias, tele radiografias, fotos e modelos ortodônticos, instalação e
+                                    manutenção de aparelho).**
+                                </td>
+                                <td>
+                                    60 dias
+                                </td>
+                                <td>
+                                    0 dias
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2">
+                                    * Cobertura exclusiva para o plano "Odonto Doc"
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    ** Cobertura exclusiva para o plano "Odonto Orto (Coletivo Adesão Mais)"
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <p> 
+                        Declaro ter recebido cópia deste Aditivo de Redução de Carências e estou de acordo com os seus termos. Estou ciente de que a possibilidade de redução de carências será analisada de forma individual, para cada proponente, e que essa possibilidade está subordinada à análise e aprovação de documentos por parte da Operadora. Estou ciente também de que os proponentes que não se enquadrarem nas condições descritas neste aditivo e não forem elegíveis à redução de carências deverão cumprir integralmente as carências descritas no Manual do Beneficiário.  
+                    </p>
+                </div>
+            </div>
+
+            <div class="container propostaAssociativa">
+                <div class="row pt-2 pb-2">
+                    <div class="col-6 text-center">
+                        <label><%= entidade.nome %></label>
+                    </div>
+                    <div class="col-6 text-center">
+                        <p><strong><%= entidade.nome %></strong><br>
+                        PROPOSTA ASSOCIATIVA</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <p>NOME COMPLETO: <%= implantacao.nomecompleto %> CPF: <%= implantacao.cpftitular %> RG: <%= implantacao.rgtitular %> </p>
+                    <p> ENDEREÇO: <%= implantacao.enderecoresidencial %></p>
+                    <p>EMAIL: <%= implantacao.emailtitular %> DATA DE NASCIMENTO: <%= implantacao.datanascimento %></p>
                     
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
+                    <p> Solicito a minha inclusão e dos meus dados pessoais no cadastro da <%= entidade.nome %> - <%= entidade.descricao %> </p>
+
+                    <p> Declaro estar ciente que a <%= entidade.nome %> é uma entidade sem fins lucrativos e que minha contribuição mensal visa à manutenção da entidade, bem como possibilita a utilização dos benefícios proporcionados pelos convênios celebrados pela mesma</p>
+
+                    <ul>
+                        <li> <%= entidade.documentos %> </li>
+                    </ul>
+
+                    <p>
+                        Concordo com a Cobrança da Contribuição Associativa no Valor de R$ <%= entidade.taxa %> por mês
+                    </p>
+                </div>
+                <div class="row pt-5 justify-content-around">
+                    <div class="col-4 text-center mw-50 border-top border-dark">
+                        <p>Local e Data</p>
+                    </div>
+                    <div class="col-4 text-center mw-50 border-top border-dark">
+                        <p> Assinatura do Associado/Representante</p>
                     </div>
                 </div>
             </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row dados titular">
-                <div class="col-sm-12">
-                    <h1>Contratante</h1>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>CPF: <span> <%= implantacao.cpftitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>RG: <span> <%= implantacao.rgtitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome completo: <span> <%= implantacao.nomecompleto %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Data de Nascimento: <span> <%= implantacao.datanascimento %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <p>Endereço Completo: <span> <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%= implantacao.bairro %>, <%= implantacao.cidade %> - <%= implantacao.estados %>, CEP: <%= implantacao.cep %></span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Nome da Mãe: <span> <%= implantacao.nomemaetitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Sexo: <span> <%= implantacao.sexotitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Email: <span> <%= implantacao.emailtitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Telefone Contato: <span> <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %> </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Estado Civil: <span> <%= implantacao.estadociviltitular %></span></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p>Profissão: <span> <%= implantacao.profissaotitular %> </span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="a4">
-                <!-- Conteúdo da página A4 aqui -->
-              </div>
         </div>
-        <footer class="footer">
+        <!-- <footer class="footer">
             <p> Este contrato só tem validade mediante pagamento comprovado</p>
             <p class="page-number"> Pág <span class="page-num"></span>/<span class="total-pages"></span> </p>
-        </footer>
+        </footer> -->
     </main>
-    
+
 </body>
-<script src="/js/scriptContrato.js"></script>
+<!-- <script src="/js/scriptContrato.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
 </html>

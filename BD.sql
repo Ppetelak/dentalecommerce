@@ -105,5 +105,8 @@ CREATE TABLE profissoes_entidades (
     id_entidade INT
 )
 
+CREATE TABLE formularios_entidades (
+    
+)
 
 
