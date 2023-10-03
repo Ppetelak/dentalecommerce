@@ -461,6 +461,7 @@ app.get('/gerarContrato/:id', (req, res) => {
   const queryPlano = 'SELECT * FROM planos WHERE id=?';
   const queryProfissao = 'SELECT * FROM profissoes WHERE nome= ?';
   const queryEntidade = 'SELECT * FROM entidades WHERE id=?';
+  const queryDependentes = 'SELECT * FROM dependentes WHERE id_implantacoes = ?'
 
  
   db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
@@ -474,6 +475,8 @@ app.get('/gerarContrato/:id', (req, res) => {
       res.status(404).send('Implantação não encontrada');
       return;
     }
+
+    const idImplantacao = resultImplantacoes[0].id;
 
     const nomeProfissao = resultImplantacoes[0].profissaotitular;
 
@@ -494,14 +497,20 @@ app.get('/gerarContrato/:id', (req, res) => {
             res.status(500).send('Erro ao buscar plano vinculado à implantação');
             return;
           }
-          const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
-          const dia = String(data_implantacao.getDate()).padStart(2, '0');
-          const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
-          const ano = data_implantacao.getFullYear();
-          const dataFormatada = `${dia}/${mes}/${ano}`;
-  
-          // Renderize a página 'contrato' com os dados da implantação e do plano
-          res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade:resultEntidade[0], profissao: resultProfissao[0] });
+          db.query(queryDependentes, [idImplantacao], (err, resultDependentes) => {
+            if(err){
+              console.error('Erro na busca pelos dependentes vinculados a essa implantacao', err)
+            }
+            const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
+            const dia = String(data_implantacao.getDate()).padStart(2, '0');
+            const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
+            const ano = data_implantacao.getFullYear();
+            const dataFormatada = `${dia}/${mes}/${ano}`;
+
+    
+            // Renderize a página 'contrato' com os dados da implantação e do plano
+            res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade:resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes });
+          })
         });
       })
     })    
@@ -687,8 +696,8 @@ app.post('/atualiza-planos', (req, res) => {
 
       if (rows.length > 0) {
         // O plano existe, atualize-o
-        const updateQuery = 'UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ?, pgtoAnualAvista = ?, pgtoAnualCartao =? , pgtoAnualCartao3x = ? WHERE id = ?';
-        db.query(updateQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia, plano.pgtoAnualAvista, plano.pgtoAnualCartao, plano.pgtoAnualCartao3x, plano.id], (err, result) => {
+        const updateQuery = 'UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ?, pgtoAnualAvista = ?, pgtoAnualCartao =? , pgtoAnualCartao3x = ? , reajuste = ? WHERE id = ?';
+        db.query(updateQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia, plano.pgtoAnualAvista, plano.pgtoAnualCartao, plano.pgtoAnualCartao3x, plano.reajuste, plano.id], (err, result) => {
           if (err) {
             console.error('Erro ao atualizar plano:', err);
             return rollbackAndRespond(res, 'Erro interno do servidor');
@@ -698,8 +707,8 @@ app.post('/atualiza-planos', (req, res) => {
         });
       } else {
         // O plano não existe, crie-o
-        const createQuery = 'INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia, pgtoAnualAvista, pgtoAnualCartao, pgtoAnualCartao3x) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        db.query(createQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia, plano.pgtoAnualAvista, plano.pgtoAnualCartao, plano.pgtoAnualCartao3x], (err, result) => {
+        const createQuery = 'INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia, pgtoAnualAvista, pgtoAnualCartao, pgtoAnualCartao3x, reajuste) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        db.query(createQuery, [plano.nome_do_plano, plano.ans, plano.descricao, plano.observacoes, plano.logoSrc, plano.bannerSrc, plano.contratacao, plano.coparticipacao, plano.abrangencia, plano.pgtoAnualAvista, plano.pgtoAnualCartao, plano.pgtoAnualCartao3x, plano.reajuste], (err, result) => {
           if (err) {
             console.error('Erro ao criar plano:', err);
             return rollbackAndRespond(res, 'Erro interno do servidor');

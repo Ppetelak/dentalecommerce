@@ -52,6 +52,12 @@ $(document).ready(function () {
             $(this).prop('selected', true);
         }
     });
+    const reajusteSelected = $(this).find('[name="reajusteValue"]').val()
+    $(this).find('[name="reajuste"] option').each(function () {
+        if ($(this).val() === reajusteSelected) {
+            $(this).prop('selected', true);
+        }
+    });
   });
 
   $(".edit-image-btn").click(function () {
@@ -172,8 +178,26 @@ $('#addPlano').click(function () {
       <div class="col-6">
         <div class="form-group">
           <label for="">Observações:</label>
-          <textarea class="form-control" name="observacoes" rows="6" id="observacoes"></textarea>
+          <textarea class="form-control" name="observacoes" rows="4" id="observacoes"></textarea>
         </div>
+        <div class="form-group">
+                      <label for="reajuste">Mês de Reajuste</label>
+                      <select class="form-control" name="reajuste" id="reajuste">
+                        <option disabled selected value="">Selecione</option>
+                        <option value="Janeiro">Janeiro</option>
+                        <option value="Fevereiro">Fevereiro</option>
+                        <option value="Março">Março</option>
+                        <option value="Abril">Abril</option>
+                        <option value="Maio">Maio</option>
+                        <option value="Junho">Junho</option>
+                        <option value="Julho">Julho</option>
+                        <option value="Agosto">Agosto</option>
+                        <option value="Setembro">Setembro</option>
+                        <option value="Outubro">Outubro</option>
+                        <option value="Novembro">Novembro</option>
+                        <option value="Dezembro">Dezembro</option>
+                      </select>
+                    </div>
         <div class="form-group">
           <label for="contratacao">Contratação</label>
           <select class="form-control" name="contratacao" id="contratacao">
@@ -284,6 +308,7 @@ function salvarPlano(trElement) {
     pgtoAnualAvista: trElement.find("input[name=pgtoAnualAvista]").val(),
     pgtoAnualCartao: trElement.find("input[name=pgtoAnualCartao]").val(),
     pgtoAnualCartao3x: trElement.find("input[name=pgtoAnualCartao3x]").val(),
+    reajuste: trElement.find("select[name=reajuste]").val()
   }
 
   console.log(plano)
@@ -302,6 +327,18 @@ function salvarPlano(trElement) {
       console.error('Erro ao salvar os dados do plano:', status, error);
     },
   });
+}
+
+function getCookieValue(name) {
+  const cookieName = `${name}=`;
+  const cookies = document.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+      let cookie = cookies[i].trim();
+      if (cookie.startsWith(cookieName)) {
+          return cookie.substring(cookieName.length, cookie.length);
+      }
+  }
+  return '';
 }
 
 if (document.cookie.includes('alertSuccess')) {
