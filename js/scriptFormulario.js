@@ -52,8 +52,8 @@ function handleNextClick() {
     var nextTab = activeTab.nextElementSibling;
     var activeProgress = document.querySelector('.progress-bar');
     var currentWidth = activeProgress.style.width;
-    var currentWidthValue = parseInt(currentWidth, 10);
-    var increment = 20;
+    var currentWidthValue = parseInt(currentWidth);
+    var increment = 14;
     var newWidthValue = currentWidthValue + increment;
     activeProgress.style.width = newWidthValue + '%';
 
@@ -69,8 +69,8 @@ function handlePrevClick() {
     var prevTab = activeTab.previousElementSibling;
     var activeProgress = document.querySelector('.progress-bar');
     var currentWidth = activeProgress.style.width;
-    var currentWidthValue = parseInt(currentWidth, 10);
-    var decrement = 20;
+    var currentWidthValue = parseInt(currentWidth);
+    var decrement = 14;
     var newWidthValue = currentWidthValue - decrement;
     activeProgress.style.width = newWidthValue + '%';
 

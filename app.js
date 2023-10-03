@@ -242,7 +242,7 @@ function checkProposalExists(proposalNumber) {
   });
 }
 
-app.post("/enviadados", async (req, res) => {
+/* app.post("/enviadados", async (req, res) => {
   const dados = req.body;
   const dependentes = [];
 
@@ -340,7 +340,164 @@ app.post("/enviadados", async (req, res) => {
       }
     }
   );
+}); */
+
+app.post("/enviadados", async (req, res) => {
+  const dados = req.body;
+  const dependentes = [];
+
+  const numeroProposta = await generateUniqueProposalNumber();
+
+  for (let i = 0; i < dados.cpfdependente.length; i++) {
+    dependentes.push({
+      cpfdependente: dados.cpfdependente[i],
+      nomecompletodependente: dados.nomecompletodependente[i],
+      nomemaedependente: dados.nomemaedependente[i],
+      nascimentodependente: dados.nascimentodependente[i],
+      sexodependente: dados.sexodependente[i],
+    });
+  }
+
+  db.beginTransaction(async function (err) {
+    if (err) {
+      console.log("Erro ao iniciar a transação:", err);
+      return res.status(500).send("Erro ao inserir os dados");
+    }
+
+    try {
+      const dataNascimentoFinanceiro = new Date(dados.datadenascimentofinanceiro);
+
+      if (dados.datadenascimentofinanceiro !== "") {
+        if (!isNaN(dataNascimentoFinanceiro.getTime())) {
+          dados.datadenascimentofinanceiro = dataNascimentoFinanceiro.toISOString().slice(0, 10);
+        } else {
+          throw new Error("Data de nascimento do responsável financeiro inválida");
+        }
+      } else {
+        dados.datadenascimentofinanceiro = null; // Ou alguma data padrão válida
+      }
+
+      const dadosImplantacao = {
+        planoSelecionado: dados.planoSelecionado,
+        nomecompleto: dados.nomecompleto,
+        datadenascimento: dados.datadenascimento,
+        cpftitular: dados.cpftitular,
+        nomemaetitular: dados.nomemaetitular,
+        rgtitular: dados.rgtitular,
+        orgaoexpedidor: dados.orgaoexpedidor,
+        dataexpedicaorgtitular: dados.dataexpedicaorgtitular,
+        sexotitular: dados.sexotitular,
+        estadociviltitular: dados.estadociviltitular,
+        telefonetitular: dados.telefonetitular,
+        celulartitular: dados.celulartitular,
+        emailtitular: dados.emailtitular,
+        profissaotitular: dados.profissaotitular,
+        titularresponsavelfinanceiro: dados.titularresponsavelfinanceiro,
+        cpffinanceiro: dados.cpffinanceiro,
+        nomefinanceiro: dados.nomefinanceiro,
+        datadenascimentofinanceiro: dados.datadenascimentofinanceiro,
+        telefonetitularfinanceiro: dados.telefonetitularfinanceiro,
+        emailtitularfinanceiro: dados.emailtitularfinanceiro,
+        cep: dados.cep,
+        enderecoresidencial: dados.enderecoresidencial,
+        numeroendereco: dados.numeroendereco,
+        complementoendereco: dados.complementoendereco,
+        bairro: dados.bairro,
+        cidade: dados.cidade,
+        cpfcorretor: dados.cpfcorretor,
+        nomecorretor: dados.nomecorretor,
+        corretora: dados.corretora,
+        celularcorretor: dados.celularcorretor,
+        formaPagamento: dados.formaPagamento,
+        aceitoTermos: dados.aceitoTermos,
+        aceitoPrestacaoServicos: dados.aceitoPrestacaoServicos,
+        numeroProposta: numeroProposta
+      };
+
+      const resultImplantacao = await insertData("INSERT INTO implantacoes SET ?", dadosImplantacao);
+      const idImplantacao = resultImplantacao.insertId;
+
+      await insertDependentes(idImplantacao, dependentes);
+
+      await commitTransaction();
+
+      console.log("Dados inseridos com sucesso");
+      res.send("Dados inseridos com sucesso");
+    } catch (error) {
+      await rollbackTransaction();
+      console.log("Erro durante a transação:", error);
+      res.status(500).send("Erro ao inserir os dados");
+    }
+  });
+
+  async function insertData(query, values) {
+    return new Promise((resolve, reject) => {
+      db.query(query, values, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  }
+
+  async function insertDependentes(idImplantacao, dependentes) {
+    return new Promise((resolve, reject) => {
+      function insertDependente(dependente) {
+        const dadosDependente = {
+          id_implantacoes: idImplantacao,
+          cpfdependente: dependente.cpfdependente,
+          nomecompletodependente: dependente.nomecompletodependente,
+          nomemaedependente: dependente.nomemaedependente,
+          nascimentodependente: dependente.nascimentodependente,
+          sexodependente: dependente.sexodependente,
+        };
+
+        db.query("INSERT INTO dependentes SET ?", dadosDependente, (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            if (dependentes.length === 0) {
+              resolve();
+            } else {
+              insertDependente(dependentes.shift());
+            }
+          }
+        });
+      }
+
+      if (dependentes.length > 0) {
+        insertDependente(dependentes.shift());
+      } else {
+        resolve(); // Nenhum dependente para inserir
+      }
+    });
+  }
+
+  async function commitTransaction() {
+    return new Promise((resolve, reject) => {
+      db.commit((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  async function rollbackTransaction() {
+    return new Promise((resolve, reject) => {
+      db.rollback(() => {
+        resolve();
+      });
+    });
+  }
 });
+
+
+
 
 function insertDependentes(idImplantacao, dependentes, callback) {
   if (dependentes.length === 0) {
@@ -557,7 +714,7 @@ app.post('/edit/:id', (req, res) => {
         return res.status(500).send('Erro ao atualizar o corretor no banco de dados.');
       }
 
-      console.log('Corretor atualizado com sucesso!');
+      res.cookie('alertSuccess','Corretor atualizado com sucesso!', {maxAge: 3000});
       res.sendStatus(200); // Resposta de sucesso (status 200) para o cliente
     }
   );
@@ -574,7 +731,7 @@ app.post('/editCorretora/:id', (req, res) => {
         console.error('Erro ao atualizar a corretora no banco de dados:', error);
         return res.status(500).send('Erro ao atualizar a corretora no banco de dados.');
       }
-      console.log('Corretora atualizado com sucesso!');
+      res.cookie('alertSuccess','Corretora atualizada com sucesso!', {maxAge: 3000});
       res.sendStatus(200); // Resposta de sucesso (status 200) para o cliente
     }
   );
@@ -607,7 +764,7 @@ app.post('/cadastrar-corretor', (req, res) => {
       return res.status(500).send('Erro ao cadastrar o corretor no banco de dados.');
     }
 
-    // Se a inserção foi bem-sucedida, retornar uma resposta de sucesso
+    res.cookie('alertSuccess','Corretor cadastrado com sucesso!', {maxAge: 3000});
     res.status(200).send('Corretor cadastrado com sucesso.');
   });
 });
@@ -624,7 +781,7 @@ app.post('/cadastrar-corretora', (req, res) => {
       return res.status(500).send('Erro ao cadastrar a corretora no banco de dados.');
     }
 
-    // Se a inserção foi bem-sucedida, retornar uma resposta de sucesso
+    res.cookie('alertSuccess','Corretora cadastrada com sucesso!', {maxAge: 3000});
     res.status(200).send('Corretora cadastrada com sucesso.');
   });
 });
@@ -641,7 +798,7 @@ app.delete('/corretores/:id', (req, res) => {
       return res.status(500).send('Erro ao excluir o corretor do banco de dados.');
     }
 
-    // Se a exclusão foi bem-sucedida, retornar uma resposta de sucesso
+    res.cookie('alertSuccess','Corretor excluído com sucesso!', {maxAge: 3000});
     res.status(200).send('Corretor excluído com sucesso.');
   });
 });
