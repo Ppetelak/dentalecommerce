@@ -46,6 +46,52 @@ btnBuscarCorretor.addEventListener("click", () => {
 
 });
 
+function previewImage(inputId, previewId, removeButtonId) {
+  var input = document.getElementById(inputId);
+  var preview = document.getElementById(previewId);
+  var removeButton = document.getElementById(removeButtonId);
+
+  var reader = new FileReader();
+
+  reader.onload = function (e) {
+      preview.src = e.target.result;
+      removeButton.style.display = 'inline-block'; // Exibe o botão de remoção
+  };
+
+  if (input.files && input.files[0]) {
+      // Verifica se o arquivo é uma imagem
+      if (!input.files[0].type.startsWith('image/')) {
+          alert('Por favor, selecione um arquivo de imagem.');
+          input.value = ''; // Limpa o valor do campo de arquivo
+          preview.src = ''; // Limpa a pré-visualização
+          removeButton.style.display = 'none'; // Oculta o botão de remoção
+          return;
+      }
+
+      // Verifica se o tamanho do arquivo é inferior a 1 MB
+      if (input.files[0].size > 1024 * 1024) {
+          alert('Por favor, selecione um arquivo de imagem com tamanho inferior a 1 MB.');
+          input.value = ''; // Limpa o valor do campo de arquivo
+          preview.src = ''; // Limpa a pré-visualização
+          removeButton.style.display = 'none'; // Oculta o botão de remoção
+          return;
+      }
+
+      reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function removePreview(inputId, previewId, removeButtonId) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+  var removeButton = document.getElementById(removeButtonId);
+
+  removeButton.style.display = 'none';
+  input.value = ''; // Limpar o valor do campo de arquivo
+  preview.src = ''; // Limpar a pré-visualização
+}
+
+
 var nDependentes = document.querySelector('.nDependentes')
 
 function handleNextClick() {

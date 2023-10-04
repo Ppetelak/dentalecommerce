@@ -47,6 +47,40 @@ body {
     box-shadow: inset;
 }
 
+.preview-container {
+    position: relative;
+    display: inline-block;
+}
+
+.preview-wrapper {
+    margin-top: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.preview-image {
+    max-width: 100%; /* Garante que a imagem não ultrapasse a largura do contêiner */
+    max-height: 150px; /* Altura máxima, ajuste conforme necessário */
+    display: block; /* Remove a margem inferior residual em alguns casos */
+    margin: auto; /* Centraliza a imagem no contêiner */
+}
+
+
+.remove-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+}
+
+.documentos ul li {
+    font-weight: 300;
+}
+
+
 label {
     font-weight: 300;
 }

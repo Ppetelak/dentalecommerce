@@ -30,6 +30,7 @@ app.use("/css", express.static("css"));
 app.use("/js", express.static("js"));
 app.use("/img", express.static("img"));
 app.use("/arquivos", express.static("arquivos"));
+app.use("/formulario", express.static("formulario"));
 app.use("/bootstrap-icons", express.static("node_modules/bootstrap-icons"));
 app.set("view engine", "ejs");
 app.use(cookie());
@@ -80,9 +81,19 @@ db.connect((error) => {
 const storage = multer.diskStorage({
   destination: 'arquivos/',
   filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const storageForm = multer.diskStorage({
+  destination: 'formulario/',
+  filename: function (req, file, cb) {
     cb(null, file.originalname);
   }
 });
+
+const uploadForm = multer({ storage: storageForm });
 
 const upload = multer({ storage: storage });
 
@@ -342,7 +353,7 @@ function checkProposalExists(proposalNumber) {
   );
 }); */
 
-app.post("/enviadados", async (req, res) => {
+app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 }, { name: 'comprovanteResidencia', maxCount: 1 }]), async (req, res) => {
   const dados = req.body;
   const dependentes = [];
 
@@ -366,6 +377,8 @@ app.post("/enviadados", async (req, res) => {
 
     try {
       const dataNascimentoFinanceiro = new Date(dados.datadenascimentofinanceiro);
+      const srcDocumentoFoto = req.files['documentoFoto'][0].path;
+      const srcComprovanteResidencia = req.files['comprovanteResidencia'][0].path;
 
       if (dados.datadenascimentofinanceiro !== "") {
         if (!isNaN(dataNascimentoFinanceiro.getTime())) {
@@ -419,6 +432,8 @@ app.post("/enviadados", async (req, res) => {
 
       await insertDependentes(idImplantacao, dependentes);
 
+      await insertDocumentPaths(idImplantacao, srcDocumentoFoto, srcComprovanteResidencia);
+
       await commitTransaction();
 
       console.log("Dados inseridos com sucesso");
@@ -429,6 +444,12 @@ app.post("/enviadados", async (req, res) => {
       res.status(500).send("Erro ao inserir os dados");
     }
   });
+
+  async function insertDocumentPaths(idImplantacao, srcDocumentoFoto, srcComprovanteResidencia) {
+    const query = "INSERT INTO documentos_implantacoes (id_implantacao, documentoFoto, comprovanteResidencia) VALUES (?, ?, ?)";
+    
+    await insertData(query, [idImplantacao, srcDocumentoFoto, srcComprovanteResidencia]);
+  }
 
   async function insertData(query, values) {
     return new Promise((resolve, reject) => {
@@ -581,6 +602,7 @@ app.get('/gerarContrato/:id', (req, res) => {
   const queryProfissao = 'SELECT * FROM profissoes WHERE nome= ?';
   const queryEntidade = 'SELECT * FROM entidades WHERE id=?';
   const queryDependentes = 'SELECT * FROM dependentes WHERE id_implantacoes = ?'
+  const queryDocumentos = 'SELECT *FROM documentos_implantacoes WHERE id_implantacao = ?'
 
  
   db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
@@ -620,15 +642,18 @@ app.get('/gerarContrato/:id', (req, res) => {
             if(err){
               console.error('Erro na busca pelos dependentes vinculados a essa implantacao', err)
             }
-            const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
-            const dia = String(data_implantacao.getDate()).padStart(2, '0');
-            const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
-            const ano = data_implantacao.getFullYear();
-            const dataFormatada = `${dia}/${mes}/${ano}`;
-
-    
-            // Renderize a página 'contrato' com os dados da implantação e do plano
-            res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade:resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes });
+            db.query(queryDocumentos, [idImplantacao], (err, resultDocumentos) => {
+              if(err){
+                console.error('Erro na busca pelos documentos vinculados a implantação', err)
+              }
+              const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
+              const dia = String(data_implantacao.getDate()).padStart(2, '0');
+              const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
+              const ano = data_implantacao.getFullYear();
+              const dataFormatada = `${dia}/${mes}/${ano}`;
+  
+              res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade:resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0] });
+            })
           })
         });
       })
