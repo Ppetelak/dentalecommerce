@@ -496,44 +496,6 @@ app.post("/enviadados", async (req, res) => {
   }
 });
 
-
-
-
-function insertDependentes(idImplantacao, dependentes, callback) {
-  if (dependentes.length === 0) {
-    // Se não houver dependentes, finaliza a função recursiva
-    callback(null);
-    return;
-  }
-
-  const dependente = dependentes.shift();
-  const dadosDependente = {
-    id_implantacoes: idImplantacao,
-    cpfdependente: dependente.cpfdependente,
-    nomecompletodependente: dependente.nomecompletodependente,
-    nomemaedependente: dependente.nomemaedependente,
-    nascimentodependente: dependente.nascimentodependente,
-    sexodependente: dependente.sexodependente,
-  };
-
-  db.query("INSERT INTO dependentes SET ?", dadosDependente, (err, result) => {
-    if (err) {
-      callback(err);
-    } else {
-      //console.log("Dependente inserido na tabela dependentes:", dependente);
-      insertDependentes(idImplantacao, dependentes, callback);
-    }
-  });
-}
-
-app.post("/enviadados-teste", (req, res) => {
-  const dados = req.body;
-  const dataDependentes = req.body.getDependentes;
-  const nDependentes = dados.nDependentes;
-  console.log(nDependentes, dataDependentes);
-  res.send("Exito! Verificar Console");
-});
-
 app.get("/login", (req, res) => {
   res.render("login");
 });
