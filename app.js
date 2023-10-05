@@ -60,11 +60,12 @@ const db = mysql.createConnection({
   port: "3306",
 });
 
+
 /* const db = mysql.createConnection({
   host: "localhost",
-  user: "mhdental",
-  password: "pmp078917",
-  database: "mhdentalvendas1",
+  user: "mhdentalvendas_user",
+  password: "6_64idh9V",
+  database: "mhdentalvendas2",
   port: "3306",
 }); */
 
@@ -102,11 +103,11 @@ app.get('/files', (req, res) =>{
   res.render('uploads', {files:files} )
 })
 
-app.post('/upload', upload.single('file'), (req, res) => {
+app.post('/upload', verificaAutenticacao, upload.single('file'), (req, res) => {
   res.json('Enviado com sucesso');
 });
 
-app.post('/deleteImage', (req, res) => {
+app.post('/deleteImage', verificaAutenticacao, (req, res) => {
   const file = path.join(__dirname, req.body.img)
   if (fs.existsSync(file)) {
     try {
@@ -122,7 +123,7 @@ app.post('/deleteImage', (req, res) => {
   }
 });
 
-app.post('/salvarLogo', (req, res) => {
+app.post('/salvarLogo', verificaAutenticacao, (req, res) => {
   const logo = req.body.logoUrl
   const operadoraId = req.body.operadoraId
   const query = 'UPDATE planos SET logo = ? WHERE id = ?';
@@ -547,7 +548,7 @@ app.post('/login-verifica', (req, res) => {
   });
 });
 
-app.get('/implantacoes', (req, res) => {
+app.get('/implantacoes', verificaAutenticacao, (req, res) => {
   const query = 'SELECT id, cpftitular, nomecompleto, data_implantacao, planoSelecionado FROM implantacoes';
   db.query(query, (err, results) => {
     if (err) {
@@ -559,7 +560,7 @@ app.get('/implantacoes', (req, res) => {
   });
 });
 
-app.get('/implantacao/:id', (req, res) => {
+app.get('/implantacao/:id', verificaAutenticacao, (req, res) => {
   const idImplantacao = req.params.id;
 
   // Consulta a implantação pelo ID
@@ -595,14 +596,16 @@ app.get('/implantacao/:id', (req, res) => {
   });
 });
 
-app.get('/gerarContrato/:id', (req, res) => {
+app.get('/gerarContrato/:id', verificaAutenticacao, (req, res) => {
   const idImplantacao = req.params.id;
   const queryImplantacoes = 'SELECT * FROM implantacoes WHERE id=?';
   const queryPlano = 'SELECT * FROM planos WHERE id=?';
   const queryProfissao = 'SELECT * FROM profissoes WHERE nome= ?';
   const queryEntidade = 'SELECT * FROM entidades WHERE id=?';
   const queryDependentes = 'SELECT * FROM dependentes WHERE id_implantacoes = ?'
-  const queryDocumentos = 'SELECT *FROM documentos_implantacoes WHERE id_implantacao = ?'
+  const queryDocumentos = 'SELECT * FROM documentos_implantacoes WHERE id_implantacao = ?'
+  const queryCorretor = 'SELECT * FROM corretores WHERE cpf = ?'
+  const queryCorretora = 'SELECT * FROM corretoras WHERE id = ?'
 
  
   db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
@@ -620,6 +623,8 @@ app.get('/gerarContrato/:id', (req, res) => {
     const idImplantacao = resultImplantacoes[0].id;
 
     const nomeProfissao = resultImplantacoes[0].profissaotitular;
+
+    const cpfCorretor = resultImplantacoes[0].cpfcorretor;
 
     db.query(queryProfissao, [nomeProfissao], (err, resultProfissao) => {
       if(err){
@@ -646,13 +651,26 @@ app.get('/gerarContrato/:id', (req, res) => {
               if(err){
                 console.error('Erro na busca pelos documentos vinculados a implantação', err)
               }
-              const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
-              const dia = String(data_implantacao.getDate()).padStart(2, '0');
-              const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
-              const ano = data_implantacao.getFullYear();
-              const dataFormatada = `${dia}/${mes}/${ano}`;
-  
-              res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade:resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0] });
+              db.query(queryCorretor, [cpfCorretor], (err, resultCorretor) => {
+                if(err){
+                  console.error('Erro na busca pelo corretor vinculado')
+                }
+                const idCorretora = resultCorretor[0].corretora
+
+                db.query(queryCorretora, [idCorretora], (err, resultCorretora) => {
+                  if(err){
+                    console.error('Erro na busca da corretora atrelada ao corretor')
+                  }
+
+                  const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
+                  const dia = String(data_implantacao.getDate()).padStart(2, '0');
+                  const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
+                  const ano = data_implantacao.getFullYear();
+                  const dataFormatada = `${dia}/${mes}/${ano}`;
+      
+                  res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade:resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], corretor: resultCorretor[0], corretora: resultCorretora[0] });
+                })
+              })
             })
           })
         });
@@ -661,7 +679,7 @@ app.get('/gerarContrato/:id', (req, res) => {
   });
 });
 
-app.get('/corretores', (req, res) => {
+app.get('/corretores', verificaAutenticacao, (req, res) => {
   // Consulta no banco de dados para buscar os dados dos corretores juntamente com as informações das corretoras vinculadas
   db.query('SELECT c.*, co.nomeFantasia AS corretoraNome FROM corretores c LEFT JOIN corretoras co ON c.corretora = co.id', (error, results) => {
     if (error) {
@@ -689,7 +707,7 @@ app.get('/corretores', (req, res) => {
   });
 });
 
-app.post('/edit/:id', (req, res) => {
+app.post('/edit/:id', verificaAutenticacao, (req, res) => {
   const idCorretor = req.params.id;
   const { cpf, nome, telefone, email, corretora } = req.body;
   db.query(
@@ -707,7 +725,7 @@ app.post('/edit/:id', (req, res) => {
   );
 });
 
-app.post('/editCorretora/:id', (req, res) => {
+app.post('/editCorretora/:id', verificaAutenticacao, (req, res) => {
   const idCorretora = req.params.id;
   const { cnpj, razaoSocial, nomeFantasia } = req.body;
   db.query(
@@ -724,7 +742,7 @@ app.post('/editCorretora/:id', (req, res) => {
   );
 });
 
-app.get('/corretoras', (req,res) => {
+app.get('/corretoras', verificaAutenticacao, (req,res) => {
   db.query('SELECT * FROM corretoras', (error, results) => {
     if (error) {
       console.error('Erro ao consultar o banco de dados:', error);
@@ -739,7 +757,7 @@ app.get('/corretoras', (req,res) => {
   });
 })
 
-app.post('/cadastrar-corretor', (req, res) => {
+app.post('/cadastrar-corretor', verificaAutenticacao, (req, res) => {
   const { cpf, nome, telefone, email, corretora } = req.body;
   // Consulta SQL para inserir o novo corretor na tabela corretores
   const sql = 'INSERT INTO corretores (cpf, nome, telefone, email, corretora) VALUES (?, ?, ?, ?, ?)';
@@ -756,7 +774,7 @@ app.post('/cadastrar-corretor', (req, res) => {
   });
 });
 
-app.post('/cadastrar-corretora', (req, res) => {
+app.post('/cadastrar-corretora', verificaAutenticacao, (req, res) => {
   const { cnpj, razaoSocial, nomeFantasia } = req.body;
   // Consulta SQL para inserir o novo corretor na tabela corretores
   const sql = 'INSERT INTO corretoras (cnpj, razaoSocial, nomeFantasia) VALUES (?, ?, ?)';
@@ -773,7 +791,7 @@ app.post('/cadastrar-corretora', (req, res) => {
   });
 });
 
-app.delete('/corretores/:id', (req, res) => {
+app.delete('/corretores/:id', verificaAutenticacao, (req, res) => {
   const corretorId = req.params.id;
   // Consulta SQL para excluir o corretor pelo ID
   const sql = 'DELETE FROM corretores WHERE id = ?';
@@ -790,7 +808,7 @@ app.delete('/corretores/:id', (req, res) => {
   });
 });
 
-app.delete('/corretoras/:id', (req, res) => {
+app.delete('/corretoras/:id', verificaAutenticacao, (req, res) => {
   const corretorId = req.params.id;
   // Consulta SQL para excluir o corretor pelo ID
   const sql = 'DELETE FROM corretoras WHERE id = ?';
@@ -807,7 +825,7 @@ app.delete('/corretoras/:id', (req, res) => {
   });
 });
 
-app.get('/planos', (req, res) => {
+app.get('/planos', verificaAutenticacao, (req, res) => {
   const queryPlanos = 'SELECT * FROM planos';
   const files = fs.readdirSync('arquivos/');
 
@@ -820,7 +838,7 @@ app.get('/planos', (req, res) => {
   })
 });
 
-app.post('/atualiza-planos', (req, res) => {
+app.post('/atualiza-planos', verificaAutenticacao, (req, res) => {
   const { plano } = req.body;
 
   // Inicie a transação
@@ -873,7 +891,7 @@ function rollbackAndRespond(res, message) {
   });
 }
 
-app.post('/deleta-plano', (req,res) => {
+app.post('/deleta-plano', verificaAutenticacao, (req,res) => {
   const idPlano = req.body.id;
   const query = 'DELETE FROM planos WHERE id = ?';
   db.query(query, [idPlano], (err, result) => {
