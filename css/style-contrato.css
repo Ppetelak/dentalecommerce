@@ -23,8 +23,7 @@ main{
     flex-direction: column;
     background: var(--Branco);
     margin: auto;
-    padding: 3rem;
-    border: 1px solid rgba(0, 0, 0, 0.096);
+    padding: 20px;
 }
 
 .preview-image {
@@ -37,6 +36,10 @@ main{
 
 .preview-image img{
     width: 80%;
+}
+
+.page-break {
+    page-break-before: always;
 }
 
 .row {
@@ -269,4 +272,16 @@ footer {
 @page {
     size: A4;
     margin: 0;
+}
+
+@media print {
+    .elemento-oculto {
+        display: none;
+    }
+    main{
+        margin: 20mm
+    }
+    .page-break {
+        page-break-before: always;
+    }
 }

@@ -1,18 +1,20 @@
 function saveAsPDF() {
   var element = document.querySelector('main'); // Pode ser substituído por um seletor mais específico
-
+  var numeroProposta = document.getElementById('numeroProposta').value  
   // Opções para personalizar a conversão PDF
   var opt = {
       margin: 0,
-      filename: 'sua_pagina_a4.pdf',
+      filename: `Proposta ${numeroProposta}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { 
                 unit: 'mm', 
+                margin: { top: 200, right: 10, bottom: 200, left: 10 },
                 format: 'a4', 
                 orientation: 'portrait',
                 putOnlyUsedFonts: true,
                 pagesplit: true,
+                pagebreak: { before: '.page-break' },
                 callback: function (pdf) {
                       var numPages = pdf.internal.getNumberOfPages();
                       
@@ -33,7 +35,6 @@ function saveAsPDF() {
   html2pdf(element, opt);
 }
 
-// Adicione um ouvinte de evento ao botão
 document.getElementById('btnSave').addEventListener('click', saveAsPDF);
 
   
