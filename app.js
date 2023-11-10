@@ -9,6 +9,7 @@ const crypto = require("crypto");
 const cookie = require('cookie-parser');
 const multer = require('multer');
 const fs = require('fs');
+const axios = require('axios');
 const winston = require('winston')
 const uuid = require('uuid');
 const { format } = require('date-fns');
@@ -223,6 +224,19 @@ app.get("/buscar-corretor", (req, res) => {
       res.json(corretor); // Enviar as informações do corretor como resposta da requisição
     }
   });
+});
+
+app.get('/buscar-cep', async (req, res) => {
+  const { cep } = req.query;
+
+  try {
+    const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = response.data;
+    res.json(data);
+  } catch (error) {
+    console.error('Erro na busca de CEP:', error.message);
+    res.status(500).json({ error: 'Erro na busca de CEP' });
+  }
 });
 
 function generateRandomDigits(length) {
