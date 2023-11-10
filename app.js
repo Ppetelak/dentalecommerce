@@ -9,6 +9,7 @@ const crypto = require("crypto");
 const cookie = require('cookie-parser');
 const multer = require('multer');
 const fs = require('fs');
+const winston = require('winston')
 const uuid = require('uuid');
 const { format } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
@@ -92,6 +93,19 @@ const storageForm = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(null, file.originalname);
   }
+});
+
+const logger = winston.createLogger({
+  level: 'error',
+  format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json()
+  ),
+  transports: [
+      new winston.transports.File({
+          filename: path.join('erros', 'error.log.json'),
+      }),
+  ],
 });
 
 const uploadForm = multer({ storage: storageForm });
@@ -431,6 +445,8 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
       const resultImplantacao = await insertData("INSERT INTO implantacoes SET ?", dadosImplantacao);
       const idImplantacao = resultImplantacao.insertId;
 
+      const numeroPropostaGerado = resultImplantacao.numeroProposta;
+
       await insertDependentes(idImplantacao, dependentes);
 
       await insertDocumentPaths(idImplantacao, srcDocumentoFoto, srcComprovanteResidencia);
@@ -438,7 +454,7 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
       await commitTransaction();
 
       console.log("Dados inseridos com sucesso");
-      res.send("Dados inseridos com sucesso");
+      res.render("sucesso",{ numeroPropostaGerado });
     } catch (error) {
       await rollbackTransaction();
       console.log("Erro durante a transação:", error);
@@ -456,6 +472,12 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
     return new Promise((resolve, reject) => {
       db.query(query, values, (err, result) => {
         if (err) {
+          logger.error({
+            message: 'Erro ao inserir documentos',
+            error: err.message,
+            stack: err.stack,
+            timestamp: new Date().toISOString()
+        });
           reject(err);
         } else {
           resolve(result);
@@ -478,6 +500,12 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
 
         db.query("INSERT INTO dependentes SET ?", dadosDependente, (err, result) => {
           if (err) {
+            logger.error({
+              message: 'Erro ao inserir dependentes',
+              error: err.message,
+              stack: err.stack,
+              timestamp: new Date().toISOString()
+          });
             reject(err);
           } else {
             if (dependentes.length === 0) {
@@ -501,6 +529,12 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
     return new Promise((resolve, reject) => {
       db.commit((err) => {
         if (err) {
+          logger.error({
+            message: 'Erro ao dar Commit no BD das infos',
+            error: err.message,
+            stack: err.stack,
+            timestamp: new Date().toISOString()
+        });
           reject(err);
         } else {
           resolve();
