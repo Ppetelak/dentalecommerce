@@ -17,12 +17,12 @@
               <br>
             <h1>Ecommerce Dental</h1>
             
-            <li><a href="/implantacoes"><i class="bi bi-arrow-down-right-circle-fill"></i> Implantações</a></li>
-            <li><a href="/planos"><i class="bi bi-heart"></i> Planos</a></li>
-            <li><a href="/entidades"><i class="bi bi-ubuntu"></i> Entidades</a></li>
-            <li><a href="/corretoras"><i class="bi bi-building-fill-add"></i> Corretoras</a></li>
-            <li><a href="/corretores"><i class="bi bi-person-bounding-box"></i></i> Corretores</a></li>
-            <li><a href="/files"><i class="bi bi-image"></i> Midia</a></li>
+            <li class="<%= rotaAtual === 'implantacoes' ? 'rota-atual' : '' %>"><a href="/implantacoes"><i class="bi bi-arrow-down-right-circle-fill"></i> Implantações</a></li>
+            <li class="<%= rotaAtual === 'planos' ? 'rota-atual' : '' %>"><a href="/planos"><i class="bi bi-heart"></i> Planos</a></li>
+            <li class="<%= rotaAtual === 'entidades' ? 'rota-atual' : '' %>"><a href="/entidades"><i class="bi bi-ubuntu"></i> Entidades</a></li>
+            <li class="<%= rotaAtual === 'corretoras' ? 'rota-atual' : '' %>"><a href="/corretoras"><i class="bi bi-building-fill-add"></i> Corretoras</a></li>
+            <li class="<%= rotaAtual === 'corretores' ? 'rota-atual' : '' %>"><a href="/corretores"><i class="bi bi-person-bounding-box"></i></i> Corretores</a></li>
+            <li class="<%= rotaAtual === 'files' ? 'rota-atual' : '' %>"><a href="/files"><i class="bi bi-image"></i> Midia</a></li>
             <li><a href="/logout"><i class="bi bi-box-arrow-left"></i> Sair</a></li>
         </ul>
     </div>

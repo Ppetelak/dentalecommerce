@@ -14,7 +14,8 @@ const winston = require('winston')
 const uuid = require('uuid');
 const { format } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
-const porta = process.env.PORT || 5586; 
+const nodemailer = require('nodemailer');
+const porta = process.env.PORT || 5586;
 
 /* Verificar se usuário está logado */
 const verificaAutenticacao = (req, res, next) => {
@@ -99,13 +100,13 @@ const storageForm = multer.diskStorage({
 const logger = winston.createLogger({
   level: 'error',
   format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.json()
+    winston.format.timestamp(),
+    winston.format.json()
   ),
   transports: [
-      new winston.transports.File({
-          filename: path.join('erros', 'error.log.json'),
-      }),
+    new winston.transports.File({
+      filename: path.join('erros', 'error.log.json'),
+    }),
   ],
 });
 
@@ -113,9 +114,9 @@ const uploadForm = multer({ storage: storageForm });
 
 const upload = multer({ storage: storage });
 
-app.get('/files', (req, res) =>{
+app.get('/files', (req, res) => {
   const files = fs.readdirSync('arquivos/');
-  res.render('uploads', {files:files} )
+  res.render('uploads', { files: files, rotaAtual: 'files' })
 })
 
 app.post('/upload', verificaAutenticacao, upload.single('file'), (req, res) => {
@@ -175,11 +176,11 @@ app.post('/salvarLogo', verificaAutenticacao, (req, res) => {
 
 app.get("/", (req, res) => {
   const queryPlanos = 'SELECT * FROM planos'
-  db.query(queryPlanos, (err, resultPlanos) =>{
-  if(err) {
-    console.error('Erro ao consultar o banco de dados:', err);
-    return res.status(500).json({ error: 'Erro ao processar consulta ao BD'})
-  }
+  db.query(queryPlanos, (err, resultPlanos) => {
+    if (err) {
+      console.error('Erro ao consultar o banco de dados:', err);
+      return res.status(500).json({ error: 'Erro ao processar consulta ao BD' })
+    }
     res.render("index", { planos: resultPlanos });
   })
 });
@@ -197,7 +198,7 @@ app.post("/formulario", (req, res) => {
         return res.status(404).json({ error: 'Plano não encontrado' });
       }
       db.query(queryProfissoes, (err, resultProfissoes) => {
-        if(err){
+        if (err) {
           console.error('Erro ao resgatar profissoes do BD')
         }
         const planoCompleto = result[0];
@@ -282,106 +283,6 @@ function checkProposalExists(proposalNumber) {
   });
 }
 
-/* app.post("/enviadados", async (req, res) => {
-  const dados = req.body;
-  const dependentes = [];
-
-  const numeroProposta = await generateUniqueProposalNumber();
-
-  for (let i = 0; i < dados.cpfdependente.length; i++) {
-    dependentes.push({
-      cpfdependente: dados.cpfdependente[i],
-      nomecompletodependente: dados.nomecompletodependente[i],
-      nomemaedependente: dados.nomemaedependente[i],
-      nascimentodependente: dados.nascimentodependente[i],
-      sexodependente: dados.sexodependente[i],
-    });
-  }
-
-  // Verifica se a data de nascimento do responsável financeiro é válida
-  if (dados.datadenascimentofinanceiro === "") {
-    // Caso a data de nascimento esteja vazia, define como null ou alguma data padrão
-    dados.datadenascimentofinanceiro = null; // Ou alguma data padrão válida
-  } else {
-    // Caso a data de nascimento não esteja vazia, tenta convertê-la para um objeto Date
-    const dataNascimentoFinanceiro = new Date(dados.datadenascimentofinanceiro);
-    // Verifica se a conversão foi bem-sucedida e se é uma data válida
-    if (!isNaN(dataNascimentoFinanceiro.getTime())) {
-      // Se for uma data válida, formata-a no formato do MySQL (YYYY-MM-DD)
-      dados.datadenascimentofinanceiro = dataNascimentoFinanceiro
-        .toISOString()
-        .slice(0, 10);
-    } else {
-      // Se não for uma data válida, retorne um erro ou trate a situação conforme necessário
-      return res
-        .status(400)
-        .json({
-          error: "Data de nascimento do responsável financeiro inválida",
-        });
-    }
-  }
-
-  const dadosImplantacao = {
-    planoSelecionado: dados.planoSelecionado,
-    nomecompleto: dados.nomecompleto,
-    datadenascimento: dados.datadenascimento,
-    cpftitular: dados.cpftitular,
-    nomemaetitular: dados.nomemaetitular,
-    rgtitular: dados.rgtitular,
-    orgaoexpedidor: dados.orgaoexpedidor,
-    dataexpedicaorgtitular: dados.dataexpedicaorgtitular,
-    sexotitular: dados.sexotitular,
-    estadociviltitular: dados.estadociviltitular,
-    telefonetitular: dados.telefonetitular,
-    celulartitular: dados.celulartitular,
-    emailtitular: dados.emailtitular,
-    profissaotitular: dados.profissaotitular,
-    titularresponsavelfinanceiro: dados.titularresponsavelfinanceiro,
-    cpffinanceiro: dados.cpffinanceiro,
-    nomefinanceiro: dados.nomefinanceiro,
-    datadenascimentofinanceiro: dados.datadenascimentofinanceiro,
-    telefonetitularfinanceiro: dados.telefonetitularfinanceiro,
-    emailtitularfinanceiro: dados.emailtitularfinanceiro,
-    cep: dados.cep,
-    enderecoresidencial: dados.enderecoresidencial,
-    numeroendereco: dados.numeroendereco,
-    complementoendereco: dados.complementoendereco,
-    bairro: dados.bairro,
-    cidade: dados.cidade,
-    cpfcorretor: dados.cpfcorretor,
-    nomecorretor: dados.nomecorretor,
-    corretora: dados.corretora,
-    celularcorretor: dados.celularcorretor,
-    formaPagamento: dados.formaPagamento,
-    aceitoTermos: dados.aceitoTermos,
-    aceitoPrestacaoServicos: dados.aceitoPrestacaoServicos,
-    numeroProposta: numeroProposta
-  };
-
-  db.query(
-    "INSERT INTO implantacoes SET ?",
-    dadosImplantacao,
-    (err, result) => {
-      if (err) {
-        console.log("Erro ao inserir na tabela implantacoes:", err);
-        res.status(500).send("Erro ao inserir os dados");
-      } else {
-        console.log("Dados inseridos na tabela implantacoes");
-        const idImplantacao = result.insertId;
-        insertDependentes(idImplantacao, dependentes, (error) => {
-          if (error) {
-            console.log("Erro ao inserir na tabela dependentes:", error);
-            res.status(500).send("Erro ao inserir os dados");
-          } else {
-            console.log("Dados inseridos na tabela dependentes");
-            res.send("Dados inseridos com sucesso");
-          }
-        });
-      }
-    }
-  );
-}); */
-
 app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 }, { name: 'comprovanteResidencia', maxCount: 1 }]), async (req, res) => {
   const dados = req.body;
   const dependentes = [];
@@ -459,16 +360,20 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
       const resultImplantacao = await insertData("INSERT INTO implantacoes SET ?", dadosImplantacao);
       const idImplantacao = resultImplantacao.insertId;
 
-      const numeroPropostaGerado = resultImplantacao.numeroProposta;
-
       await insertDependentes(idImplantacao, dependentes);
 
       await insertDocumentPaths(idImplantacao, srcDocumentoFoto, srcComprovanteResidencia);
 
+      const numeroPropostaGerado = await consultarNumeroProposta(idImplantacao)
+
+      const emailTitular = await consultarEmailTitular(idImplantacao)
+
+      await sendContractEmail(emailTitular, idImplantacao);
+
       await commitTransaction();
 
       console.log("Dados inseridos com sucesso");
-      res.render("sucesso",{ numeroPropostaGerado });
+      res.render("sucesso", { numeroPropostaGerado });
     } catch (error) {
       await rollbackTransaction();
       console.log("Erro durante a transação:", error);
@@ -476,9 +381,10 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
     }
   });
 
+
   async function insertDocumentPaths(idImplantacao, srcDocumentoFoto, srcComprovanteResidencia) {
     const query = "INSERT INTO documentos_implantacoes (id_implantacao, documentoFoto, comprovanteResidencia) VALUES (?, ?, ?)";
-    
+
     await insertData(query, [idImplantacao, srcDocumentoFoto, srcComprovanteResidencia]);
   }
 
@@ -491,7 +397,7 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
             error: err.message,
             stack: err.stack,
             timestamp: new Date().toISOString()
-        });
+          });
           reject(err);
         } else {
           resolve(result);
@@ -519,7 +425,7 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
               error: err.message,
               stack: err.stack,
               timestamp: new Date().toISOString()
-          });
+            });
             reject(err);
           } else {
             if (dependentes.length === 0) {
@@ -539,6 +445,18 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
     });
   }
 
+  function consultarNumeroProposta(idImplantacao) {
+    return new Promise((resolve, reject) => {
+      db.query('SELECT numeroProposta FROM implantacoes WHERE id=?', [idImplantacao], (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result[0].numeroProposta);
+        }
+      });
+    });
+  }
+
   async function commitTransaction() {
     return new Promise((resolve, reject) => {
       db.commit((err) => {
@@ -548,7 +466,7 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
             error: err.message,
             stack: err.stack,
             timestamp: new Date().toISOString()
-        });
+          });
           reject(err);
         } else {
           resolve();
@@ -563,6 +481,77 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
         resolve();
       });
     });
+  }
+});
+
+function consultarEmailTitular(idImplantacao) {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT emailtitular FROM implantacoes WHERE id=?', [idImplantacao], (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result[0].emailtitular);
+      }
+    });
+  });
+}
+
+function generateRandomLink() {
+  // Lógica para gerar um link aleatório
+  // Substitua isso pela lógica real para gerar o link
+  return 'http://localhost:5586/gerarContrato/26'
+  //+ Math.random().toString(36).substring(2, 15); 
+}
+
+
+async function sendContractEmail(email, idImplantacao) {
+  return new Promise(async (resolve, reject) => {
+    const transporter = nodemailer.createTransport({
+      host: 'mail.mounthermon.com.br',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'naoresponda@mounthermon.com.br',
+        pass: '5w55t5$Ev'
+      },
+      tls: {
+        rejectUnauthorized: false // Use com cautela
+      }
+    });
+
+    const idImplantacaoGET = idImplantacao
+
+    const linkAleatorio = generateRandomLink();
+
+    const mailOptions = {
+      from: 'naoresponda@mounthermon.com.br',
+      to: email,
+      subject: 'Assinatura do Contrato',
+      html: `Olá,<br><br>Por favor, acesse o link abaixo para assinar o contrato:<br><a href="${linkAleatorio}">Clique aqui para Assinar</a>`
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      resolve(); // Resolva a promessa se o e-mail for enviado com sucesso
+    } catch (error) {
+      reject(error); // Rejeite a promessa se houver um erro no envio do e-mail
+    }
+  });
+}
+
+app.get("/enviar-email/:id", async (req, res) => {
+  const idImplantacao = req.params.id;
+  const emailTitular = await consultarEmailTitular(idImplantacao);
+
+  try {
+    await sendContractEmail(emailTitular, idImplantacao);
+    // Se a promessa for resolvida, o e-mail foi enviado com sucesso
+    res.cookie('alertSuccess', 'Disparo de email feito com sucesso', { maxAge: 3000 });
+    res.redirect('/'); // Redirecione ou renderize a página desejada
+  } catch (error) {
+    console.error(error);
+    // Se a promessa for rejeitada, houve um erro no envio do e-mail
+    res.status(500).send('Erro ao enviar o e-mail');
   }
 });
 
@@ -603,7 +592,7 @@ app.get('/implantacoes', verificaAutenticacao, (req, res) => {
       console.error('Erro ao consultar o banco de dados:', err);
       res.status(500).send('Erro ao processar a solicitação');
     } else {
-      res.render('implantacoes', { implantacoes: results, format: format, ptBR: ptBR });
+      res.render('implantacoes', { implantacoes: results, format: format, ptBR: ptBR, rotaAtual: 'implantacoes' });
     }
   });
 });
@@ -639,6 +628,7 @@ app.get('/implantacao/:id', verificaAutenticacao, (req, res) => {
         dependentes: resultDependentes,
         format: format,
         ptBR: ptBR,
+        rotaAtual: 'implantacoes'
       });
     });
   });
@@ -655,7 +645,7 @@ app.get('/gerarContrato/:id', verificaAutenticacao, (req, res) => {
   const queryCorretor = 'SELECT * FROM corretores WHERE cpf = ?'
   const queryCorretora = 'SELECT * FROM corretoras WHERE id = ?'
 
- 
+
   db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
     if (err) {
       console.log('Erro ao buscar implantação no BD', err);
@@ -675,13 +665,13 @@ app.get('/gerarContrato/:id', verificaAutenticacao, (req, res) => {
     const cpfCorretor = resultImplantacoes[0].cpfcorretor;
 
     db.query(queryProfissao, [nomeProfissao], (err, resultProfissao) => {
-      if(err){
+      if (err) {
         console.error('Erro ao buscar dados da entidade relacionada a profissão')
       }
       const entidadeId = resultProfissao[0].idEntidade;
 
       db.query(queryEntidade, [entidadeId], (err, resultEntidade) => {
-        if(err){
+        if (err) {
           console.error('Erro puxar entidade relacionada', err)
         }
         const planoId = resultImplantacoes[0].planoSelecionado;
@@ -692,21 +682,21 @@ app.get('/gerarContrato/:id', verificaAutenticacao, (req, res) => {
             return;
           }
           db.query(queryDependentes, [idImplantacao], (err, resultDependentes) => {
-            if(err){
+            if (err) {
               console.error('Erro na busca pelos dependentes vinculados a essa implantacao', err)
             }
             db.query(queryDocumentos, [idImplantacao], (err, resultDocumentos) => {
-              if(err){
+              if (err) {
                 console.error('Erro na busca pelos documentos vinculados a implantação', err)
               }
               db.query(queryCorretor, [cpfCorretor], (err, resultCorretor) => {
-                if(err){
+                if (err) {
                   console.error('Erro na busca pelo corretor vinculado')
                 }
                 const idCorretora = resultCorretor[0].corretora
 
                 db.query(queryCorretora, [idCorretora], (err, resultCorretora) => {
-                  if(err){
+                  if (err) {
                     console.error('Erro na busca da corretora atrelada ao corretor')
                   }
 
@@ -715,15 +705,98 @@ app.get('/gerarContrato/:id', verificaAutenticacao, (req, res) => {
                   const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
                   const ano = data_implantacao.getFullYear();
                   const dataFormatada = `${dia}/${mes}/${ano}`;
-      
-                  res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade:resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], corretor: resultCorretor[0], corretora: resultCorretora[0] });
+
+                  res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade: resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], corretor: resultCorretor[0], corretora: resultCorretora[0] });
                 })
               })
             })
           })
         });
       })
-    })    
+    })
+  });
+});
+
+app.get('/visualizaImplantacao/:id', verificaAutenticacao, (req, res) => {
+  const idImplantacao = req.params.id;
+  const queryImplantacoes = 'SELECT * FROM implantacoes WHERE id=?';
+  const queryPlano = 'SELECT * FROM planos WHERE id=?';
+  const queryProfissao = 'SELECT * FROM profissoes WHERE nome= ?';
+  const queryEntidade = 'SELECT * FROM entidades WHERE id=?';
+  const queryDependentes = 'SELECT * FROM dependentes WHERE id_implantacoes = ?'
+  const queryDocumentos = 'SELECT * FROM documentos_implantacoes WHERE id_implantacao = ?'
+  const queryCorretor = 'SELECT * FROM corretores WHERE cpf = ?'
+  const queryCorretora = 'SELECT * FROM corretoras WHERE id = ?'
+
+
+  db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
+    if (err) {
+      console.log('Erro ao buscar implantação no BD', err);
+      res.status(500).send('Erro ao buscar implantação no BD');
+      return;
+    }
+
+    if (resultImplantacoes.length === 0) {
+      res.status(404).send('Implantação não encontrada');
+      return;
+    }
+
+    const idImplantacao = resultImplantacoes[0].id;
+
+    const nomeProfissao = resultImplantacoes[0].profissaotitular;
+
+    const cpfCorretor = resultImplantacoes[0].cpfcorretor;
+
+    db.query(queryProfissao, [nomeProfissao], (err, resultProfissao) => {
+      if (err) {
+        console.error('Erro ao buscar dados da entidade relacionada a profissão')
+      }
+      const entidadeId = resultProfissao[0].idEntidade;
+
+      db.query(queryEntidade, [entidadeId], (err, resultEntidade) => {
+        if (err) {
+          console.error('Erro puxar entidade relacionada', err)
+        }
+        const planoId = resultImplantacoes[0].planoSelecionado;
+        db.query(queryPlano, [planoId], (err, resultPlano) => {
+          if (err) {
+            console.error('Erro ao buscar plano vinculado à implantação', err);
+            res.status(500).send('Erro ao buscar plano vinculado à implantação');
+            return;
+          }
+          db.query(queryDependentes, [idImplantacao], (err, resultDependentes) => {
+            if (err) {
+              console.error('Erro na busca pelos dependentes vinculados a essa implantacao', err)
+            }
+            db.query(queryDocumentos, [idImplantacao], (err, resultDocumentos) => {
+              if (err) {
+                console.error('Erro na busca pelos documentos vinculados a implantação', err)
+              }
+              db.query(queryCorretor, [cpfCorretor], (err, resultCorretor) => {
+                if (err) {
+                  console.error('Erro na busca pelo corretor vinculado')
+                }
+                const idCorretora = resultCorretor[0].corretora
+
+                db.query(queryCorretora, [idCorretora], (err, resultCorretora) => {
+                  if (err) {
+                    console.error('Erro na busca da corretora atrelada ao corretor')
+                  }
+
+                  const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
+                  const dia = String(data_implantacao.getDate()).padStart(2, '0');
+                  const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
+                  const ano = data_implantacao.getFullYear();
+                  const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                  res.render('detalhes-implantacao', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade: resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], corretor: resultCorretor[0], corretora: resultCorretora[0], rotaAtual: 'implantacoes' });
+                })
+              })
+            })
+          })
+        });
+      })
+    })
   });
 });
 
@@ -750,7 +823,7 @@ app.get('/corretores', verificaAutenticacao, (req, res) => {
       const corretoras = corretorasResult;
 
       // Renderize a página "corretores" e passe os dados de corretores e corretoras para o template
-      res.render('corretores', { corretores, corretoras });
+      res.render('corretores', { corretores, corretoras, rotaAtual: 'corretores' });
     });
   });
 });
@@ -767,7 +840,7 @@ app.post('/edit/:id', verificaAutenticacao, (req, res) => {
         return res.status(500).send('Erro ao atualizar o corretor no banco de dados.');
       }
 
-      res.cookie('alertSuccess','Corretor atualizado com sucesso!', {maxAge: 3000});
+      res.cookie('alertSuccess', 'Corretor atualizado com sucesso!', { maxAge: 3000 });
       res.sendStatus(200); // Resposta de sucesso (status 200) para o cliente
     }
   );
@@ -784,13 +857,13 @@ app.post('/editCorretora/:id', verificaAutenticacao, (req, res) => {
         console.error('Erro ao atualizar a corretora no banco de dados:', error);
         return res.status(500).send('Erro ao atualizar a corretora no banco de dados.');
       }
-      res.cookie('alertSuccess','Corretora atualizada com sucesso!', {maxAge: 3000});
+      res.cookie('alertSuccess', 'Corretora atualizada com sucesso!', { maxAge: 3000 });
       res.sendStatus(200); // Resposta de sucesso (status 200) para o cliente
     }
   );
 });
 
-app.get('/corretoras', verificaAutenticacao, (req,res) => {
+app.get('/corretoras', verificaAutenticacao, (req, res) => {
   db.query('SELECT * FROM corretoras', (error, results) => {
     if (error) {
       console.error('Erro ao consultar o banco de dados:', error);
@@ -801,7 +874,7 @@ app.get('/corretoras', verificaAutenticacao, (req,res) => {
     const corretoras = results.map(corretora => {
       return { ...corretora, editing: false };
     });
-  res.render('corretoras', { corretoras });
+    res.render('corretoras', { corretoras, rotaAtual: 'corretoras' });
   });
 })
 
@@ -817,7 +890,7 @@ app.post('/cadastrar-corretor', verificaAutenticacao, (req, res) => {
       return res.status(500).send('Erro ao cadastrar o corretor no banco de dados.');
     }
 
-    res.cookie('alertSuccess','Corretor cadastrado com sucesso!', {maxAge: 3000});
+    res.cookie('alertSuccess', 'Corretor cadastrado com sucesso!', { maxAge: 3000 });
     res.status(200).send('Corretor cadastrado com sucesso.');
   });
 });
@@ -834,7 +907,7 @@ app.post('/cadastrar-corretora', verificaAutenticacao, (req, res) => {
       return res.status(500).send('Erro ao cadastrar a corretora no banco de dados.');
     }
 
-    res.cookie('alertSuccess','Corretora cadastrada com sucesso!', {maxAge: 3000});
+    res.cookie('alertSuccess', 'Corretora cadastrada com sucesso!', { maxAge: 3000 });
     res.status(200).send('Corretora cadastrada com sucesso.');
   });
 });
@@ -851,7 +924,7 @@ app.delete('/corretores/:id', verificaAutenticacao, (req, res) => {
       return res.status(500).send('Erro ao excluir o corretor do banco de dados.');
     }
 
-    res.cookie('alertSuccess','Corretor excluído com sucesso!', {maxAge: 3000});
+    res.cookie('alertSuccess', 'Corretor excluído com sucesso!', { maxAge: 3000 });
     res.status(200).send('Corretor excluído com sucesso.');
   });
 });
@@ -881,8 +954,8 @@ app.get('/planos', verificaAutenticacao, (req, res) => {
     if (err) {
       console.error('Erro ao consultar o banco de dados:', err);
       res.status(500).send('Erro ao consultar os planos');
-    } 
-    res.render('planos', { planos: resultPlanos, files:files });
+    }
+    res.render('planos', { planos: resultPlanos, files: files, rotaAtual: 'planos' });
   })
 });
 
@@ -912,7 +985,7 @@ app.post('/atualiza-planos', verificaAutenticacao, (req, res) => {
             console.error('Erro ao atualizar plano:', err);
             return rollbackAndRespond(res, 'Erro interno do servidor');
           }
-          res.cookie('alertSuccess', 'Plano atualizado com sucesso', {maxAge: 3000});
+          res.cookie('alertSuccess', 'Plano atualizado com sucesso', { maxAge: 3000 });
           res.status(200).json({ message: 'Plano atualizado com sucesso' });
         });
       } else {
@@ -923,7 +996,7 @@ app.post('/atualiza-planos', verificaAutenticacao, (req, res) => {
             console.error('Erro ao criar plano:', err);
             return rollbackAndRespond(res, 'Erro interno do servidor');
           }
-          res.cookie('alertSuccess', 'Plano inserido com sucesso', {maxAge: 3000});
+          res.cookie('alertSuccess', 'Plano inserido com sucesso', { maxAge: 3000 });
           res.status(200).json({ message: 'Plano inserido com sucesso' });
         });
       }
@@ -939,28 +1012,28 @@ function rollbackAndRespond(res, message) {
   });
 }
 
-app.post('/deleta-plano', verificaAutenticacao, (req,res) => {
+app.post('/deleta-plano', verificaAutenticacao, (req, res) => {
   const idPlano = req.body.id;
   const query = 'DELETE FROM planos WHERE id = ?';
   db.query(query, [idPlano], (err, result) => {
-    if(err) {
-      console.error('Erro ao excluir plano, ou ID não existe, erro: ' , err);
-      return res.status(500).json({ message: 'Erro na exclusão do plano selecionado'});
+    if (err) {
+      console.error('Erro ao excluir plano, ou ID não existe, erro: ', err);
+      return res.status(500).json({ message: 'Erro na exclusão do plano selecionado' });
     }
-    res.status(200).json({ message: 'Plano excluído com sucesso '});
+    res.status(200).json({ message: 'Plano excluído com sucesso ' });
   });
 })
 
 app.get('/entidades', verificaAutenticacao, (req, res) => {
   db.query('SELECT * FROM entidades', (error, resultsEntidades) => {
     if (error) throw error;
-    res.render('entidades', { entidades: resultsEntidades});
+    res.render('entidades', { entidades: resultsEntidades, rotaAtual: 'entidades' });
   })
 })
 
 app.get('/api/profissoes/:id', verificaAutenticacao, (req, res) => {
   var idEntidade = req.params.id
-  db.query('SELECT * FROM profissoes WHERE idEntidade = ?',[idEntidade], (error, resultsProfissoes) => {
+  db.query('SELECT * FROM profissoes WHERE idEntidade = ?', [idEntidade], (error, resultsProfissoes) => {
     if (error) {
       res.status(500).json({ error: 'Erro ao buscar profissões' });
     } else {
@@ -984,14 +1057,14 @@ app.post('/editar-entidade/:id', verificaAutenticacao, (req, res) => {
     'UPDATE entidades SET nome=?, descricao=?, publico=?, documentos=?, taxa=? WHERE id=?';
   const sqlDeleteProfissoes = 'DELETE FROM profissoes WHERE idEntidade = ?'
   const sqlInsertProfissoes = 'INSERT INTO profissoes (nome, idEntidade) VALUES (?, ?)';
-  
+
   // Verifique se há algo dentro de profissoes
   if (Array.isArray(profissoes) && profissoes.length > 0) {
     db.query(sqlDeleteProfissoes, [idEntidade], (err, result) => {
-      if(err){
+      if (err) {
         console.error('Erro ao deletar profissões relacionadas', err)
       }
-      db.query( sql, [nome, descricao, publico, documentos, taxa, idEntidade],(error, result) => {
+      db.query(sql, [nome, descricao, publico, documentos, taxa, idEntidade], (error, result) => {
         if (error) {
           console.error('Erro ao atualizar entidade:', error);
           res.cookie('alertError', 'Erro ao atualizar Entidade, verifique e tente novamente', {
@@ -1001,18 +1074,18 @@ app.post('/editar-entidade/:id', verificaAutenticacao, (req, res) => {
         }
         profissoes.forEach((profissao) => {
           db.query(sqlInsertProfissoes, [profissao, idEntidade], (err, result) => {
-            if(err){
+            if (err) {
               console.error('Erro ao CADASTRAR profissões relacionadas', err)
             }
             res.cookie('alertSuccess', 'Entidade atualizada com Sucesso', { maxAge: 3000 });
             res.status(200).json({ message: 'Entidade atualizada com sucesso' });
           });
         })
-      })  
+      })
     });
   } else {
     // Se profissoes estiver vazio, continue sem excluir ou inserir
-    db.query( sql, [nome, descricao, publico, documentos, taxa, idEntidade],(error, result) => {
+    db.query(sql, [nome, descricao, publico, documentos, taxa, idEntidade], (error, result) => {
       if (error) {
         console.error('Erro ao atualizar entidade:', error);
         res.cookie('alertError', 'Erro ao atualizar Entidade, verifique e tente novamente', {
@@ -1073,12 +1146,12 @@ app.post('/cadastrar-entidade', verificaAutenticacao, (req, res) => {
 
     const idEntidade = result.insertId;
 
-    if (Array.isArray(profissoes)){
+    if (Array.isArray(profissoes)) {
       profissoes.forEach((profissao) => {
         db.query(sqlProfissoes, [profissao, idEntidade], (err, result) => {
-          if(err){
+          if (err) {
             comsole.error('Erro ao cadastrar profissao relacionada', err)
-          }     
+          }
         })
       })
     }

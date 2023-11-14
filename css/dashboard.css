@@ -195,10 +195,9 @@ a {
     margin: 0;
 }
 
-.navbar li {
-    padding: 10px;
+/* .navbar li {
     
-}
+} */
 
 .navbar li a {
     text-decoration: none;
@@ -243,7 +242,12 @@ a {
     transition: opacity 0.2s;
 }
 
-.active {
+.rota-atual {
+    background-color: var(--CorMHAzul);
+    color: #fff; 
+}
+
+.rota-atual i {
     background-color: var(--CorMHAzul);
     color: #fff; 
 }

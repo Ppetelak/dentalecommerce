@@ -3,9 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <!-- IMPORTAÇÕES JQUERY  -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Adicione este link no head do seu HTML -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    <!-- IMPORTAÇÕES BOOTSTRAP  -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+        crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
+    <title>Proposta Enviada</title>
 </head>
-<body>
-    <p> Id de Implantação <%= numeroPropostaGerado %></p>
+<body class="bodySucess">
+    <div class="container vh-100 d-flex justify-content-center align-items-center">
+        <div class="row infosPropostaSucess"> 
+            <h1> Obrigado pelo envio das informações</h1>
+            <p> Sua proposta foi gerada com sucesso e já está com nossa equipe, em breve você receberá no seu email cadastrado anteriormente o contrato para assinatura.</p>
+            <p> Abaixo você está recebendo o número da proposta gerado, guarde ele para futura consulta se necessário, ou caso não receba no email em até 10 minutos o link para assinatura você pode entrar em contato com nossa equipe pelo WhatsApp abaixo.</p>
+            <div class="col-6">
+                <p class="text-center"> Número da Proposta: </p>
+                <h2 class="text-center"> <%= numeroPropostaGerado %></h2>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

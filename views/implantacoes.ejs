@@ -43,7 +43,10 @@
           <td><%= implantacao.nomecompleto %></td>
           <td><%= format(implantacao.data_implantacao, 'dd/MM/yyyy', { locale: ptBR }) %></td>
           <td><%= implantacao.planoSelecionado %></td>
-          <td> <a href="/gerarContrato/<%= implantacao.id %>" target="_blank" class="btn btn-info"><button class="btn btn-info"> Visualizar Contrato </button></a></td>
+          <td> 
+            <a href="/gerarContrato/<%= implantacao.id %>" target="_blank" class="btn btn-info"><button class="btn btn-info"> Visualizar Contrato </button></a>
+            <a href="/visualizaImplantacao/<%= implantacao.id %>" target="_blank" class="btn btn-info"><button class="btn btn-info"> Detalhes </button></a>
+          </td>
         </tr>
         <% }); %>
       </tbody>
@@ -80,6 +83,5 @@
     sortTable(columnIndex);
   });
 </script>
-<script src="/js/jsActiveLink.js"></script>
 
 <body>

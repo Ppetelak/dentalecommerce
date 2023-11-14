@@ -142,3 +142,38 @@ label {
     display: flex;
     flex-direction: column;
 }
+
+/* PÁGINA DE OBRIGADO */
+.infosPropostaSucess{
+    width: 60%;
+    background: #0E3178;
+    color: #FFFFFF;
+    padding: 5rem;
+    border-radius: 12px;
+    justify-content: center;
+}
+
+.infosPropostaSucess p{
+    font-weight: 300;
+    color: #FFFFFF;
+    text-align: justify;
+}
+
+.infosPropostaSucess h1{
+    font-weight: 500;
+    font-size: 22px;
+    color: #FFFFFF;
+    border-radius: 12px;
+}
+
+.infosPropostaSucess h2{
+    background: #BE7512;
+    padding: 1rem;
+    font-weight: 500;
+    color: #FFFFFF;
+    border-radius: 12px;
+}
+
+.bodySucess{
+    background-image: url();
+}

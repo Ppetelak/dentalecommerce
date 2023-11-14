@@ -11,6 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 </head>
 
 <body>
@@ -36,7 +38,7 @@
                 <%= implantacao.id %>
               </p>
               <p><strong>Data Implantação:</strong>
-                <%= format(implantacao.data_implantacao, 'dd/MM/yyyy' , { locale: ptBR }) %>
+                <%= implantacao.data_implantacao %>
               </p>
               <p><strong>CPF Titular:</strong>
                 <%= implantacao.cpftitular %>
@@ -48,7 +50,7 @@
                 <%= implantacao.orgaoexpedidor %>
               </p>
               <p><strong>Data expedição RG Titular:</strong>
-                <%= format(implantacao.dataexpedicaorgtitular, 'dd/MM/yyyy' , { locale: ptBR }) %>
+                <%= implantacao.dataexpedicaorgtitular %>
               </p>
               <p><strong>Celular Titular:</strong>
                 <%= implantacao.telefonetitular %>
@@ -118,7 +120,7 @@
                   <%= implantacao.nomefinanceiro %>
                 </p>
                 <p><strong>Data Nascimento Financeiro:</strong>
-                  <%= format(implantacao.datadenascimentofinanceiro, 'dd/MM/yyyy' , { locale: ptBR }) %>
+                  <%= implantacao.datadenascimentofinanceiro %>
                 </p>
                 <p><strong>Sexo Titular:</strong>
                   <%= implantacao.sexotitularfinanceiro %>
@@ -225,7 +227,7 @@
                       <%= dependente.nomemaedependente %>
                     </p>
                     <p><strong>Data Nascimento Dependente:</strong>
-                      <%= format(dependente.nascimentodependente, 'dd/MM/yyyy' , { locale: ptBR }) %>
+                      <%= dependente.nascimentodependente %>
                     </p>
                     <p><strong>Sexo Dependente:</strong>
                       <%= dependente.sexodependente %>
@@ -250,8 +252,42 @@
 
       <p class="text-center">Aqui ficará o contrato para ser impresso</p>
       <a href="/gerarContrato/<%= implantacao.id %>" target="_blank"><button class="btn btn-success">Gerar PDF Contrato</button></a>
+      <a href="#" id="reenviarEmail" data-id="<%= implantacao.id %>">
+        <button class="btn btn-success">Reenviar email</button>
+      </a>
     </div>
   </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Quando o botão for clicado
+    $("#reenviarEmail").click(function(event) {
+      // Impede o comportamento padrão do link
+      event.preventDefault();
+      
+      // Obtém o ID da implantação do atributo data
+      const idImplantacao = $(this).data("id");
+  
+      // Exibe a mensagem "Enviando email, aguarde..."
+      alert("Enviando email, aguarde...");
+  
+      // Faz a requisição Ajax
+      $.ajax({
+        type: "GET",
+        url: `/enviar-email/${idImplantacao}`,
+        success: function(data) {
+          // Esconde a mensagem "Enviando email, aguarde..."
+          // (pode ser substituído por um spinner ou outra lógica desejada)
+          alert("E-mail enviado com sucesso!"); // Substitua por qualquer lógica desejada
+        },
+        error: function(error) {
+          // Esconde a mensagem "Enviando email, aguarde..."
+          // (pode ser substituído por um spinner ou outra lógica desejada)
+          alert("Erro ao enviar o e-mail. Por favor, tente novamente."); // Substitua por qualquer lógica desejada
+        }
+      });
+    });
+  });
+  </script>  
 </html>
