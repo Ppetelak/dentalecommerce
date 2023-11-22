@@ -20,17 +20,23 @@
     <%- include('navbar') %>
 <div class="content">
 <div class="contentImplantacoes mt-5">
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <img src="./img/logomounthermonoriginal.png" width="10%">
-      </div> 
+  <div class="cabecalho">
+    <div class="row">
+        <div class="col-6">
+            <label> Filtrar Implantação por Nº Proposta ou CPF </label>
+            <input type="text" id="searchProposta" class="form-control mb-3" placeholder="Insira Nº Proposta ou CPF">
+        </div>
+    </div>
+</div>
     <h2>Implantações</h2>
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>ID Implantação <i class="fas fa-sort"></i></th>
+          <th>Nº Proposta <i class="fas fa-sort"></i></th>
           <th>CPF Titular <i class="fas fa-sort"></i></th>
           <th>Nome Titular</th>
           <th>Data Implantação <i class="fas fa-sort"></i></th>
+          <th>Status</th>
           <th>Plano Escolhido</th>
           <th>Visualizar Informações</th>
         </tr>
@@ -38,13 +44,13 @@
       <tbody>
         <% implantacoes.forEach(implantacao => { %>
         <tr>
-          <td><%= implantacao.id %></td>
-          <td><%= implantacao.cpftitular %></td>
+          <td class="numeroImplantacao"><%= implantacao.numeroProposta %></td>
+          <td class="cpf"><%= implantacao.cpftitular %></td>
           <td><%= implantacao.nomecompleto %></td>
           <td><%= format(implantacao.data_implantacao, 'dd/MM/yyyy', { locale: ptBR }) %></td>
-          <td><%= implantacao.planoSelecionado %></td>
+          <td>Status Aqui</td>
+          <td><%= implantacao.nome_do_plano %></td>
           <td> 
-            <a href="/gerarContrato/<%= implantacao.id %>" target="_blank" class="btn btn-info"><button class="btn btn-info"> Visualizar Contrato </button></a>
             <a href="/visualizaImplantacao/<%= implantacao.id %>" target="_blank" class="btn btn-info"><button class="btn btn-info"> Detalhes </button></a>
           </td>
         </tr>
@@ -54,7 +60,26 @@
   </div>
 </div>
 <script>
-  // Variável para rastrear o estado atual da ordenação (1 para crescente, -1 para decrescente)
+  $(document).ready(function () {
+    $("#searchProposta").on("input", function () {
+        var searchText = $(this).val().trim().toLowerCase();
+
+        $("tbody tr").each(function () {
+            var nImplantacao = $(this).find(".numeroImplantacao").text().trim().toLowerCase();
+            var cpf = $(this).find(".cpf").text().trim().toLowerCase();
+
+            // Verifica se o texto digitado corresponde ao número de implantação ou ao CPF
+            if (nImplantacao.includes(searchText) || cpf.includes(searchText)) {
+                $(this).removeClass("d-none"); // Exibe o elemento
+            } else {
+                $(this).addClass("d-none"); // Oculta o elemento
+            }
+        });
+    });
+});
+
+
+
   let sortOrder = 1;
 
   // Função para ordenar a tabela por coluna

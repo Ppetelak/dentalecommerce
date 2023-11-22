@@ -17,8 +17,8 @@
               <br>
             <h1>Ecommerce Dental</h1>
 
-            <p>Olá, Usuário, </p>
-            <p> <a href="/logout">Sair </a> </p>
+            <p>Olá, <span class="nomeUser"> <%= user.nome %> </span> </p>
+            <li><a href="/logout"><i class="bi bi-box-arrow-left"></i> Sair</a></li>
             
             <li class="<%= rotaAtual === 'implantacoes' ? 'rota-atual' : '' %>"><a href="/implantacoes"><i class="bi bi-arrow-down-right-circle-fill"></i> Implantações</a></li>
             <li class="<%= rotaAtual === 'planos' ? 'rota-atual' : '' %>"><a href="/planos"><i class="bi bi-heart"></i> Planos</a></li>
@@ -26,7 +26,6 @@
             <li class="<%= rotaAtual === 'corretoras' ? 'rota-atual' : '' %>"><a href="/corretoras"><i class="bi bi-building-fill-add"></i> Corretoras</a></li>
             <li class="<%= rotaAtual === 'corretores' ? 'rota-atual' : '' %>"><a href="/corretores"><i class="bi bi-person-bounding-box"></i></i> Corretores</a></li>
             <li class="<%= rotaAtual === 'files' ? 'rota-atual' : '' %>"><a href="/files"><i class="bi bi-image"></i> Midia</a></li>
-            <li><a href="/logout"><i class="bi bi-box-arrow-left"></i> Sair</a></li>
         </ul>
     </div>
 </body>

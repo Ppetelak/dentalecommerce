@@ -20,8 +20,10 @@ const porta = process.env.PORT || 5586;
 /* Verificar se usuário está logado */
 const verificaAutenticacao = (req, res, next) => {
   if (req.session && req.session.usuario) {
+    res.locals.user = req.session.usuario;
     next();
   } else {
+    req.session.originalUrl = req.originalUrl;
     res.redirect('/login');
   }
 };
@@ -114,7 +116,7 @@ const uploadForm = multer({ storage: storageForm });
 
 const upload = multer({ storage: storage });
 
-app.get('/files', (req, res) => {
+app.get('/files', verificaAutenticacao, (req, res) => {
   const files = fs.readdirSync('arquivos/');
   res.render('uploads', { files: files, rotaAtual: 'files' })
 })
@@ -566,27 +568,31 @@ app.post('/login-verifica', (req, res) => {
   db.query(query, [username], (err, results) => {
     if (err) {
       console.error('Erro ao consultar o banco de dados:', err);
-      return res.status(500).json({ error: 'Erro ao processar a solicitação' });
+      return res.render('login', { error: 'Erro no servidor contate o suporte' });
     }
 
     if (results.length === 0) {
-      return res.status(401).json({ error: 'Usuário não encontrado' });
+      return res.render('login', { error: 'Usuário não encontrado' });
     }
 
     const user = results[0];
 
     if (user.password !== password) {
-      return res.status(401).json({ error: 'Senha incorreta' });
+      return res.render('login', { error: 'Senha incorreta' });
     }
 
-    // Autenticação bem-sucedida, enviar uma resposta de sucesso
+    // Após o login, redireciona para a URL original armazenada na sessão ou para '/'
+    const originalUrl = req.session.originalUrl || '/';
+    delete req.session.originalUrl; // Limpa a URL original da sessão
     req.session.usuario = user;
-    res.status(200).json({ message: 'Autenticação bem-sucedida' });
+    res.redirect(originalUrl);
   });
 });
 
+
 app.get('/implantacoes', verificaAutenticacao, (req, res) => {
-  const query = 'SELECT id, cpftitular, nomecompleto, data_implantacao, planoSelecionado FROM implantacoes';
+  const query = 'SELECT i.id, i.numeroProposta, i.cpftitular, i.nomecompleto, i.data_implantacao, i.planoSelecionado, p.nome_do_plano FROM implantacoes i JOIN planos p ON i.planoSelecionado = p.id';
+  
   db.query(query, (err, results) => {
     if (err) {
       console.error('Erro ao consultar o banco de dados:', err);
@@ -596,6 +602,7 @@ app.get('/implantacoes', verificaAutenticacao, (req, res) => {
     }
   });
 });
+
 
 app.get('/implantacao/:id', verificaAutenticacao, (req, res) => {
   const idImplantacao = req.params.id;
@@ -1169,6 +1176,10 @@ app.get("/logout", (req, res) => {
     // Redirecionar o usuário para a página de login ou para outra página desejada
     res.redirect("/login");
   });
+});
+
+app.use((req, res, next) => {
+  res.status(404).render('404');
 });
 
 app.listen(porta, () => {

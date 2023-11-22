@@ -83,8 +83,10 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="cpftitular">CPF</label>
-                                                    <input type="text" class="form-control required" id="cpftitular"
-                                                        name="cpftitular" placeholder="Cpf do titular">
+                                                    <input type="number" class="form-control required" id="cpftitular"
+                                                        name="cpftitular" placeholder="Cpf do titular" onblur="validarCPF(this)">
+                                                        <span class="valid-feedback"></span>
+                                                        <span class="invalid-feedback"></span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -210,8 +212,9 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="cpffinanceiro">CPF:</label>
-                                                    <input type="text" class="form-control required" id="cpffinanceiro"
-                                                        name="cpffinanceiro" placeholder="Cpf titular financeiro">
+                                                    <input type="text" class="form-control required" id="cpffinanceiro" name="cpffinanceiro" placeholder="Cpf titular financeiro" onblur="validarCPF(this)">
+                                                    <span class="valid-feedback"></span>
+                                                    <span class="invalid-feedback"></span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -482,8 +485,10 @@
                                                         <label for="cpfdependente">CPF:</label>
                                                         <input type="text"
                                                             class="form-control required dependente-input"
-                                                            name="cpfdependente" rows="3"
-                                                            placeholder="CPF do dependente">
+                                                            name="cpfdependente" id="cpfdependente" rows="3"
+                                                            placeholder="CPF do dependente" onblur="validarCPF(this)">
+                                                            <span class="valid-feedback"></span>
+                                                            <span class="invalid-feedback"></span>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
@@ -522,6 +527,7 @@
                                                         <label for="sexodependente">Sexo:</label>
                                                         <select class="form-control required dependente-input"
                                                             name="sexodependente">
+                                                            <option disabled selected value="">Selecione ...</option>
                                                             <option value="masculino">Masculino</option>
                                                             <option value="feminino">Feminino</option>
                                                         </select>

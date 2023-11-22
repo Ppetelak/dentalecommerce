@@ -37,6 +37,7 @@ body {
     background: var(--Branco);
     border-radius: 20px;
     padding: 20px;
+    font-size: 0.8rem;
 }
 
 .containerLogin{
@@ -111,6 +112,12 @@ label {
     display: none;
 }
 
+.nomeUser{
+    color: #0E3178;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
 .next:hover, .entrar:hover {
     background-color: var(--Branco);
     color: var(--CorMHAzul);
@@ -176,4 +183,21 @@ label {
 
 .bodySucess{
     background-image: url();
+}
+
+.valid-feedback, .invalid-feedback {
+    display: none;
+    margin-top: 5px;
+}
+
+.valid-feedback::before {
+    content: '\2714 CPF Válido'; /* Checkmark Unicode character */
+    color: green;
+    margin-right: 5px;
+}
+
+.invalid-feedback::before {
+    content: '\26A0 CPF Inválido'; /* Warning Unicode character */
+    color: red;
+    margin-right: 5px;
 }

@@ -17,53 +17,24 @@
             <img src="./img/logomounthermonoriginal.png" width="30%">
           </div>          
         <h3 class="text-center"> Ecommerce Dental - Gestão </h3>
-        <form id="login-form">
+        <form id="login-form" action="/login-verifica" method="post">
             <div class="form-group">
-                <label for="username">Usuário:</label>
-                <input type="text" class="form-control" id="username" placeholder="Digite seu usuário" name="username">
+              <label for="username">Usuário:</label>
+              <input type="text" class="form-control" id="username" placeholder="Digite seu usuário" name="username">
             </div>
             <div class="form-group">
-                <label for="password">Senha:</label>
-                <input type="password" class="form-control" id="password" placeholder="Digite sua senha"
-                    name="password">
+              <label for="password">Senha:</label>
+              <input type="password" class="form-control" id="password" placeholder="Digite sua senha" name="password">
             </div>
-            <button type="submit" class="btn btn-primary btn-block entrar">Entrar</button>
-        </form>
+            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+            <% if (typeof error !== 'undefined' && error) { %>
+              <div class="alert alert-danger" role="alert">
+                <%= error %>
+              </div>
+            <% } %>
+          </form>
     </div>
     <div class="fixed-bottom"></div>
 </body>
-<script>
-    const form = document.querySelector('form');
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const username = document.querySelector('#username').value;
-        const password = document.querySelector('#password').value;
-
-        console.log(username, password); // Verifique se os valores estão corretos
-
-        const response = await fetch('/login-verifica', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        });
-
-        const data = await response.json();
-
-        console.log(data); // Verifique a resposta do servidor
-
-        if (response.status === 200) {
-            // Autenticação bem-sucedida, redirecionar para a página de dashboard
-            console.log('Usuário autenticado com sucesso');
-            window.location.href = '/implantacoes';
-        } else {
-            // Exibir mensagem de erro
-            console.error(data.error);
-        }
-    });
-</script>
 
 </html>
