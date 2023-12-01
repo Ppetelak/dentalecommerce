@@ -210,23 +210,68 @@ app.post("/formulario", (req, res) => {
   });
 });
 
-app.get("/buscar-corretor", (req, res) => {
-  const cpfCorretor = req.query.cpfcorretor;
-  const query = 'SELECT * FROM corretores WHERE cpf = ?';
-  db.query(query, [cpfCorretor], (err, result) => {
-    if (err) {
-      console.error('Erro ao consultar o banco de dados:', err);
-      return res.status(500).json({ error: 'Erro ao processar consulta ao BD' });
-    } else {
-      // Verifica se foi encontrado algum corretor com o CPF informado
-      if (result.length === 0) {
-        return res.status(404).json({ error: 'Corretor não encontrado' });
-      }
+app.get("/buscar-corretor", async (req, res) => {
+  try {
+    const cpfCorretor = req.query.cpfcorretor;
 
-      const corretor = result[0];
-      res.json(corretor); // Enviar as informações do corretor como resposta da requisição
+    const token = 'X43ADVSEXM';
+    const senhaApi = 'kgt87pkxc2';
+
+    const config = {
+      headers: {
+        'Content-Type': 'text/plain;charset=UTF-8',
+        'token': `${token}`,
+        'senhaApi': senhaApi,
+      },
+    };
+
+    // Fazer a solicitação à API
+    const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`;
+    const response = await axios.get(apiUrl, config);
+
+    // Verificar se a API retornou algum resultado
+    if (response.data.length === 0) {
+      return res.status(404).json({ error: 'Corretor não encontrado' });
     }
-  });
+
+    // Extrair os dados relevantes
+    const corretorData = response.data;
+    const nomeCorretor = corretorData[0].nome;
+    const telefoneCorretor = corretorData[0].telefone;
+
+    // Manipular os dados do produtor (se existirem)
+    let dadosProdutores = [];
+
+    if (corretorData.length > 0) {
+        corretorData.forEach(corretor => {
+            if (corretor.produtor && corretor.produtor.nome) {
+                dadosProdutores.push({nome: corretor.produtor.nome, numeroDocumento: corretor.produtor.numeroDocumento});
+            } else {
+                nomeProdutores.push("Nome do produtor não encontrado");
+            }
+        });
+    } else {
+        if (corretorData.produtor && corretorData.produtor.nome) {
+          dadosProdutores.push({ nome: corretorData.produtor.nome, numeroDocumento: corretorData.produtor.numeroDocumento });
+        } else {
+          nomeProdutores.push("Nome do produtor não encontrado");
+    }
+    }
+    
+    const responseData = {
+      nome: nomeCorretor,
+      telefone: telefoneCorretor,
+      nomeProdutores: dadosProdutores,
+    };
+
+    console.log(responseData)
+
+    res.json(responseData);
+    
+  } catch (error) {
+    console.error('Erro ao consultar a API:', error);
+    return res.status(500).json({ error: 'Erro ao processar consulta à API' });
+  }
 });
 
 app.get('/buscar-cep', async (req, res) => {

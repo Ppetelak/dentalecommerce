@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const cpfCorretorInput = document.getElementById("cpfcorretor");
   const btnBuscarCorretor = document.getElementById("btnBuscarCorretor");
+  const corretoraSelect = document.getElementById("corretora");
   btnBuscarCorretor.addEventListener("click", () => {
     const cpfCorretor = cpfCorretorInput.value;
     if (cpfCorretor) {
@@ -40,10 +41,42 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((data) => {
           // Preencher os campos do formulário com as informações retornadas do servidor
           document.getElementById("nomecorretor").value = data.nome || "";
-          document.getElementById("corretora").value = data.corretora || "";
-          document.getElementById("celularcorretor").value =
-            data.telefone || "";
-        })
+          document.getElementById("celularcorretor").value = data.telefone || "";
+      
+          const corretoraSelect = document.getElementById("corretora");
+          const numeroDocumentoInput = document.getElementById("numeroDocumento");
+      
+          // Limpar opções existentes
+          corretoraSelect.innerHTML = "";
+      
+          if (data.nomeProdutores && data.nomeProdutores.length > 0) {
+              // Adicionar uma opção padrão
+              const defaultOption = document.createElement("option");
+              defaultOption.disabled = true;
+              defaultOption.selected = true;
+              defaultOption.text = "Selecione um produtor";
+              corretoraSelect.add(defaultOption);
+      
+              // Iterar sobre os nomes do array e adicionar opções ao select
+              data.nomeProdutores.forEach((produtor) => {
+                  const option = document.createElement("option");
+                  option.text = produtor.nome;
+                  option.value = produtor.numeroDocumento; // Definir o valor como o número do documento
+                  corretoraSelect.add(option);
+              });
+      
+              // Adicionar um ouvinte de evento change para atualizar o número do documento
+              corretoraSelect.addEventListener("change", () => {
+                  const selectedOption = corretoraSelect.options[corretoraSelect.selectedIndex];
+                  numeroDocumentoInput.value = selectedOption.value;
+              });
+          } else {
+              // Adicionar uma opção padrão caso não haja produtores
+              const option = document.createElement("option");
+              option.text = "Nenhum produtor encontrado";
+              corretoraSelect.add(option);
+          }
+      })      
         .catch((error) => {
           alert(error.message);
           console.error("Erro na requisição:", error);

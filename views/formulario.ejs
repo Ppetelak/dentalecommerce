@@ -441,13 +441,21 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="corretora">Corretora:</label>
-                                                <input type="text" class="form-control required" id="corretora"
-                                                    name="corretora" rows="3" placeholder="Corretora" readonly>
+                                                <select class="form-control required" id="corretora" name="corretora">
+                                                    <option disabled selected>Informe o CPF e pesquise Primeiro</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="celularcorretor">Telefone(WhatsApp)</label>
+                                                <label for="numeroDocumento">CPF/CNPJ Corretora</label>
+                                                <input type="tel" class="form-control" id="numeroDocumento"
+                                                    name="numeroDocumento" placeholder="CPF/CNPJ Corretora" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="celularcorretor">Telefone(WhatsApp) - Corretor</label>
                                                 <input type="tel" class="form-control" id="celularcorretor"
                                                     name="celularcorretor" placeholder="Celular WhatsApp" readonly>
                                             </div>
