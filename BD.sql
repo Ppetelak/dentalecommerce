@@ -109,4 +109,11 @@ CREATE TABLE formularios_entidades (
     
 )
 
+CREATE TABLE IF NOT EXISTS assinatura_implantacao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_implantacao INT, -- Substitua pelo ID da implantação relacionada
+    assinatura_base64 TEXT,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 

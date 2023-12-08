@@ -16,9 +16,15 @@
 </head>
 
 <body>
-  <div class="navbardiv">
-    <%- include('navbar') %>
-  </div>
+  <%- include('navbar') %>
+  <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message"
+        style="display:none">
+        Sucesso!
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show fixed-top" role="alert" id="MessageError"
+        style="display:none">
+        Erro!
+    </div>
   <div class="content">
     <div class="container mt-4">
       <h2>Detalhes da Implantação</h2>
@@ -252,42 +258,10 @@
 
       <p class="text-center">Aqui ficará o contrato para ser impresso</p>
       <a href="/gerarContrato/<%= implantacao.id %>" target="_blank"><button class="btn btn-success">Gerar PDF Contrato</button></a>
-      <a href="#" id="reenviarEmail" data-id="<%= implantacao.id %>">
-        <button class="btn btn-success">Reenviar email</button>
-      </a>
+      <button class="btn btn-success" id="reenviarEmail" data-id="<%= implantacao.id %>">Reenviar email</button>
     </div>
   </div>
 </body>
+<script src="/js/scriptImplantacoes.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
-<script>
-  $(document).ready(function() {
-    // Quando o botão for clicado
-    $("#reenviarEmail").click(function(event) {
-      // Impede o comportamento padrão do link
-      event.preventDefault();
-      
-      // Obtém o ID da implantação do atributo data
-      const idImplantacao = $(this).data("id");
-  
-      // Exibe a mensagem "Enviando email, aguarde..."
-      alert("Enviando email, aguarde...");
-  
-      // Faz a requisição Ajax
-      $.ajax({
-        type: "GET",
-        url: `/enviar-email/${idImplantacao}`,
-        success: function(data) {
-          // Esconde a mensagem "Enviando email, aguarde..."
-          // (pode ser substituído por um spinner ou outra lógica desejada)
-          alert("E-mail enviado com sucesso!"); // Substitua por qualquer lógica desejada
-        },
-        error: function(error) {
-          // Esconde a mensagem "Enviando email, aguarde..."
-          // (pode ser substituído por um spinner ou outra lógica desejada)
-          alert("Erro ao enviar o e-mail. Por favor, tente novamente."); // Substitua por qualquer lógica desejada
-        }
-      });
-    });
-  });
-  </script>  
 </html>

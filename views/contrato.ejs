@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualização Contrato</title>
+    <title>Assinatura da Proposta</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style-contrato.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <script src="https://unpkg.com/signature_pad"></script>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Open+Sans:wght@300;400;600&display=swap"
@@ -17,9 +19,25 @@
 </head>
 
 <body>
+    <div class="alert alert-success alert-dismissible fade show fixed-top" role="alert" id="Message"
+        style="display:none">
+        Sucesso!
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show fixed-top" role="alert" id="MessageError"
+        style="display:none">
+        Erro!
+    </div>
     <div class="topo sticky-top elemento-oculto">
-        <h2> Prévia do documento </h2>
-        <button type="button" class="btn btn-primary salvar" id="btnSave"> IMPRIMIR/ SALVAR PDF </button>
+        <h2> Assinatura da Proposta </h2>
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-primary salvar" id="btnSave"> IMPRIMIR/ SALVAR PDF </button>
+            </div>
+            <div class="col">
+                <a href="#assinar">
+                <button type="button" class="btn btn-primary salvar" > ASSINAR </button></a>
+            </div>
+        </div>
     
     </div>
     <main>
@@ -142,24 +160,24 @@
                     <div class="row">
                         <div class="col-6">
                             <p>Empresa Corretora: <span>
-                                    <%= corretora.razaoSocial %>
+                                    <%= implantacao.corretora %>
                                 </span></p>
                         </div>
                         <div class="col-6">
                             <p>CNPJ Corretora: <span>
-                                    <%= corretora.cnpj %>
+                                00.000.000/0001-00
                                 </span></p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-6">
                             <p>Corretor: <span>
-                                    <%= corretor.nome %>
+                                    <%= implantacao.nomecorretor %>
                                 </span></p>
                         </div>
                         <div class="col-6">
                             <p>CPF Corretor: <span>
-                                    <%= corretor.cpf %>
+                                    <%= implantacao.cpfcorretor %>
                                 </span></p>
                         </div>
                     </div>
@@ -1410,6 +1428,25 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row assinatura page-break" id="assinar">
+                <div class="col-12">
+                    <h6> Assinatura da Proposta</h6>
+                    <% if (assinaturaBase64) { %>
+                        <img src="<%= assinaturaBase64 %>" alt="Assinatura do Usuário">
+                    <% } else { %>
+                        <!-- Se não existir assinatura, renderize o canvas -->
+                        <canvas id="signature-pad" width="400" height="200"></canvas>
+                        <div class="row btnAssinatura">
+                            <button id="save-btn" class="btn btn-primary" data-implantacao-id="<%= implantacao.id %>">ASSINAR PROPOSTA</button>
+                            <button id="reset-btn" class="btn btn-secondary">Resetar Assinatura</button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+
+    <!-- Adicione um botão para salvar a assinatura -->
         </div>
         <!-- <footer class="footer">
             <p> Este contrato só tem validade mediante pagamento comprovado</p>

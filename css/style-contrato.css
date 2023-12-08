@@ -83,6 +83,24 @@ button{
     color: var(--Preto);
 }
 
+canvas {
+    border: 1px solid rgb(112, 112, 112);
+    background-color: #cacaca; /* Cor de fundo cinza escuro */
+    width: 400px; /* Largura de 100% */
+    touch-action: none;
+}
+
+.assinatura{
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.btnAssinatura {
+    gap: 20px;
+    justify-content: center;
+}
+
 h6 {
     background: var(--CorMHAmarelo);
     color: var(--Branco);

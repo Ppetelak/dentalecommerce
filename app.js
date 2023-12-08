@@ -16,6 +16,8 @@ const { format } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
 const nodemailer = require('nodemailer');
 const porta = process.env.PORT || 5586;
+const appUrl = process.env.APP_URL || 'http://localhost:5586';
+
 
 /* Verificar se usuário está logado */
 const verificaAutenticacao = (req, res, next) => {
@@ -270,6 +272,12 @@ app.get("/buscar-corretor", async (req, res) => {
     
   } catch (error) {
     console.error('Erro ao consultar a API:', error);
+    logger.error({
+      message: 'Erro ao consultar API de busca de corretores do Digital',
+      error: err.message,
+      stack: err.stack,
+      timestamp: new Date().toISOString()
+    });
     return res.status(500).json({ error: 'Erro ao processar consulta à API' });
   }
 });
@@ -415,7 +423,7 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
 
       const emailTitular = await consultarEmailTitular(idImplantacao)
 
-      await sendContractEmail(emailTitular, idImplantacao);
+      await sendContractEmail(emailTitular, idImplantacao, numeroPropostaGerado, dados.cpffinanceiro, dados.nomefinanceiro);
 
       await commitTransaction();
 
@@ -533,7 +541,7 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
 
 function consultarEmailTitular(idImplantacao) {
   return new Promise((resolve, reject) => {
-    db.query('SELECT emailtitular FROM implantacoes WHERE id=?', [idImplantacao], (err, result) => {
+    db.query('SELECT emailtitularfinanceiro FROM implantacoes WHERE id=?', [idImplantacao], (err, result) => {
       if (err) {
         reject(err);
       } else {
@@ -543,15 +551,7 @@ function consultarEmailTitular(idImplantacao) {
   });
 }
 
-function generateRandomLink() {
-  // Lógica para gerar um link aleatório
-  // Substitua isso pela lógica real para gerar o link
-  return 'http://localhost:5586/gerarContrato/26'
-  //+ Math.random().toString(36).substring(2, 15); 
-}
-
-
-async function sendContractEmail(email, idImplantacao) {
+async function sendContractEmail(email, idImplantacao, numeroProposta, cpfTitularFinanceiro,nomeTitularFinanceiro) {
   return new Promise(async (resolve, reject) => {
     const transporter = nodemailer.createTransport({
       host: 'mail.mounthermon.com.br',
@@ -562,25 +562,38 @@ async function sendContractEmail(email, idImplantacao) {
         pass: '5w55t5$Ev'
       },
       tls: {
-        rejectUnauthorized: false // Use com cautela
+        rejectUnauthorized: false
       }
     });
 
-    const idImplantacaoGET = idImplantacao
+    const linkAleatorio = `${appUrl}/assinar/${idImplantacao}/${numeroProposta}/${cpfTitularFinanceiro}`;
 
-    const linkAleatorio = generateRandomLink();
 
     const mailOptions = {
       from: 'naoresponda@mounthermon.com.br',
       to: email,
-      subject: 'Assinatura do Contrato',
-      html: `Olá,<br><br>Por favor, acesse o link abaixo para assinar o contrato:<br><a href="${linkAleatorio}">Clique aqui para Assinar</a>`
+      subject: `MOUNT HERMON - Assinatura Proposta Nº ${numeroProposta}`,
+      html: `
+            Olá, ${nomeTitularFinanceiro}<br><br>
+            Recebemos sua solicitação para inclusão em nossos planos de Saúde Odontológicos<br>
+            Por favor, acesse o link abaixo para assinar o contrato:<br>
+            <a href="${linkAleatorio}">Clique aqui para Assinar</a> </br>
+            Desde já agradecemos a Preferência! </br>
+            </br>
+            Obs: Abra o link no celular para ser mais fácil a assinatura da proposta!
+            `
     };
 
     try {
       await transporter.sendMail(mailOptions);
       resolve(); // Resolva a promessa se o e-mail for enviado com sucesso
     } catch (error) {
+      logger.error({
+        message: 'Erro no envio do email ao beneficiário para assinatura',
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString()
+      });
       reject(error); // Rejeite a promessa se houver um erro no envio do e-mail
     }
   });
@@ -588,23 +601,175 @@ async function sendContractEmail(email, idImplantacao) {
 
 app.get("/enviar-email/:id", async (req, res) => {
   const idImplantacao = req.params.id;
-  const emailTitular = await consultarEmailTitular(idImplantacao);
+  const queryImplantacoes =   'SELECT * FROM implantacoes WHERE id=?'
+  db.query(queryImplantacoes, [idImplantacao], (err, result) => {
+    if(err){
+      res.cookie('alertError', 'Erro ao pegar dados do beneficiário para disparo de email', { maxAge: 3000 });
+    }
 
-  try {
-    await sendContractEmail(emailTitular, idImplantacao);
-    // Se a promessa for resolvida, o e-mail foi enviado com sucesso
-    res.cookie('alertSuccess', 'Disparo de email feito com sucesso', { maxAge: 3000 });
-    res.redirect('/'); // Redirecione ou renderize a página desejada
-  } catch (error) {
-    console.error(error);
-    // Se a promessa for rejeitada, houve um erro no envio do e-mail
-    res.status(500).send('Erro ao enviar o e-mail');
-  }
+    console.log(result)
+    let implantacao = result[0];
+    try {
+      sendContractEmail(implantacao.emailtitularfinanceiro, idImplantacao, implantacao.numeroProposta, implantacao.cpffinanceiro, implantacao.nomefinanceiro);
+      res.cookie('alertSuccess', 'Disparo de email feito com sucesso, aguarde até 5 minutos para verificar se usuário recebe o email', { maxAge: 3000 });
+      res.status(200).send('Corretor cadastrado com sucesso.');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Erro ao enviar o e-mail');
+    }
+  })
 });
 
 app.get("/login", (req, res) => {
   res.render("login");
 });
+
+app.get("/assinar/:idImplantacao/:numeroProposta/:cpfTitularFinanceiro", (req, res) => {
+  const numeroProposta = req.params.numeroProposta;
+  const cpfTitular = req.params.cpfTitularFinanceiro;
+
+  const idImplantacao = req.params.idImplantacao;
+  const queryImplantacoes = 'SELECT * FROM implantacoes WHERE id=?';
+  const queryPlano = 'SELECT * FROM planos WHERE id=?';
+  const queryProfissao = 'SELECT * FROM profissoes WHERE nome= ?';
+  const queryEntidade = 'SELECT * FROM entidades WHERE id=?';
+  const queryDependentes = 'SELECT * FROM dependentes WHERE id_implantacoes = ?'
+  const queryDocumentos = 'SELECT * FROM documentos_implantacoes WHERE id_implantacao = ?'
+  const queryAssinatura = 'SELECT * FROM assinatura_implantacao WHERE id_implantacao = ?'
+
+  db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
+    if (err) {
+      logger.error({
+        message: 'ROTA: ASSINAR | ERRO: ao buscar a implantação no banco de dados',
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString()
+      });
+      console.log('Erro ao buscar implantação no BD', err);
+      res.status(500).send('Erro ao buscar implantação no BD');
+      return;
+    }
+
+    if (resultImplantacoes.length === 0) {
+      logger.error({
+        message: 'ROTA: ASSINAR | ERRO: Implantação não foi encontrada',
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString()
+      });
+      res.status(404).send('Implantação não encontrada');
+      return;
+    }
+
+    const idImplantacao = resultImplantacoes[0].id;
+
+    const nomeProfissao = resultImplantacoes[0].profissaotitular;
+
+    db.query(queryProfissao, [nomeProfissao], (err, resultProfissao) => {
+      if (err) {
+        logger.error({
+          message: 'ROTA: ASSINAR | ERRO: Erro ao buscar dados da entidade relacionada a profissão',
+          error: err.message,
+          stack: err.stack,
+          timestamp: new Date().toISOString()
+        });
+        console.error('Erro ao buscar dados da entidade relacionada a profissão')
+      }
+      const entidadeId = resultProfissao[0].idEntidade;
+
+      db.query(queryEntidade, [entidadeId], (err, resultEntidade) => {
+        if (err) {
+          logger.error({
+            message: 'ROTA: ASSINAR | ERRO: ao buscar entidade relacionada',
+            error: err.message,
+            stack: err.stack,
+            timestamp: new Date().toISOString()
+          });
+          console.error('Erro puxar entidade relacionada', err)
+        }
+        const planoId = resultImplantacoes[0].planoSelecionado;
+        db.query(queryPlano, [planoId], (err, resultPlano) => {
+          if (err) {
+            logger.error({
+              message: 'ROTA: ASSINAR | ERRO: ao buscar plano vinculado a implantação',
+              error: err.message,
+              stack: err.stack,
+              timestamp: new Date().toISOString()
+            });
+            console.error('Erro ao buscar plano vinculado à implantação', err);
+            res.status(500).send('Erro ao buscar plano vinculado à implantação');
+            return;
+          }
+          db.query(queryDependentes, [idImplantacao], (err, resultDependentes) => {
+            if (err) {
+              logger.error({
+                message: 'ROTA: ASSINAR | ERRO: Ao buscar dependentes vinculados a essa implantação',
+                error: err.message,
+                stack: err.stack,
+                timestamp: new Date().toISOString()
+              });
+              console.error('Erro na busca pelos dependentes vinculados a essa implantacao', err)
+            }
+            db.query(queryDocumentos, [idImplantacao], (err, resultDocumentos) => {
+              if (err) {
+                logger.error({
+                  message: 'ROTA: ASSINAR | ERRO: ao buscar documentos vinculados a implantação',
+                  error: err.message,
+                  stack: err.stack,
+                  timestamp: new Date().toISOString()
+                });
+                console.error('Erro na busca pelos documentos vinculados a implantação', err)
+              }
+              db.query(queryAssinatura, [idImplantacao], (err, resultAssinatura) => {
+                if(err){
+                  logger.error({
+                    message: 'ROTA: ASSINAR | ERRO: ao pegar a assinatura vinculada',
+                    error: err.message,
+                    stack: err.stack,
+                    timestamp: new Date().toISOString()
+                  });
+                  console.error('Erro ao pegar assinatura', err)
+                }
+                const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
+                const dia = String(data_implantacao.getDate()).padStart(2, '0');
+                const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
+                const ano = data_implantacao.getFullYear();
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                const assinaturaBase64 = resultAssinatura.length > 0 && resultAssinatura[0] ? resultAssinatura[0].assinatura_base64 : null;
+                
+                res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade: resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], assinaturaBase64: assinaturaBase64 });
+
+              })
+            })
+          })
+        })
+      })
+    });
+  })
+});
+
+app.post('/salva-assinatura', (req,res) => {
+  const idImplantacao = req.body.idImplantacao;
+  const assinatura = req.body.assinatura_base64;
+  const sqlInsertAsign = 'INSERT INTO assinatura_implantacao( id_implantacao, assinatura_base64) VALUES (?,?)';
+
+  db.query(sqlInsertAsign, [idImplantacao, assinatura], (err, result) => {
+    if(err){
+      logger.error({
+        message: 'ROTA: ASSINAR | ERRO: ao salvar assinatura do beneficiário',
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString()
+      });
+      console.error('Erro ao salvar assinatura do beneficiário')
+      res.cookie('alertError', 'Erro ao salvar assinatura, contate o suporte')
+      res.status(500).send('Erro ao enviar assinatura, solicite auxílio do suporte');
+    }
+    res.cookie('alertSuccess', 'Assinatura feita com sucesso', { maxAge: 3000 });
+    res.status(200).send('Corretor cadastrado com sucesso.');
+  })
+})
 
 app.post('/login-verifica', (req, res) => {
   const { username, password } = req.body;
@@ -634,7 +799,6 @@ app.post('/login-verifica', (req, res) => {
   });
 });
 
-
 app.get('/implantacoes', verificaAutenticacao, (req, res) => {
   const query = 'SELECT i.id, i.numeroProposta, i.cpftitular, i.nomecompleto, i.data_implantacao, i.planoSelecionado, p.nome_do_plano FROM implantacoes i JOIN planos p ON i.planoSelecionado = p.id';
   
@@ -647,7 +811,6 @@ app.get('/implantacoes', verificaAutenticacao, (req, res) => {
     }
   });
 });
-
 
 app.get('/implantacao/:id', verificaAutenticacao, (req, res) => {
   const idImplantacao = req.params.id;
@@ -686,89 +849,6 @@ app.get('/implantacao/:id', verificaAutenticacao, (req, res) => {
   });
 });
 
-app.get('/gerarContrato/:id', verificaAutenticacao, (req, res) => {
-  const idImplantacao = req.params.id;
-  const queryImplantacoes = 'SELECT * FROM implantacoes WHERE id=?';
-  const queryPlano = 'SELECT * FROM planos WHERE id=?';
-  const queryProfissao = 'SELECT * FROM profissoes WHERE nome= ?';
-  const queryEntidade = 'SELECT * FROM entidades WHERE id=?';
-  const queryDependentes = 'SELECT * FROM dependentes WHERE id_implantacoes = ?'
-  const queryDocumentos = 'SELECT * FROM documentos_implantacoes WHERE id_implantacao = ?'
-  const queryCorretor = 'SELECT * FROM corretores WHERE cpf = ?'
-  const queryCorretora = 'SELECT * FROM corretoras WHERE id = ?'
-
-
-  db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
-    if (err) {
-      console.log('Erro ao buscar implantação no BD', err);
-      res.status(500).send('Erro ao buscar implantação no BD');
-      return;
-    }
-
-    if (resultImplantacoes.length === 0) {
-      res.status(404).send('Implantação não encontrada');
-      return;
-    }
-
-    const idImplantacao = resultImplantacoes[0].id;
-
-    const nomeProfissao = resultImplantacoes[0].profissaotitular;
-
-    const cpfCorretor = resultImplantacoes[0].cpfcorretor;
-
-    db.query(queryProfissao, [nomeProfissao], (err, resultProfissao) => {
-      if (err) {
-        console.error('Erro ao buscar dados da entidade relacionada a profissão')
-      }
-      const entidadeId = resultProfissao[0].idEntidade;
-
-      db.query(queryEntidade, [entidadeId], (err, resultEntidade) => {
-        if (err) {
-          console.error('Erro puxar entidade relacionada', err)
-        }
-        const planoId = resultImplantacoes[0].planoSelecionado;
-        db.query(queryPlano, [planoId], (err, resultPlano) => {
-          if (err) {
-            console.error('Erro ao buscar plano vinculado à implantação', err);
-            res.status(500).send('Erro ao buscar plano vinculado à implantação');
-            return;
-          }
-          db.query(queryDependentes, [idImplantacao], (err, resultDependentes) => {
-            if (err) {
-              console.error('Erro na busca pelos dependentes vinculados a essa implantacao', err)
-            }
-            db.query(queryDocumentos, [idImplantacao], (err, resultDocumentos) => {
-              if (err) {
-                console.error('Erro na busca pelos documentos vinculados a implantação', err)
-              }
-              db.query(queryCorretor, [cpfCorretor], (err, resultCorretor) => {
-                if (err) {
-                  console.error('Erro na busca pelo corretor vinculado')
-                }
-                const idCorretora = resultCorretor[0].corretora
-
-                db.query(queryCorretora, [idCorretora], (err, resultCorretora) => {
-                  if (err) {
-                    console.error('Erro na busca da corretora atrelada ao corretor')
-                  }
-
-                  const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
-                  const dia = String(data_implantacao.getDate()).padStart(2, '0');
-                  const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
-                  const ano = data_implantacao.getFullYear();
-                  const dataFormatada = `${dia}/${mes}/${ano}`;
-
-                  res.render('contrato', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade: resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], corretor: resultCorretor[0], corretora: resultCorretora[0] });
-                })
-              })
-            })
-          })
-        });
-      })
-    })
-  });
-});
-
 app.get('/visualizaImplantacao/:id', verificaAutenticacao, (req, res) => {
   const idImplantacao = req.params.id;
   const queryImplantacoes = 'SELECT * FROM implantacoes WHERE id=?';
@@ -777,8 +857,6 @@ app.get('/visualizaImplantacao/:id', verificaAutenticacao, (req, res) => {
   const queryEntidade = 'SELECT * FROM entidades WHERE id=?';
   const queryDependentes = 'SELECT * FROM dependentes WHERE id_implantacoes = ?'
   const queryDocumentos = 'SELECT * FROM documentos_implantacoes WHERE id_implantacao = ?'
-  const queryCorretor = 'SELECT * FROM corretores WHERE cpf = ?'
-  const queryCorretora = 'SELECT * FROM corretoras WHERE id = ?'
 
 
   db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
@@ -797,7 +875,6 @@ app.get('/visualizaImplantacao/:id', verificaAutenticacao, (req, res) => {
 
     const nomeProfissao = resultImplantacoes[0].profissaotitular;
 
-    const cpfCorretor = resultImplantacoes[0].cpfcorretor;
 
     db.query(queryProfissao, [nomeProfissao], (err, resultProfissao) => {
       if (err) {
@@ -824,32 +901,21 @@ app.get('/visualizaImplantacao/:id', verificaAutenticacao, (req, res) => {
               if (err) {
                 console.error('Erro na busca pelos documentos vinculados a implantação', err)
               }
-              db.query(queryCorretor, [cpfCorretor], (err, resultCorretor) => {
-                if (err) {
-                  console.error('Erro na busca pelo corretor vinculado')
-                }
-                const idCorretora = resultCorretor[0].corretora
+              
 
-                db.query(queryCorretora, [idCorretora], (err, resultCorretora) => {
-                  if (err) {
-                    console.error('Erro na busca da corretora atrelada ao corretor')
-                  }
+              const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
+              const dia = String(data_implantacao.getDate()).padStart(2, '0');
+              const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
+              const ano = data_implantacao.getFullYear();
+              const dataFormatada = `${dia}/${mes}/${ano}`;
 
-                  const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
-                  const dia = String(data_implantacao.getDate()).padStart(2, '0');
-                  const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
-                  const ano = data_implantacao.getFullYear();
-                  const dataFormatada = `${dia}/${mes}/${ano}`;
-
-                  res.render('detalhes-implantacao', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade: resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], corretor: resultCorretor[0], corretora: resultCorretora[0], rotaAtual: 'implantacoes' });
-                })
-              })
+              res.render('detalhes-implantacao', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade: resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], rotaAtual: 'implantacoes' });
             })
           })
-        });
+        })
       })
-    })
-  });
+    });
+  })
 });
 
 app.get('/corretores', verificaAutenticacao, (req, res) => {
