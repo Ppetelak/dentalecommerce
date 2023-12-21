@@ -85,7 +85,7 @@
                                                 <div class="form-group">
                                                     <label for="cpftitular">CPF</label>
                                                     <input type="number" class="form-control required" id="cpftitular"
-                                                        name="cpftitular" placeholder="Cpf do titular" onblur="validarCPF(this)">
+                                                        name="cpftitular" placeholder="Cpf do titular" onblur="validarCPF(this)" required>
                                                         <span class="valid-feedback"></span>
                                                         <span class="invalid-feedback"></span>
                                                 </div>
@@ -213,7 +213,7 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="cpffinanceiro">CPF:</label>
-                                                    <input type="text" class="form-control required" id="cpffinanceiro" name="cpffinanceiro" placeholder="Cpf titular financeiro" onblur="validarCPF(this)">
+                                                    <input type="text" class="form-control required" id="cpffinanceiro" name="cpffinanceiro" placeholder="Cpf titular financeiro" onblur="validarCPF(this)" required>
                                                     <span class="valid-feedback"></span>
                                                     <span class="invalid-feedback"></span>
                                                 </div>
@@ -625,9 +625,6 @@
                                     <button class="btn btn-primary prev" type="button">Anterior</button>
                                     <button class="btn btn-primary next" type="button">Próximo</button>
                                 </div>
-                                
-                                
-                                
 
                                 <!-- FORMAS DE PAGAMENTO E ACEITES -->
                                 <div class="tab-pane fade" id="pills-step7" role="tabpanel"

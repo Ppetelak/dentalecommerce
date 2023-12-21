@@ -7,6 +7,14 @@ document.addEventListener("DOMContentLoaded", function () {
     element.addEventListener("click", handlePrevClick);
   });
 
+  validateRequiredFields();
+
+  var requiredFields = document.querySelectorAll(".tab-pane.active [required]");
+  requiredFields.forEach(function(field) {
+    field.addEventListener("change", validateRequiredFields);
+    field.addEventListener("keyup", validateRequiredFields);
+  });
+
   document
     .getElementById("titularresponsavelfinanceiro")
     .addEventListener("change", handleTitularResponsavelChange);
@@ -163,6 +171,21 @@ function previewImage(inputId, previewId, removeButtonId) {
   }
 }
 
+function validateRequiredFields() {
+  var activeTab = document.querySelector(".tab-pane.active");
+  var requiredFields = activeTab.querySelectorAll("[required]");
+  var allFilled = true;
+
+  requiredFields.forEach(function(field) {
+    if (!field.value.trim()) {
+      allFilled = false;
+    }
+  });
+
+  var nextButton = document.querySelector(".next");
+  nextButton.disabled = !allFilled;
+}
+
 function removePreview(inputId, previewId, removeButtonId) {
   const input = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
@@ -186,6 +209,7 @@ function handleNextClick() {
   activeProgress.style.width = newWidthValue + "%";
 
   if (nextTab) {
+    validateRequiredFields();
     activeTab.classList.remove("show", "active");
     nextTab.classList.add("show", "active");
   }
@@ -213,7 +237,9 @@ function handleTitularResponsavelChange() {
 
   if (selectedOption === "Não") {
     naoEResponsavel.style.display = "block";
+    validateRequiredFields()
   } else {
+    
     naoEResponsavel.style.display = "none";
   }
 }
