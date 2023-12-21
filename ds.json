@@ -1,0 +1,97 @@
+{
+    "numeroProposta": "string", // É o mesmo que será gerado no ecommerce?
+    "dataAssinatura": "string", //Seria a data de assinatura da proposta? 
+    "diaVencimento": 0,
+    "cpfResponsavel": "string", //Titular financeiro no caso assim como o nome?
+    "nomeResponsavel": "string",
+    "observacao": "string",
+    "plano": {
+      "codigo": "string" // ?
+    },
+    "convenio": {
+      "codigo": "string" // ?
+    },
+    "produtor": {
+      "codigo": "string" // ?
+    },
+    "supervisor": {
+      "codigo": "string" // ?
+    },
+    "corretora": {
+      "codigo": "string" // ?
+    },
+    "angariador": {
+      "codigo": "string" // ?
+    },
+    "grupo": {
+      "codigo": "string" // ?
+    },
+    "filial": {
+      "codigo": "string" // ?
+    },
+    "opcionalList": [
+      {
+        "codigo": "string"
+      }
+    ],
+    "beneficiarioList": [
+      {
+        "nome": "string",
+        "dataNascimento": "string",
+        "rg": "string",
+        "orgaoEmissor": "string",
+        "cpf": "string",
+        "dnv": "string",
+        "cns": "string",
+        "pis": "string",
+        "nomeMae": "string",
+        "endereco": "string",
+        "numero": "string",
+        "complemento": "string",
+        "bairro": "string",
+        "municipio": "string",
+        "uf": "string",
+        "cep": "string",
+        "dddTelefone": "string",
+        "telefone": "string",
+        "dddCelular": "string",
+        "celular": "string",
+        "email": "string",
+        "emailSecundario": "string",
+        "altura": 0,
+        "peso": 0,
+        "imc": 0,
+        "dataVigencia": "string",
+        "mensalidade": 0,
+        "declaracaoSaudeList": [
+          {
+            "codigo": "string"
+          }
+        ],
+        "carencia": {
+          "codigo": "string",
+          "nome": "string"
+        },
+        "estatoCivil": {
+          "id": 0,
+          "nome": "string"
+        },
+        "tipoBeneficiario": {
+          "id": 0,
+          "nome": "string"
+        },
+        "sexo": {
+          "id": 0,
+          "nome": "string"
+        },
+        "parentesco": {
+          "id": 0,
+          "nome": "string"
+        },
+        "statusBeneficiario": {
+          "id": 0,
+          "nome": "string"
+        }
+      }
+    ]
+  }

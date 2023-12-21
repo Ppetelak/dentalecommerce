@@ -293,13 +293,58 @@ footer {
 }
 
 @media print {
+    main{
+        width: 100%;
+        background: var(--Branco);
+        margin: 0;
+        padding: 20px;
+    }
+    .table-contrato tr td:nth-child(1), .table-contrato tr th:nth-child(1) {
+        background: #000 !important;
+        color: #fff !important;
+    }
+    
+    .table-contrato tr td:nth-child(2), .table-contrato tr th:nth-child(2){
+        background: #A2A1A1 !important;
+    }
+    
+    .table-contrato h2{
+        background: #000 !important;
+        color: #fff !important;
+    }
+    .table-contrato tr td:nth-child(3), .table-contrato tr th:nth-child(3){
+        background: #E0E0DF !important;
+    }
+    
+    .table-contrato h2{
+        background: #000 !important;
+        color: #fff !important;
+    }
+    .table-contratoGerais {
+        border: 1px solid #0E3178 !important;
+    }
+    .table-contratoGerais tr th:nth-child(1), .table-contratoGerais tr th:nth-child(2), .table-contratoGerais tr th:nth-child(3) {
+        background:#0E3178 !important;
+        color: #fff !important;
+    }
+    
+    .table-glc tr td:nth-child(1), .table-glc tr th:nth-child(1) {
+        background: #A2A1A1 !important;
+    }
+    
+    .table-glc tr td:nth-child(2), .table-glc tr th:nth-child(2){
+        background: #E0E0DF !important;
+    }
     .elemento-oculto {
         display: none;
     }
-    main{
-        margin: 20mm
-    }
     .page-break {
         page-break-before: always;
+    }
+    body{
+        margin:0;
+        padding-top: 10mm;
+        padding-bottom: 10mm;
+        background: #fff !important;
     }
 }

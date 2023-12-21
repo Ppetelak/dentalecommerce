@@ -251,14 +251,59 @@
                   <% } %>
         </div>
       </div>
-    </div>
-    <div class=" container impressao">
-      <h1 class="text-center">Contrato referente ao Plano <% implantacao.planoSelecionado %>
-      </h1>
 
-      <p class="text-center">Aqui ficará o contrato para ser impresso</p>
-      <a href="/gerarContrato/<%= implantacao.id %>" target="_blank"><button class="btn btn-success">Gerar PDF Contrato</button></a>
-      <button class="btn btn-success" id="reenviarEmail" data-id="<%= implantacao.id %>">Reenviar email</button>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title">Ações</h5>
+        </div>
+        <div class="card-body">
+          <div class="row acoes">
+            <a href="/assinar/<%= implantacao.id %>/<%= implantacao.numeroProposta %>/<%= implantacao.cpffinanceiro %>" target="_blank"><button class="btn btn-success">Ver contrato</button></a>
+            <a><button class="btn btn-success" id="reenviarEmail" data-id="<%= implantacao.id %>">Reenviar email</button></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5> Status e Atualizações </h5>
+        </div>
+        <div class="card-body">
+          <table class="table">
+            <% if(status.length > 0) { %>
+            <th> Ambiente </th>
+            <th> Atualização </th>
+              <% status.forEach( function(statusUnico) { %>
+                <tr>
+                  <td>
+                    <% if(statusUnico.idstatus === 2) { %>
+                      <span class="statusEcommerce status">
+                        ECOMMERCE
+                      </span>
+                    <% } %>
+                    <% if(statusUnico.idstatus === 3) { %>
+                      <span class="statusPagamento status">
+                        PAGAMENTO
+                      </span>
+                    <% } %>
+                    <% if(statusUnico.idstatus === 4) { %>
+                      <span class="statusDs status">
+                        DIGITAL SAÚDE
+                      </span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <%= statusUnico.mensagem %>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %> 
+              <p> Sem mensagens de status </p>
+            <% } %>
+  
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </body>

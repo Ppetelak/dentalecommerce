@@ -4,13 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assinatura da Proposta</title>
+    <title>Proposta nº <%= implantacao.numeroProposta %></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style-contrato.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
     <script src="https://unpkg.com/signature_pad"></script>
 
     <link
@@ -702,7 +701,7 @@
                 </div>
             </div>
 
-            <div class="row dados condicoesContrato page-break">
+            <div class="row dados condicoesContrato">
                 <div class="col-12">
                     <h6> Condições Gerais do Contrato</h6>
                     <div class="row">
@@ -916,7 +915,7 @@
                                     </tr>
                                 </tfoot>
                             </table>
-
+                            </br>
                             <li>
                                 O pagamento do benefício será na forma indicada na página 2 desta Proposta, sendo que a
                                 falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao
@@ -1002,7 +1001,7 @@
                 </div>
             </div>
 
-            <div class="row dados guiaLeitura page-break">
+            <div class="row dados guiaLeitura">
                 <div class="col-12">
                     <h6> Guia de Leitura Contratual (GLC)</h6>
                     <div class="row manual">
@@ -1371,7 +1370,7 @@
             <div class="row page-break">
                 <div class="col-12">
                     <h6> Proposta Associativa</h6>
-                    <div class="container propostaAssociativa ">
+                    <div class="propostaAssociativa ">
                         <div class="row pt-2 pb-2">
                             <div class="col-6 text-center">
                                 <label><%= entidade.nome %></label>
@@ -1410,8 +1409,7 @@
                 </div>
             </div>
             
-
-            <div class="row dados documentos page-break">
+            <div class="row dados documentos">
                 <div class="col-12">
                     <h6> Documentos vinculados a Proposta</h6>
                     <div class="row">
@@ -1429,7 +1427,7 @@
                 </div>
             </div>
 
-            <div class="row assinatura page-break" id="assinar">
+            <div class="row assinatura" id="assinar">
                 <div class="col-12">
                     <h6> Assinatura da Proposta</h6>
                     <% if (assinaturaBase64) { %>

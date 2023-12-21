@@ -15,6 +15,7 @@ const uuid = require('uuid');
 const { format } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
 const nodemailer = require('nodemailer');
+const juice = require('juice');
 const porta = process.env.PORT || 5586;
 const appUrl = process.env.APP_URL || 'http://localhost:5586';
 
@@ -338,6 +339,22 @@ function checkProposalExists(proposalNumber) {
   });
 }
 
+async function sendStatus(idImplantacao, idStatus, mensagem){
+  const query = 'INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)'
+  db.query(query, [idStatus, idImplantacao, mensagem], (err, result) => {
+    if (err){
+      console.log('Erro ao inserir valores na tabela de status' + err)
+      logger.error({
+        message: 'Erro ao inserir valores na tabela de status',
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString()
+      });
+    }
+    return
+  })
+}
+
 app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 }, { name: 'comprovanteResidencia', maxCount: 1 }]), async (req, res) => {
   const dados = req.body;
   const dependentes = [];
@@ -391,11 +408,11 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
         emailtitular: dados.emailtitular,
         profissaotitular: dados.profissaotitular,
         titularresponsavelfinanceiro: dados.titularresponsavelfinanceiro,
-        cpffinanceiro: dados.cpffinanceiro,
-        nomefinanceiro: dados.nomefinanceiro,
-        datadenascimentofinanceiro: dados.datadenascimentofinanceiro,
-        telefonetitularfinanceiro: dados.telefonetitularfinanceiro,
-        emailtitularfinanceiro: dados.emailtitularfinanceiro,
+        cpffinanceiro: dados.cpffinanceiro || dados.cpftitular,
+        nomefinanceiro: dados.nomefinanceiro || dados.nomecompleto,
+        datadenascimentofinanceiro: dados.datadenascimentofinanceiro || dados.datadenascimento,
+        telefonetitularfinanceiro: dados.telefonetitularfinanceiro || dados.telefonetitular,
+        emailtitularfinanceiro: dados.emailtitularfinanceiro || dados.emailtitular, 
         cep: dados.cep,
         enderecoresidencial: dados.enderecoresidencial,
         numeroendereco: dados.numeroendereco,
@@ -423,7 +440,13 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
 
       const emailTitular = await consultarEmailTitular(idImplantacao)
 
+      if(dados.formaPagamento === 1) {
+        await sendStatus(idImplantacao, 3, 'Forma de Pagamento escolhida BOLETO');        
+      }
+
       await sendContractEmail(emailTitular, idImplantacao, numeroPropostaGerado, dados.cpffinanceiro, dados.nomefinanceiro);
+
+      await sendStatus(idImplantacao, 2, 'Implantação realizada com sucesso ao Ecommerce');
 
       await commitTransaction();
 
@@ -539,6 +562,23 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
   }
 });
 
+app.get('/preview-email', (req, res) => {
+  const dadosEmail = {
+      nomeTitularFinanceiro: "Nome Exemplo Cliente",
+      linkAleatorio: "http://exemplo.com/link"
+  };
+
+  res.render('emailTemplate', dadosEmail);
+});
+
+app.get('/preview-success', (req, res) => {
+  const dados = {
+    numeroPropostaGerado: 2023456785,
+    nomeCliente: 'Teste de Nome Cliente'
+  }
+  res.render('sucesso', dados)
+});
+
 function consultarEmailTitular(idImplantacao) {
   return new Promise((resolve, reject) => {
     db.query('SELECT emailtitularfinanceiro FROM implantacoes WHERE id=?', [idImplantacao], (err, result) => {
@@ -568,20 +608,18 @@ async function sendContractEmail(email, idImplantacao, numeroProposta, cpfTitula
 
     const linkAleatorio = `${appUrl}/assinar/${idImplantacao}/${numeroProposta}/${cpfTitularFinanceiro}`;
 
+    const html = await ejs.renderFile(path.join(__dirname, '../DentalEcommerce/views/emailTemplate.ejs'), {
+      nomeTitularFinanceiro,
+      linkAleatorio
+    });
+
+    const htmlWithInlineStyles = juice(html);
 
     const mailOptions = {
       from: 'naoresponda@mounthermon.com.br',
       to: email,
       subject: `MOUNT HERMON - Assinatura Proposta Nº ${numeroProposta}`,
-      html: `
-            Olá, ${nomeTitularFinanceiro}<br><br>
-            Recebemos sua solicitação para inclusão em nossos planos de Saúde Odontológicos<br>
-            Por favor, acesse o link abaixo para assinar o contrato:<br>
-            <a href="${linkAleatorio}">Clique aqui para Assinar</a> </br>
-            Desde já agradecemos a Preferência! </br>
-            </br>
-            Obs: Abra o link no celular para ser mais fácil a assinatura da proposta!
-            `
+      html: htmlWithInlineStyles
     };
 
     try {
@@ -754,7 +792,7 @@ app.post('/salva-assinatura', (req,res) => {
   const assinatura = req.body.assinatura_base64;
   const sqlInsertAsign = 'INSERT INTO assinatura_implantacao( id_implantacao, assinatura_base64) VALUES (?,?)';
 
-  db.query(sqlInsertAsign, [idImplantacao, assinatura], (err, result) => {
+  db.query(sqlInsertAsign, [idImplantacao, assinatura], async (err, result) => {
     if(err){
       logger.error({
         message: 'ROTA: ASSINAR | ERRO: ao salvar assinatura do beneficiário',
@@ -762,10 +800,12 @@ app.post('/salva-assinatura', (req,res) => {
         stack: err.stack,
         timestamp: new Date().toISOString()
       });
+
       console.error('Erro ao salvar assinatura do beneficiário')
       res.cookie('alertError', 'Erro ao salvar assinatura, contate o suporte')
       res.status(500).send('Erro ao enviar assinatura, solicite auxílio do suporte');
     }
+    await sendStatus(idImplantacao, 2, 'Proposta assinada pelo contratante');
     res.cookie('alertSuccess', 'Assinatura feita com sucesso', { maxAge: 3000 });
     res.status(200).send('Corretor cadastrado com sucesso.');
   })
@@ -815,7 +855,6 @@ app.get('/implantacoes', verificaAutenticacao, (req, res) => {
 app.get('/implantacao/:id', verificaAutenticacao, (req, res) => {
   const idImplantacao = req.params.id;
 
-  // Consulta a implantação pelo ID
   const queryImplantacao = 'SELECT * FROM implantacoes WHERE id = ?';
   db.query(queryImplantacao, [idImplantacao], (err, resultImplantacao) => {
     if (err) {
@@ -857,6 +896,7 @@ app.get('/visualizaImplantacao/:id', verificaAutenticacao, (req, res) => {
   const queryEntidade = 'SELECT * FROM entidades WHERE id=?';
   const queryDependentes = 'SELECT * FROM dependentes WHERE id_implantacoes = ?'
   const queryDocumentos = 'SELECT * FROM documentos_implantacoes WHERE id_implantacao = ?'
+  const queryStatus = 'SELECT * FROM status_implantacao WHERE idimplantacao = ?'
 
 
   db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
@@ -901,15 +941,18 @@ app.get('/visualizaImplantacao/:id', verificaAutenticacao, (req, res) => {
               if (err) {
                 console.error('Erro na busca pelos documentos vinculados a implantação', err)
               }
-              
-
-              const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
-              const dia = String(data_implantacao.getDate()).padStart(2, '0');
-              const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
-              const ano = data_implantacao.getFullYear();
-              const dataFormatada = `${dia}/${mes}/${ano}`;
-
-              res.render('detalhes-implantacao', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade: resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], rotaAtual: 'implantacoes' });
+              db.query(queryStatus, [idImplantacao], (err, resultStatus) => {
+                if(err) {
+                  console.error('Erro ao buscar status da implantacao', err)
+                }
+                const data_implantacao = new Date(resultImplantacoes[0].data_implantacao);
+                const dia = String(data_implantacao.getDate()).padStart(2, '0');
+                const mes = String(data_implantacao.getMonth() + 1).padStart(2, '0');
+                const ano = data_implantacao.getFullYear();
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+  
+                res.render('detalhes-implantacao', { implantacao: resultImplantacoes[0], plano: resultPlano[0], dataFormatada: dataFormatada, entidade: resultEntidade[0], profissao: resultProfissao[0], dependentes: resultDependentes, documento: resultDocumentos[0], status: resultStatus, rotaAtual: 'implantacoes' });
+              })
             })
           })
         })

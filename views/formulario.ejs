@@ -67,7 +67,8 @@
                                                     <label for="nomecompleto">Nome Completo:</label>
                                                     <input type="text" class="form-control required required"
                                                         id="nomecompleto" name="nomecompleto"
-                                                        placeholder="Nome completo do titular do plano">
+                                                        placeholder="Nome completo do titular do plano"
+                                                        required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -638,7 +639,7 @@
                                                     <input type="radio" id="pgtoAnualAvista" name="formaPagamento"
                                                         class="custom-control-input"
                                                         value="1">
-                                                    <label class="custom-control-label" for="pgtoAnualAvista"> Valor anual á vista para pgto no boleto, pix ou cartão de crédito <strong>R$ <%= planoSelecionado.pgtoAnualAvista %> </strong>
+                                                    <label class="custom-control-label" for="pgtoAnualAvista"> Valor anual á vista para pgto no boleto ou pix <strong>R$ <%= planoSelecionado.pgtoAnualAvista %> </strong>
                                                     </label> 
                                                 </div>
                                                 <div class="custom-control custom-radio">

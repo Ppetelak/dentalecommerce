@@ -36,7 +36,6 @@
           <th>CPF Titular <i class="fas fa-sort"></i></th>
           <th>Nome Titular</th>
           <th>Data Implantação <i class="fas fa-sort"></i></th>
-          <th>Status</th>
           <th>Plano Escolhido</th>
           <th>Visualizar Informações</th>
         </tr>
@@ -48,7 +47,6 @@
           <td class="cpf"><%= implantacao.cpftitular %></td>
           <td><%= implantacao.nomecompleto %></td>
           <td><%= format(implantacao.data_implantacao, 'dd/MM/yyyy', { locale: ptBR }) %></td>
-          <td>Status Aqui</td>
           <td><%= implantacao.nome_do_plano %></td>
           <td> 
             <a href="/visualizaImplantacao/<%= implantacao.id %>" target="_blank" class="btn btn-info"><button class="btn btn-info"> Detalhes </button></a>

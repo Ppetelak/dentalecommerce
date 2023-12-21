@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Open+Sans:wght@300;400;600&family=PT+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+        <title>Email Contrato</title>
+</head>
+
+<body
+    style="
+        margin: 0;
+        padding: 0;
+        font-family: 'PT Sans', sans-serif;
+        width: 400px;
+        "       
+    >
+    <main style="
+                width: 400px;
+                border: solid 1px #BF7D2B;
+                margin: auto;
+                background: #fff !important;
+                ">
+        <div style="
+                    background: #0E3179;
+                    border-radius: 0px 0px 80px 80px;
+                    ">
+            <div 
+                style="
+                        background-image: url(https://midiaideal.com.br/projetos/Emails/NovoAtendimentoMH/img/backgroundheader-8.png);
+                        background-repeat: no-repeat;
+                        background-size: contain;
+                        background-position: center;
+                        margin: auto;
+                        align-items: center;
+                        justify-content: center;
+                        text-align: center;
+                        width: 100%;
+                        padding-top: 2rem;
+                        height: 250px;
+                        "
+                >
+                <img 
+                    src="https://midiaideal.com.br/projetos/Emails/NovoAtendimentoMH/img/logo_padrãobranca-8.png"
+                    style="width: 200px"
+                />
+                </br>
+                <h2 style="
+                        color: #FFFFFF;
+                        font-size: 30px;
+                        font-weight: 400;
+                        "> 
+                        Sua proposta Chegou! <br>
+                    <span style="
+                                color: #BF7D2B;
+                                ">
+                                Falta pouco 
+                    </span>
+                </h2>
+            </div>
+        </div>
+        <div>
+            <h3 
+                style="
+                    padding: 20px;
+                    font-size: 16px;
+                    color: #0E3179;
+                    text-align: center;
+                    font-weight: 100;
+                    ">
+                Olá, <strong><%= nomeTitularFinanceiro %> </strong><br><br>
+                Recebemos sua solicitação para inclusão em nossos planos de Saúde Odontológicos<br>
+                Por favor, clique no botão abaixo para assinar o contrato:<br>
+                <br>
+                <a 
+                    href="<%= linkAleatorio %>" 
+                    target="_blank" 
+                    style="
+                        text-decoration: none;
+                        background: #0E3179;
+                        padding: 8px;
+                        color:#FFFFFF;
+                        border: none;
+                        border-radius: 5px;
+                        margin-bottom: 100px;
+                        ">
+                Clique aqui para Assinar</a> </br><br>
+                Desde já agradecemos a Preferência! </br>
+                </br>
+                Obs: Abra o link no celular para ser mais fácil a assinatura da proposta! <br>
+            </h3>
+            <div 
+                style="
+                    align-items: center;
+                    text-align: center;
+                    ">
+                <div 
+                    style="
+                            margin-top: 5%;
+                            background: #0E3179;
+                            color:#FFFFFF;
+                            width: 300px;
+                            border-radius: 20px;
+                            text-align: center;
+                            height: auto;
+                            margin: auto;
+                            padding-top: 5px;
+                            "
+                    >
+                    <p><strong> WhatsApp: </strong><br>
+                        0800 591 2789 </br>
+                        Salve o contato e nos chame<br>
+                        sempre precisar</p>
+                    <a 
+                        href="https://api.whatsapp.com/send?phone=55418005912789&text=" target="_blank"
+                        style="
+                            text-decoration: none;
+                            background: #BF7D2B;
+                            padding: 8px;
+                            color:#FFFFFF;
+                            border: none;
+                            border-radius: 5px;
+                            margin-bottom: 10px;"
+                            >
+                            CLIQUE AQUI</a><br>
+                </br>
+            </div>
+                <div>
+                <h6
+                    style="
+                        font-size: 22px;
+                        text-align: center;
+                        color:#BF7D2B;
+                        "> ESTAMOS SEMPRE <br>
+                    À DISPOSIÇÃO</h6>
+                </div>
+
+                
+            </div>
+            <div 
+                style="
+                    padding-top: 40px;
+                    padding-bottom: 40px;
+                    background: #dbdbdb !important;
+                    align-items: center;
+                    text-align: center;
+                    ">
+                <img src="https://midiaideal.com.br/projetos/Emails/NovoAtendimentoMH/img/logo_padrao-8.png" style="width: 200px;">
+                </br>
+                <div>
+                    <a 
+                        href="https://mounthermon.com.br" 
+                        target="_blank"
+                        style="
+                            text-decoration: none;
+                            font-size: 18px;
+                            color:#0E3179;
+                        "> 
+                        <strong>Site:</strong> mounthermon.com.br</a> </br>
+                    <a 
+                        href="https://instagram.com.br/mounthermonoficial" target="_blank"
+                        style="
+                            text-decoration: none;
+                            font-size: 18px;
+                            color:#0E3179;
+                        " >
+                        <strong>Siga-nos: </strong>
+                        @mounthermonoficial</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

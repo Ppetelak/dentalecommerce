@@ -161,7 +161,17 @@ function handleExcluirDependenteClick(element) {
     }
 }
 
-document.getElementById('formDados').submit('on', function(e){
-    e.preventDefault()
-    console.log('Clicou em enviar dados')
-})
+function abrirPopupCartao() {
+    $('#modalCartaoCredito').modal('show');
+}
+
+document.getElementById('formDados').addEventListener('submit', function(e){
+    e.preventDefault();
+    
+    var formaPagamento = document.querySelector('input[name="formaPagamento"]:checked').value;
+    if (formaPagamento === '2' || formaPagamento === '3') {
+        abrirPopupCartao();
+    } else {
+        this.submit();
+    }
+});
