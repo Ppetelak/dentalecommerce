@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     element.addEventListener("click", handlePrevClick);
   });
 
+  addEventListenersToFields();
   validateRequiredFields();
 
   var requiredFields = document.querySelectorAll(".tab-pane.active [required]");
@@ -171,7 +172,17 @@ function previewImage(inputId, previewId, removeButtonId) {
   }
 }
 
+function addEventListenersToFields() {
+  console.log('Chamou função addouvintes aos fields')
+  var requiredFields = document.querySelectorAll(".tab-pane.active [required]");
+  requiredFields.forEach(function(field) {
+    field.addEventListener("change", validateRequiredFields);
+    field.addEventListener("keyup", validateRequiredFields);
+  });
+}
+
 function validateRequiredFields() {
+  console.log('Chamou função de validação')
   var activeTab = document.querySelector(".tab-pane.active");
   var requiredFields = activeTab.querySelectorAll("[required]");
   var allFilled = true;
@@ -182,7 +193,7 @@ function validateRequiredFields() {
     }
   });
 
-  var nextButton = document.querySelector(".next");
+  var nextButton = activeTab.querySelector(".next");
   nextButton.disabled = !allFilled;
 }
 
@@ -209,6 +220,7 @@ function handleNextClick() {
   activeProgress.style.width = newWidthValue + "%";
 
   if (nextTab) {
+    addEventListenersToFields();
     validateRequiredFields();
     activeTab.classList.remove("show", "active");
     nextTab.classList.add("show", "active");
@@ -226,21 +238,38 @@ function handlePrevClick() {
   activeProgress.style.width = newWidthValue + "%";
 
   if (prevTab) {
+    addEventListenersToFields();
+    validateRequiredFields();
     activeTab.classList.remove("show", "active");
     prevTab.classList.add("show", "active");
   }
 }
 
+function clearFields(container) {
+  var fields = container.querySelectorAll("input, select, textarea");
+  fields.forEach(function(field) {
+    if (field.type === 'checkbox' || field.type === 'radio') {
+      field.checked = false; // Desmarca checkboxes e radios
+    } else {
+      field.value = ''; // Limpa outros tipos de campos
+    }
+  });
+}
+
 function handleTitularResponsavelChange() {
   var selectedOption = this.value;
   var naoEResponsavel = document.getElementById("Naoeresponsavel");
+  var tabTwo = document.getElementById("pills-step2")
 
   if (selectedOption === "Não") {
     naoEResponsavel.style.display = "block";
-    validateRequiredFields()
+    addEventListenersToFields();
+    validateRequiredFields();
   } else {
-    
+    console.log('entrou no else')
     naoEResponsavel.style.display = "none";
+    clearFields(naoEResponsavel);
+    tabTwo.querySelector('.next').disabled  = false;
   }
 }
 
@@ -264,21 +293,6 @@ function handlePossuiDependentesChange() {
     }
   }
 }
-
-/* function atualizarDataIdDependentes() {
-  var dependentes = document.querySelectorAll('.dependente');
-
-  dependentes.forEach(function (dependente, index) {
-    dependente.dataset.id = 'dependente-' + (index + 1);
-
-    var dependentesInputsSelects = dependente.querySelectorAll('.dependente-input');
-    dependentesInputsSelects.forEach(function (element) {
-      var name = element.name;
-      element.name = name.replace(/dependentes\[\d+\]/g, 'dependentes[' + index + ']');
-    });
-    nDependentes.value = index + 1;
-  });
-} */
 
 function atualizarDataIdDependentes() {
   var dependentes = document.querySelectorAll(".dependente");
