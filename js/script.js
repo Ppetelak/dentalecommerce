@@ -181,6 +181,13 @@ function addEventListenersToFields() {
   });
 }
 
+function updateTabState() {
+  var titularResponsavelSelect = document.getElementById("titularresponsavelfinanceiro");
+  if (titularResponsavelSelect) {
+    handleTitularResponsavelChange.call(titularResponsavelSelect);
+  }
+}
+
 function validateRequiredFields() {
   console.log('Chamou função de validação')
   var activeTab = document.querySelector(".tab-pane.active");
@@ -218,7 +225,7 @@ function handleNextClick() {
   var increment = 14;
   var newWidthValue = currentWidthValue + increment;
   activeProgress.style.width = newWidthValue + "%";
-
+  
   if (nextTab) {
     addEventListenersToFields();
     validateRequiredFields();
@@ -236,12 +243,13 @@ function handlePrevClick() {
   var decrement = 14;
   var newWidthValue = currentWidthValue - decrement;
   activeProgress.style.width = newWidthValue + "%";
+  addEventListenersToFields();
+  validateRequiredFields();
 
   if (prevTab) {
-    addEventListenersToFields();
-    validateRequiredFields();
     activeTab.classList.remove("show", "active");
     prevTab.classList.add("show", "active");
+    updateTabState()
   }
 }
 

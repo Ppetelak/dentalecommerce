@@ -94,7 +94,8 @@
                                                 <div class="form-group">
                                                     <label for="nomemaetitular">Nome da Mãe:</label>
                                                     <input type="text" class="form-control required" id="nomemaetitular"
-                                                        name="nomemaetitular" placeholder="Nome da mãe">
+                                                        name="nomemaetitular" placeholder="Nome da mãe"
+                                                        required>
                                                 </div>
                                             </div>
                                         </div>
@@ -103,14 +104,16 @@
                                                 <div class="form-group">
                                                     <label for="rgtitular">RG</label>
                                                     <input type="text" class="form-control required" id="rgtitular"
-                                                        name="rgtitular" placeholder="RG do titular">
+                                                        name="rgtitular" placeholder="RG do titular"
+                                                        required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="orgaoexpedidor">Orgão expedidor</label>
                                                     <input type="text" class="form-control required" id="orgaoexpedidor"
-                                                        name="orgaoexpedidor" placeholder="Nome da mãe">
+                                                        name="orgaoexpedidor" placeholder="Nome da mãe"
+                                                        required>
                                                 </div>
                                             </div>
                                         </div>
@@ -120,7 +123,8 @@
                                                     <label for="dataexpedicaorgtitular">Data Expedição RG</label>
                                                     <input type="date" class="form-control required"
                                                         id="dataexpedicaorgtitular" name="dataexpedicaorgtitular"
-                                                        placeholder="RG do titular">
+                                                        placeholder="RG do titular"
+                                                        required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -129,7 +133,7 @@
                                                     <select class="form-control required" id="sexotitular"
                                                         name="sexotitular">
                                                         <option disabled selected value="">Selecione ...</option>
-                                                        <option value="Masculino">Masculino</option>
+                                                        <option value="Masculino" required>Masculino</option>
                                                         <option value="Feminino">Feminino</option>
                                                     </select>
                                                 </div>
@@ -142,7 +146,7 @@
                                                     <select class="form-control required" id="estadociviltitular"
                                                         name="estadociviltitular">
                                                         <option disabled selected value="">Selecione ...</option>
-                                                        <option value="Solteiro">Solteiro</option>
+                                                        <option value="Solteiro" required>Solteiro</option>
                                                         <option value="Casado">Casado</option>
                                                         <option value="Divorciado">Divorciado</option>
                                                         <option value="Viúvo">Viúvo</option>
@@ -154,7 +158,8 @@
                                                 <div class="form-group">
                                                     <label for="telefonetitular">Telefone</label>
                                                     <input type="tel" class="form-control required" id="telefonetitular"
-                                                        name="telefonetitular" placeholder="Telefone">
+                                                        name="telefonetitular" placeholder="Telefone"
+                                                        required>
                                                 </div>
                                             </div>
                                         </div>
@@ -163,14 +168,15 @@
                                                 <div class="form-group">
                                                     <label for="celulartitular">Celular</label>
                                                     <input type="text" class="form-control required" id="celulartitular"
-                                                        name="celulartitular" placeholder="Informe telefone celular">
+                                                        name="celulartitular" placeholder="Informe telefone celular" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="emailtitular">Email</label>
                                                     <input type="email" class="form-control required" id="emailtitular"
-                                                        name="emailtitular" placeholder="Email titular">
+                                                        name="emailtitular" placeholder="Email titular"
+                                                        required>
                                                 </div>
                                             </div>
                                         </div>
@@ -182,7 +188,7 @@
                                                         name="profissaotitular">
                                                         <option disabled selected value="">Selecione ...</option>
                 <% profissoes.forEach(function(profissao) { %>
-                    <option value="<%= profissao.idEntidade %>"><%= profissao.nome %></option>
+                    <option value="<%= profissao.idEntidade %>" required><%= profissao.nome %></option>
                 <% }); %>
                                                     </select>
                                                 </div>
@@ -232,7 +238,8 @@
                                                     <label for="datadenascimentofinanceiro">Data de Nascimento:</label>
                                                     <input type="date" class="form-control required"
                                                         id="datadenascimentofinanceiro"
-                                                        name="datadenascimentofinanceiro" placeholder="">
+                                                        name="datadenascimentofinanceiro" placeholder=""
+                                                        required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -241,7 +248,7 @@
                                                     <select class="form-control required" id="sexotitularfinanceiro"
                                                         name="sexotitularfinanceiro">
                                                         <option disabled selected value="">Selecione ...</option>
-                                                        <option value="masculino">Masculino</option>
+                                                        <option value="masculino" required>Masculino</option>
                                                         <option value="feminino">Feminino</option>
                                                     </select>
                                                 </div>
@@ -255,7 +262,7 @@
                                                         id="estadociviltitularfinanceiro"
                                                         name="estadociviltitularfinanceiro">
                                                         <option disabled selected value="">Selecione ...</option>
-                                                        <option value="solteiro">Solteiro</option>
+                                                        <option value="solteiro" required>Solteiro</option>
                                                         <option value="casado">Casado</option>
                                                         <option value="divorciado">Divorciado</option>
                                                         <option value="viúvo">Viúvo</option>
@@ -268,7 +275,8 @@
                                                     <label for="telefonetitularfinanceiro">Telefone</label>
                                                     <input type="tel" class="form-control required"
                                                         id="telefonetitularfinanceiro" name="telefonetitularfinanceiro"
-                                                        placeholder="Telefone">
+                                                        placeholder="Telefone"
+                                                        required>
                                                 </div>
                                             </div>
                                         </div>
@@ -278,7 +286,8 @@
                                                     <label for="emailtitularfinanceiro">Email</label>
                                                     <input type="email" class="form-control required"
                                                         id="emailtitularfinanceiro" name="emailtitularfinanceiro"
-                                                        placeholder="Email titular">
+                                                        placeholder="Email titular"
+                                                        required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -287,7 +296,7 @@
                                                     <select class="form-control required" id="grauparentesco"
                                                         name="grauparentesco">
                                                         <option disabled selected value="">Selecione ...</option>
-                                                        <option value="Conjugê">Conjugê</option>
+                                                        <option value="Conjugê" required>Conjugê</option>
                                                         <option value="Filho">Filho</option>
                                                         <option value="Mãe">Mãe</option>
                                                         <option value="Filha">Filha</option>
@@ -336,7 +345,8 @@
                                                 <label for="enderecoresidencial">Endereço Residencial</label>
                                                 <input type="text" class="form-control required"
                                                     id="enderecoresidencial" name="enderecoresidencial"
-                                                    placeholder="Informe o nome da rua, av, logradouro">
+                                                    placeholder="Informe o nome da rua, av, logradouro"
+                                                    required>
                                             </div>
                                         </div>
                                     </div>
@@ -345,7 +355,8 @@
                                             <div class="form-group">
                                                 <label for="numeroendereco">Número</label>
                                                 <input type="number" class="form-control required" id="numeroendereco"
-                                                    name="numeroendereco" rows="3" placeholder="Digite sua mensagem">
+                                                    name="numeroendereco" rows="3" placeholder="Digite sua mensagem"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -353,14 +364,16 @@
                                                 <label for="complementoendereco">Complemento:</label>
                                                 <input type="text" class="form-control" id="complementoendereco"
                                                     name="complementoendereco"
-                                                    placeholder="Informe complemento se houver">
+                                                    placeholder="Informe complemento se houver"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="bairro">Bairro:</label>
                                                 <input type="text" class="form-control" id="bairro" name="bairro"
-                                                    placeholder="Informe complemento se houver">
+                                                    placeholder="Informe complemento se houver"
+                                                    required>
                                             </div>
                                         </div>
                                     </div>
@@ -369,7 +382,8 @@
                                             <div class="form-group">
                                                 <label for="cidade">Cidade:</label>
                                                 <input type="text" class="form-control" id="cidade" name="cidade"
-                                                    placeholder="Cidade">
+                                                    placeholder="Cidade"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -377,7 +391,7 @@
                                                 <label for="estado">UF:</label>
                                                 <select class="form-control required" id="estado" name="estado">
                                                     <option disabled selected value="">Selecione ...</option>
-                                                    <option value="AC">Acre</option>
+                                                    <option value="AC" required>Acre</option>
                                                     <option value="AL">Alagoas</option>
                                                     <option value="AP">Amapá</option>
                                                     <option value="AM">Amazonas</option>
@@ -422,7 +436,8 @@
                                             <div class="form-group">
                                                 <label for="cpfcorretor">CPF Corretor:</label>
                                                 <input type="number" class="form-control required" id="cpfcorretor"
-                                                    name="cpfcorretor" rows="3" placeholder="Informe o cpf do corretor">
+                                                    name="cpfcorretor" rows="3" placeholder="Informe o cpf do corretor"
+                                                    required>
                                                 <div class="input-group-append">
                                                     <span> Digite o CPF e clique no ícone de pesquisa ao lado.</span>
                                                     <button class="btn btn-primary" type="button"
@@ -434,7 +449,7 @@
                                             <div class="form-group">
                                                 <label for="nomecorretor">Nome do corretor:</label>
                                                 <input type="text" class="form-control required" id="nomecorretor"
-                                                    name="nomecorretor" placeholder="Nome do corretor" readonly>
+                                                    name="nomecorretor" placeholder="Nome do corretor" readonly required>
                                             </div>
                                         </div>
                                     </div>
@@ -451,14 +466,14 @@
                                             <div class="form-group">
                                                 <label for="numeroDocumento">CPF/CNPJ Corretora</label>
                                                 <input type="tel" class="form-control" id="numeroDocumento"
-                                                    name="numeroDocumento" placeholder="CPF/CNPJ Corretora" readonly>
+                                                    name="numeroDocumento" placeholder="CPF/CNPJ Corretora" readonly required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="celularcorretor">Telefone(WhatsApp) - Corretor</label>
                                                 <input type="tel" class="form-control" id="celularcorretor"
-                                                    name="celularcorretor" placeholder="Celular WhatsApp" readonly>
+                                                    name="celularcorretor" placeholder="Celular WhatsApp" readonly required>
                                             </div>
                                         </div>
                                     </div>
@@ -473,7 +488,7 @@
                                     <div class="form-group">
                                         <label>Possui Dependentes?</label>
                                         <select class="form-control required" id="possuidependentes">
-                                            <option value="Sim">Sim</option>
+                                            <option value="Sim" required>Sim</option>
                                             <option value="Não">Não</option>
                                         </select>
                                     </div>
@@ -495,7 +510,7 @@
                                                         <input type="text"
                                                             class="form-control required dependente-input"
                                                             name="cpfdependente" id="cpfdependente" rows="3"
-                                                            placeholder="CPF do dependente" onblur="validarCPF(this)">
+                                                            placeholder="CPF do dependente" onblur="validarCPF(this)" required>
                                                             <span class="valid-feedback"></span>
                                                             <span class="invalid-feedback"></span>
                                                     </div>
@@ -506,7 +521,7 @@
                                                             dependente:</label>
                                                         <input type="text" class="form-control dependente-input"
                                                             name="nomecompletodependente"
-                                                            placeholder="Nome completo do dependente">
+                                                            placeholder="Nome completo do dependente" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -518,7 +533,7 @@
                                                         <input type="text"
                                                             class="form-control required dependente-input"
                                                             name="nomemaedependente" rows="3"
-                                                            placeholder="Nome da mãe do dependente">
+                                                            placeholder="Nome da mãe do dependente" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
@@ -526,7 +541,7 @@
                                                         <label for="nascimentodependente">Data de Nascimento
                                                             Dependente</label>
                                                         <input type="date" class="form-control dependente-input"
-                                                            name="nascimentodependente">
+                                                            name="nascimentodependente" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -537,7 +552,7 @@
                                                         <select class="form-control required dependente-input"
                                                             name="sexodependente">
                                                             <option disabled selected value="">Selecione ...</option>
-                                                            <option value="masculino">Masculino</option>
+                                                            <option value="masculino" required>Masculino</option>
                                                             <option value="feminino">Feminino</option>
                                                         </select>
                                                     </div>
@@ -549,7 +564,7 @@
                                                         <select class="form-control required dependente-input"
                                                             name="estadocivildependente">
                                                             <option disabled selected value="">Selecione ...</option>
-                                                            <option value="Solteiro(a)">Solteiro(a)</option>
+                                                            <option value="Solteiro(a)" required>Solteiro(a)</option>
                                                             <option value="Casado(a)">Casado(a)</option>
                                                             <option value="Divorciado(a)">Divorciado(a)</option>
                                                             <option value="Viúvo(a)">Viúvo(a)</option>
@@ -564,7 +579,7 @@
                                                         <select class="form-control required dependente-input"
                                                             name="grauparentescodependente">
                                                             <option disabled selected value="">Selecione ...</option>
-                                                            <option value="Conjugê">Conjugê</option>
+                                                            <option value="Conjugê" required>Conjugê</option>
                                                             <option value="Filhos">Filhos</option>
                                                             <option value="Pai/Mãe">Pai/Mãe</option>
                                                             <option value="Avô/Avó">Avô/Avó</option>
@@ -600,7 +615,7 @@
                                         <div class="form-group">
                                             <label for="documentoFoto" class="form-label"> Faça Upload de um documento com foto do titular financeiro</label>
                                             <div class="preview-container">
-                                                <input class="form-control" type="file" id="documentoFoto" name="documentoFoto" onchange="previewImage('documentoFoto', 'previewDocumentoFoto', 'removeButtonDocumentoFoto')">
+                                                <input class="form-control" type="file" id="documentoFoto" name="documentoFoto" onchange="previewImage('documentoFoto', 'previewDocumentoFoto', 'removeButtonDocumentoFoto')" required>
                                                 <div class="preview-wrapper">
                                                     <img id="previewDocumentoFoto" class="preview-image">
                                                     <button id="removeButtonDocumentoFoto" type="button" class="remove-button" style="display: none;" onclick="removePreview('documentoFoto', 'previewDocumentoFoto', 'removeButtonDocumentoFoto')">
@@ -612,7 +627,7 @@
                                         <div class="form-group">
                                             <label for="comprovanteResidencia" class="form-label"> Faça Upload de um comprovante de residência </label>
                                             <div class="preview-container">
-                                                <input class="form-control" type="file" id="comprovanteResidencia" name="comprovanteResidencia" onchange="previewImage('comprovanteResidencia', 'previewComprovanteResidencia', 'removeButtonComprovanteResidencia')">
+                                                <input class="form-control" type="file" id="comprovanteResidencia" name="comprovanteResidencia" onchange="previewImage('comprovanteResidencia', 'previewComprovanteResidencia', 'removeButtonComprovanteResidencia')" required>
                                                 <div class="preview-wrapper">
                                                     <img id="previewComprovanteResidencia" class="preview-image">
                                                     <button id="removeButtonComprovanteResidencia" type="button" class="remove-button" style="display: none;" onclick="removePreview('comprovanteResidencia', 'previewComprovanteResidencia', 'removeButtonComprovanteResidencia')">
@@ -635,21 +650,21 @@
                                                 <div class="custom-control custom-radio">
                                                     <input type="radio" id="pgtoAnualAvista" name="formaPagamento"
                                                         class="custom-control-input"
-                                                        value="1">
+                                                        value="1" required>
                                                     <label class="custom-control-label" for="pgtoAnualAvista"> Valor anual á vista para pgto no boleto ou pix <strong>R$ <%= planoSelecionado.pgtoAnualAvista %> </strong>
                                                     </label> 
                                                 </div>
                                                 <div class="custom-control custom-radio">
                                                     <input type="radio" name="formaPagamento" id="pgtoAnualCartao"
                                                         class="custom-control-input"
-                                                        value="2"> 
+                                                        value="2" required> 
                                                     <label class="custom-control-label" for="pgtoAnualCartao">Valor anual no cartão de crédito em 12x de <strong> R$ <%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %> </strong>
                                                     </label>
                                                 </div>
                                                 <div class="custom-control custom-radio">
                                                     <input type="radio" name="formaPagamento" id="pgtoAnualCartao3x"
                                                         class="custom-control-input"
-                                                        value="3">
+                                                        value="3" required>
                                                     <label class="custom-control-label" for="pgtoAnualCartao3x"> Anual cartão em 3x de <strong> R$ <%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %> </strong>
                                                     </label>
                                                 </div>
