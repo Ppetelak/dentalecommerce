@@ -1,0 +1,46 @@
+<h3>Corretor</h3>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="cpfcorretor">CPF Corretor:</label>
+            <input type="number" class="form-control" id="cpfcorretor" name="cpfcorretor" rows="3"
+                placeholder="Informe o cpf do corretor" required>
+            <div class="input-group-append">
+                <span> Digite o CPF e clique no ícone de pesquisa ao lado.</span>
+                <button class="btn btn-primary" type="button" id="btnBuscarCorretor"><i
+                        class="bi bi-search"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="nomecorretor">Nome do corretor:</label>
+            <input type="text" class="form-control required" id="nomecorretor" name="nomecorretor"
+                placeholder="Nome do corretor" readonly required>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="corretora">Corretora:</label>
+            <select class="form-control" id="corretora" name="corretora">
+                <option disabled selected>Informe o CPF e pesquise Primeiro</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="numeroDocumento">CPF/CNPJ Corretora</label>
+            <input type="tel" class="form-control" id="numeroDocumento" name="numeroDocumento"
+                placeholder="CPF/CNPJ Corretora" readonly required>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="celularcorretor">Telefone(WhatsApp) - Corretor</label>
+            <input type="tel" class="form-control" id="celularcorretor" name="celularcorretor"
+                placeholder="Celular WhatsApp" readonly required>
+        </div>
+    </div>
+</div>

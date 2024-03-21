@@ -1,0 +1,88 @@
+<h3>Endereço</h3>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="cep">CEP:</label>
+            <div class="input-group">
+                <input type="number" class="form-control" id="cep" name="cep" placeholder="Digite seu CEP" required>
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="buscarCepBtn">Buscar</button>
+                </div>
+            </div>
+            <div id="mensagemErroCep" class="text-danger"></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="enderecoresidencial">Endereço Residencial</label>
+            <input type="text" class="form-control" id="enderecoresidencial" name="enderecoresidencial"
+                placeholder="Informe o nome da rua, av, logradouro" required>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="numeroendereco">Número</label>
+            <input type="number" class="form-control" id="numeroendereco" name="numeroendereco" rows="3"
+                placeholder="Digite sua mensagem" required>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="complementoendereco">Complemento:</label>
+            <input type="text" class="form-control" id="complementoendereco" name="complementoendereco"
+                placeholder="Informe complemento (OPCIONAL)">
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="bairro">Bairro:</label>
+            <input type="text" class="form-control" id="bairro" name="bairro"
+                placeholder="Informe complemento se houver" required>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="cidade">Cidade:</label>
+            <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Cidade" required>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="estado">UF:</label>
+            <select class="form-control" id="estado" name="estado" required>
+                <option disabled selected value="">Selecione ...</option>
+                <option value="AC">Acre</option>
+                <option value="AL">Alagoas</option>
+                <option value="AP">Amapá</option>
+                <option value="AM">Amazonas</option>
+                <option value="BA">Bahia</option>
+                <option value="CE">Ceará</option>
+                <option value="DF">Distrito Federal</option>
+                <option value="ES">Espírito Santo</option>
+                <option value="GO">Goiás</option>
+                <option value="MA">Maranhão</option>
+                <option value="MT">Mato Grosso</option>
+                <option value="MS">Mato Grosso do Sul</option>
+                <option value="MG">Minas Gerais</option>
+                <option value="PA">Pará</option>
+                <option value="PB">Paraíba</option>
+                <option value="PR">Paraná</option>
+                <option value="PE">Pernambuco</option>
+                <option value="PI">Piauí</option>
+                <option value="RJ">Rio de Janeiro</option>
+                <option value="RN">Rio Grande do Norte</option>
+                <option value="RS">Rio Grande do Sul</option>
+                <option value="RO">Rondônia</option>
+                <option value="RR">Roraima</option>
+                <option value="SC">Santa Catarina</option>
+                <option value="SP">São Paulo</option>
+                <option value="SE">Sergipe</option>
+                <option value="TO">Tocantins</option>
+            </select>
+        </div>
+    </div>
+</div>

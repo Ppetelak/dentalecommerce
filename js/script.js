@@ -1,3 +1,60 @@
+let etapaAtual = 1;
+
+function validarFormulario(etapa) {
+  let form = document.getElementById(`formEtapa${etapa}`);
+
+  if (form.checkValidity()) {
+    document.getElementById(`formEtapa${etapa}`).style.display = "none";
+    etapaAtual = etapaAtual + 1;
+    document.getElementById(`formEtapa${etapa + 1}`).style.display = "block";
+  } else {
+    form.reportValidity();
+    return false;
+  }
+}
+
+function handleTitularResponsavelChange() {
+  var selectedOption = this.value;
+  var naoEResponsavel = document.getElementById("Naoeresponsavel");
+  var tabTwo = document.getElementById("pills-step2");
+
+  if (selectedOption === "Não") {
+    naoEResponsavel.style.display = "block";
+    addEventListenersToFields();
+    validateRequiredFields();
+  } else {
+    console.log("entrou no else");
+    naoEResponsavel.style.display = "none";
+    clearFields(naoEResponsavel);
+    tabTwo.querySelector(".next").disabled = false;
+  }
+}
+
+function voltar() {
+  document.getElementById(`formEtapa${etapaAtual}`).style.display = "none";
+  etapaAtual--;
+  document.getElementById(`formEtapa${etapaAtual}`).style.display = "block";
+}
+
+function validarPagamento() {
+  var pagamento = document.querySelector(
+    'input[name="formaPagamento"]:checked'
+  ).value;
+
+  if (pagamento === "2" || pagamento === "3") {
+    // Abre o modal para informações do cartão de crédito
+    $("#modalCartaoCredito").modal("show");
+  } else {
+    // Para outras formas de pagamento, envia o formulário diretamente
+    enviarFormulario();
+  }
+}
+
+function enviarFormulario() {
+  $("#modalCartaoCredito").modal("hide");
+  document.getElementById("meuFormulario").submit();
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".next").forEach(function (element) {
     element.addEventListener("click", handleNextClick);
@@ -5,15 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.querySelectorAll(".prev").forEach(function (element) {
     element.addEventListener("click", handlePrevClick);
-  });
-
-  addEventListenersToFields();
-  validateRequiredFields();
-
-  var requiredFields = document.querySelectorAll(".tab-pane.active [required]");
-  requiredFields.forEach(function(field) {
-    field.addEventListener("change", validateRequiredFields);
-    field.addEventListener("keyup", validateRequiredFields);
   });
 
   document
@@ -50,42 +98,45 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((data) => {
           // Preencher os campos do formulário com as informações retornadas do servidor
           document.getElementById("nomecorretor").value = data.nome || "";
-          document.getElementById("celularcorretor").value = data.telefone || "";
-      
+          document.getElementById("celularcorretor").value =
+            data.telefone || "";
+
           const corretoraSelect = document.getElementById("corretora");
-          const numeroDocumentoInput = document.getElementById("numeroDocumento");
-      
+          const numeroDocumentoInput =
+            document.getElementById("numeroDocumento");
+
           // Limpar opções existentes
           corretoraSelect.innerHTML = "";
-      
+
           if (data.nomeProdutores && data.nomeProdutores.length > 0) {
-              // Adicionar uma opção padrão
-              const defaultOption = document.createElement("option");
-              defaultOption.disabled = true;
-              defaultOption.selected = true;
-              defaultOption.text = "Selecione um produtor";
-              corretoraSelect.add(defaultOption);
-      
-              // Iterar sobre os nomes do array e adicionar opções ao select
-              data.nomeProdutores.forEach((produtor) => {
-                  const option = document.createElement("option");
-                  option.text = produtor.nome;
-                  option.value = produtor.numeroDocumento; // Definir o valor como o número do documento
-                  corretoraSelect.add(option);
-              });
-      
-              // Adicionar um ouvinte de evento change para atualizar o número do documento
-              corretoraSelect.addEventListener("change", () => {
-                  const selectedOption = corretoraSelect.options[corretoraSelect.selectedIndex];
-                  numeroDocumentoInput.value = selectedOption.value;
-              });
-          } else {
-              // Adicionar uma opção padrão caso não haja produtores
+            // Adicionar uma opção padrão
+            const defaultOption = document.createElement("option");
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            defaultOption.text = "Selecione um produtor";
+            corretoraSelect.add(defaultOption);
+
+            // Iterar sobre os nomes do array e adicionar opções ao select
+            data.nomeProdutores.forEach((produtor) => {
               const option = document.createElement("option");
-              option.text = "Nenhum produtor encontrado";
+              option.text = produtor.nome;
+              option.value = produtor.numeroDocumento; // Definir o valor como o número do documento
               corretoraSelect.add(option);
+            });
+
+            // Adicionar um ouvinte de evento change para atualizar o número do documento
+            corretoraSelect.addEventListener("change", () => {
+              const selectedOption =
+                corretoraSelect.options[corretoraSelect.selectedIndex];
+              numeroDocumentoInput.value = selectedOption.value;
+            });
+          } else {
+            // Adicionar uma opção padrão caso não haja produtores
+            const option = document.createElement("option");
+            option.text = "Nenhum produtor encontrado";
+            corretoraSelect.add(option);
           }
-      })      
+        })
         .catch((error) => {
           alert(error.message);
           console.error("Erro na requisição:", error);
@@ -135,131 +186,24 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-function previewImage(inputId, previewId, removeButtonId) {
-  var input = document.getElementById(inputId);
-  var preview = document.getElementById(previewId);
-  var removeButton = document.getElementById(removeButtonId);
-
-  var reader = new FileReader();
-
-  reader.onload = function (e) {
-    preview.src = e.target.result;
-    removeButton.style.display = "inline-block"; // Exibe o botão de remoção
-  };
-
-  if (input.files && input.files[0]) {
-    // Verifica se o arquivo é uma imagem
-    if (!input.files[0].type.startsWith("image/")) {
-      alert("Por favor, selecione um arquivo de imagem.");
-      input.value = ""; // Limpa o valor do campo de arquivo
-      preview.src = ""; // Limpa a pré-visualização
-      removeButton.style.display = "none"; // Oculta o botão de remoção
-      return;
-    }
-
-    // Verifica se o tamanho do arquivo é inferior a 1 MB
-    if (input.files[0].size > 1024 * 1024) {
-      alert(
-        "Por favor, selecione um arquivo de imagem com tamanho inferior a 1 MB."
-      );
-      input.value = ""; // Limpa o valor do campo de arquivo
-      preview.src = ""; // Limpa a pré-visualização
-      removeButton.style.display = "none"; // Oculta o botão de remoção
-      return;
-    }
-
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-function addEventListenersToFields() {
-  console.log('Chamou função addouvintes aos fields')
-  var requiredFields = document.querySelectorAll(".tab-pane.active [required]");
-  requiredFields.forEach(function(field) {
-    field.addEventListener("change", validateRequiredFields);
-    field.addEventListener("keyup", validateRequiredFields);
-  });
-}
-
 function updateTabState() {
-  var titularResponsavelSelect = document.getElementById("titularresponsavelfinanceiro");
+  var titularResponsavelSelect = document.getElementById(
+    "titularresponsavelfinanceiro"
+  );
   if (titularResponsavelSelect) {
     handleTitularResponsavelChange.call(titularResponsavelSelect);
   }
 }
 
-function validateRequiredFields() {
-  console.log('Chamou função de validação')
-  var activeTab = document.querySelector(".tab-pane.active");
-  var requiredFields = activeTab.querySelectorAll("[required]");
-  var allFilled = true;
-
-  requiredFields.forEach(function(field) {
-    if (!field.value.trim()) {
-      allFilled = false;
-    }
-  });
-
-  var nextButton = activeTab.querySelector(".next");
-  nextButton.disabled = !allFilled;
-}
-
-function removePreview(inputId, previewId, removeButtonId) {
-  const input = document.getElementById(inputId);
-  const preview = document.getElementById(previewId);
-  var removeButton = document.getElementById(removeButtonId);
-
-  removeButton.style.display = "none";
-  input.value = ""; // Limpar o valor do campo de arquivo
-  preview.src = ""; // Limpar a pré-visualização
-}
-
 var nDependentes = document.querySelector(".nDependentes");
-
-function handleNextClick() {
-  var activeTab = document.querySelector(".tab-pane.active");
-  var nextTab = activeTab.nextElementSibling;
-  var activeProgress = document.querySelector(".progress-bar");
-  var currentWidth = activeProgress.style.width;
-  var currentWidthValue = parseInt(currentWidth);
-  var increment = 14;
-  var newWidthValue = currentWidthValue + increment;
-  activeProgress.style.width = newWidthValue + "%";
-  
-  if (nextTab) {
-    addEventListenersToFields();
-    validateRequiredFields();
-    activeTab.classList.remove("show", "active");
-    nextTab.classList.add("show", "active");
-  }
-}
-
-function handlePrevClick() {
-  var activeTab = document.querySelector(".tab-pane.active");
-  var prevTab = activeTab.previousElementSibling;
-  var activeProgress = document.querySelector(".progress-bar");
-  var currentWidth = activeProgress.style.width;
-  var currentWidthValue = parseInt(currentWidth);
-  var decrement = 14;
-  var newWidthValue = currentWidthValue - decrement;
-  activeProgress.style.width = newWidthValue + "%";
-  addEventListenersToFields();
-  validateRequiredFields();
-
-  if (prevTab) {
-    activeTab.classList.remove("show", "active");
-    prevTab.classList.add("show", "active");
-    updateTabState()
-  }
-}
 
 function clearFields(container) {
   var fields = container.querySelectorAll("input, select, textarea");
-  fields.forEach(function(field) {
-    if (field.type === 'checkbox' || field.type === 'radio') {
+  fields.forEach(function (field) {
+    if (field.type === "checkbox" || field.type === "radio") {
       field.checked = false; // Desmarca checkboxes e radios
     } else {
-      field.value = ''; // Limpa outros tipos de campos
+      field.value = ""; // Limpa outros tipos de campos
     }
   });
 }
@@ -267,17 +211,17 @@ function clearFields(container) {
 function handleTitularResponsavelChange() {
   var selectedOption = this.value;
   var naoEResponsavel = document.getElementById("Naoeresponsavel");
-  var tabTwo = document.getElementById("pills-step2")
+  var tabTwo = document.getElementById("pills-step2");
 
   if (selectedOption === "Não") {
     naoEResponsavel.style.display = "block";
     addEventListenersToFields();
     validateRequiredFields();
   } else {
-    console.log('entrou no else')
+    console.log("entrou no else");
     naoEResponsavel.style.display = "none";
     clearFields(naoEResponsavel);
-    tabTwo.querySelector('.next').disabled  = false;
+    tabTwo.querySelector(".next").disabled = false;
   }
 }
 
@@ -358,40 +302,109 @@ function handleExcluirDependenteClick(element) {
 
 function validarCPF(inputElement) {
   var cpfCampo = inputElement;
-  var cpf = cpfCampo.value.replace(/\D/g, '');
+  var cpf = cpfCampo.value.replace(/\D/g, "");
 
-  var validFeedback = cpfCampo.nextElementSibling ? cpfCampo.nextElementSibling : cpfCampo.nextSibling;
-  var invalidFeedback = validFeedback.nextElementSibling ? validFeedback.nextElementSibling : validFeedback.nextSibling;
-
+  var validFeedback = cpfCampo.nextElementSibling
+    ? cpfCampo.nextElementSibling
+    : cpfCampo.nextSibling;
+  var invalidFeedback = validFeedback.nextElementSibling
+    ? validFeedback.nextElementSibling
+    : validFeedback.nextSibling;
 
   if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
-      invalidFeedback.style.display = 'inline';
-      validFeedback.style.display = 'none';
-      return;
+    invalidFeedback.style.display = "inline";
+    validFeedback.style.display = "none";
+    return;
   }
 
   var soma = 0;
   for (var i = 0; i < 9; i++) {
-      soma += parseInt(cpf.charAt(i)) * (10 - i);
+    soma += parseInt(cpf.charAt(i)) * (10 - i);
   }
 
   var resto = 11 - (soma % 11);
-  var digitoVerificador1 = (resto === 10 || resto === 11) ? 0 : resto;
+  var digitoVerificador1 = resto === 10 || resto === 11 ? 0 : resto;
 
   soma = 0;
   for (var i = 0; i < 10; i++) {
-      soma += parseInt(cpf.charAt(i)) * (11 - i);
+    soma += parseInt(cpf.charAt(i)) * (11 - i);
   }
 
   resto = 11 - (soma % 11);
-  var digitoVerificador2 = (resto === 10 || resto === 11) ? 0 : resto;
+  var digitoVerificador2 = resto === 10 || resto === 11 ? 0 : resto;
 
-  if (digitoVerificador1 !== parseInt(cpf.charAt(9)) || digitoVerificador2 !== parseInt(cpf.charAt(10))) {
-      invalidFeedback.style.display = 'inline';
-      validFeedback.style.display = 'none';
-      return;
+  if (
+    digitoVerificador1 !== parseInt(cpf.charAt(9)) ||
+    digitoVerificador2 !== parseInt(cpf.charAt(10))
+  ) {
+    invalidFeedback.style.display = "inline";
+    validFeedback.style.display = "none";
+    return;
   }
 
-  invalidFeedback.style.display = 'none';
-  validFeedback.style.display = 'inline';
+  invalidFeedback.style.display = "none";
+  validFeedback.style.display = "inline";
 }
+
+function showErrorMessage() {
+  var errorMessageDiv = document.createElement("div");
+  errorMessageDiv.id = "error-message";
+  errorMessageDiv.style.color = "red";
+  errorMessageDiv.innerHTML =
+    '<span style="font-weight: bold; font-size: 16px;">⚠ Verifique: </span> os campos em vermelho são obrigatórios.';
+
+  var botaoAcoesDiv = document.querySelector(".botaoAcoes");
+  if (botaoAcoesDiv) {
+    if (!document.getElementById("error-message")) {
+      // Evita duplicar a mensagem de erro
+      botaoAcoesDiv.parentNode.insertBefore(errorMessageDiv, botaoAcoesDiv);
+    }
+  }
+}
+
+function removeErrorMessage() {
+  var errorMessage = document.getElementById("error-message");
+  if (errorMessage) {
+    errorMessage.parentNode.removeChild(errorMessage);
+  }
+}
+
+/* const cepInput = document.getElementById("cep");
+const buscarCepBtn = document.getElementById("buscarCepBtn");
+const mensagemErroCep = document.getElementById("mensagemErroCep");
+
+buscarCepBtn.addEventListener("click", async function () {
+  const cep = cepInput.value;
+
+  try {
+    const response = await fetch(`/buscar-cep?cep=${cep}`);
+    const data = await response.json();
+
+    if (response.ok) {
+      mensagemErroCep.textContent = ""; // Limpa a mensagem de erro se houver
+      atualizarCamposEndereco(data);
+    } else {
+      mensagemErroCep.textContent =
+        "CEP não encontrado. Por favor, verifique e tente novamente.";
+      limparCamposEndereco(); // Limpa os campos de endereço
+    }
+  } catch (error) {
+    console.error("Erro na busca de CEP:", error.message);
+  }
+});
+
+function atualizarCamposEndereco(data) {
+  // Atualize os campos conforme necessário
+  document.getElementById("enderecoresidencial").value = data.logradouro || "";
+  document.getElementById("bairro").value = data.bairro || "";
+  document.getElementById("cidade").value = data.localidade || "";
+  document.getElementById("estado").value = data.uf || "";
+}
+
+function limparCamposEndereco() {
+  // Limpa os campos de endereço
+  document.getElementById("enderecoresidencial").value = "";
+  document.getElementById("bairro").value = "";
+  document.getElementById("cidade").value = "";
+  document.getElementById("estado").value = "";
+} */

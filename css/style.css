@@ -182,6 +182,10 @@ label {
     justify-content: center;
 }
 
+.invalid-field {
+    border: 1px solid red;
+}
+
 .infosPropostaSucess p{
     font-weight: 300;
     color: #FFFFFF;

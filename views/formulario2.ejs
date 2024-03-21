@@ -1,0 +1,109 @@
+<h3>Dados Responsável Financeiro</h3>
+<div class="form-group">
+    <label>O titular é o responsável Financeiro?</label>
+    <select class="form-control required" id="titularresponsavelfinanceiro" name="titularresponsavelfinanceiro"
+        onchange="handleTitularResponsavelChange.call(this)">
+        <option value="Sim">Sim</option>
+        <option value="Não">Não</option>
+    </select>
+</div>
+<div class="form-group" id="Naoeresponsavel">
+    <h6 class="text-center"> Insira os dados do responsável Financeiro</h6>
+    <p class="text-center"> A pessoa que serpa legalmente a responsável financeira
+        na
+        emissão do contrato</p>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="cpffinanceiro">CPF:</label>
+                <input type="text" class="form-control required" id="cpffinanceiro" name="cpffinanceiro"
+                    placeholder="Cpf titular financeiro" onblur="validarCPF(this)" required>
+                <span class="valid-feedback"></span>
+                <span class="invalid-feedback"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomefinanceiro">Nome Completo:</label>
+                <input type="text" class="form-control required" id="nomefinanceiro" name="nomefinanceiro"
+                    placeholder="Nome Completo" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="datadenascimentofinanceiro">Data de Nascimento:</label>
+                <input type="date" class="form-control required" id="datadenascimentofinanceiro"
+                    name="datadenascimentofinanceiro" placeholder="" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="sexotitularfinanceiro">Sexo:</label>
+                <select class="form-control required" id="sexotitularfinanceiro" name="sexotitularfinanceiro" required>
+                    <option disabled selected value="">Selecione ...</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="feminino">Feminino</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="estadociviltitularfinanceiro">Estado Civil:</label>
+                <select class="form-control required" id="estadociviltitularfinanceiro"
+                    name="estadociviltitularfinanceiro" required>
+                    <option disabled selected value="">Selecione ...</option>
+                    <option value="solteiro">Solteiro</option>
+                    <option value="casado">Casado</option>
+                    <option value="divorciado">Divorciado</option>
+                    <option value="viúvo">Viúvo</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="telefonetitularfinanceiro">Telefone</label>
+                <input type="tel" class="form-control required" id="telefonetitularfinanceiro"
+                    name="telefonetitularfinanceiro" placeholder="Telefone" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="emailtitularfinanceiro">Email</label>
+                <input type="email" class="form-control required" id="emailtitularfinanceiro"
+                    name="emailtitularfinanceiro" placeholder="Email titular" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="grauparentesco">Grau de Parentesco</label>
+                <select class="form-control required" id="grauparentesco" name="grauparentesco" required>
+                    <option disabled selected value="">Selecione ...</option>
+                    <option value="Conjugê">Conjugê</option>
+                    <option value="Filho">Filho</option>
+                    <option value="Mãe">Mãe</option>
+                    <option value="Filha">Filha</option>
+                    <option value="Enteado(a)">Enteado(a)</option>
+                    <option value="Pai">Pai</option>
+                    <option value="Irmão/Irmã">Irmão/Irmã</option>
+                    <option value="Sogro/Sogra">Sogro/Sogra</option>
+                    <option value="Bisavô/Bisavó">Bisavô/Bisavó</option>
+                    <option value="Neto">Neto(a)</option>
+                    <option value="Bisneto">Bisneto(a)</option>
+                    <option value="Avô/Avó">Avô/Avó</option>
+                    <option value="Padrasto/Madastra">Padrasto/Madastra</option>
+                    <option value="Tio/Tia">Tio/Tia</option>
+                    <option value="Sobrinho/Sobrinha">Sobrinho/Sobrinha</option>
+                    <option value="Genro/Nora">Genro/Nora</option>
+                    <option value="Cunhado/Cunhada">Cunhado/Cunhada</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

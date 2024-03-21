@@ -1,9 +1,9 @@
+const { db, connectToDatabase } = require('./database');
 const express = require("express");
 const app = new express();
 const ejs = require("ejs");
 const path = require('path')
 const bodyParser = require("body-parser");
-const mysql = require("mysql2");
 const session = require("express-session");
 const crypto = require("crypto");
 const cookie = require('cookie-parser');
@@ -16,7 +16,7 @@ const { format } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
 const nodemailer = require('nodemailer');
 const juice = require('juice');
-const porta = process.env.PORT || 5586;
+const port = process.env.PORT || 5586;
 const appUrl = process.env.APP_URL || 'http://localhost:5586';
 
 
@@ -44,6 +44,22 @@ app.set("view engine", "ejs");
 app.use(cookie());
 app.use(express.json());
 
+/* CONEXÃO COM BANCO DE DADOS */
+
+connectToDatabase()
+    .then(() => {
+        app.listen(port, () => {
+            console.log(`Servidor rodando na porta ${port}`);
+        });
+    })
+    .catch((error) => {
+        app.get('*', (req, res) => {
+            res.redirect('/error404');
+        });
+        console.error('Erro ao conectar ao banco de dados:', error);
+        process.exit(1);
+    });
+
 const generateSecretKey = () => {
   return crypto.randomBytes(32).toString("hex");
 };
@@ -58,40 +74,19 @@ app.use(
   })
 );
 
-/* CONEXÃO COM BANCO DE DADOS */
-
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "pmp078917",
-  database: "mhdentalvendas",
-  port: "3306",
-});
-
-
-/* const db = mysql.createConnection({
-  host: "localhost",
-  user: "mhdentalvendas_user",
-  password: "6_64idh9V",
-  database: "mhdentalvendas2",
-  port: "3306",
-}); */
-
-db.connect((error) => {
-  if (error) {
-    console.error("Erro ao conectar ao banco de dados:", error);
-  } else {
-    console.log("Conexão bem-sucedida ao banco de dados");
-  }
-});
-
 /* Criação de rota e ambiente de upload de arquivos */
 
 const storage = multer.diskStorage({
-  destination: 'arquivos/',
+  destination: 'uploads/',
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    const modifiedFileName = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
+    // Salve o nome original e o nome modificado em req.locals para acessá-lo posteriormente
+    req.locals = {
+      originalName: file.originalname,
+      modifiedName: modifiedFileName
+    };
+    cb(null, modifiedFileName);
   }
 });
 
@@ -124,8 +119,36 @@ app.get('/files', verificaAutenticacao, (req, res) => {
   res.render('uploads', { files: files, rotaAtual: 'files' })
 })
 
-app.post('/upload', verificaAutenticacao, upload.single('file'), (req, res) => {
+/* app.post('/uploadRestrito', verificaAutenticacao, upload.single('file'), (req, res) => {
   res.json('Enviado com sucesso');
+}); */
+
+app.post('/upload', upload.array('file'), (req, res) => {
+  // Obtenha o caminho e o nome do arquivo modificado
+  const filepaths = req.files.map(file => ({
+    originalName: req.locals.originalName,
+    modifiedName: file.filename,
+    filepath: path.join(__dirname, 'uploads', file.filename)
+  }));
+  res.json({ filepaths });
+});
+
+// Rota para remover um arquivo
+app.post('/remove', (req, res) => {
+  const { removefile } = req.body;
+  console.log({removefile});
+  const filepath = path.join(__dirname, 'uploads', removefile);
+  console.log(filepath);
+  
+  // Remove o arquivo
+  fs.unlink(filepath, (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Erro ao remover o arquivo.');
+    } else {
+      res.send('Arquivo removido com sucesso.');
+    }
+  });
 });
 
 app.post('/deleteImage', verificaAutenticacao, (req, res) => {
@@ -190,7 +213,7 @@ app.get("/", (req, res) => {
   })
 });
 
-app.post("/formulario", (req, res) => {
+app.post("/formulario", (req,res) => {
   const planoId = req.body.planoSelecionado;
   const query = 'SELECT * FROM planos WHERE id = ?';
   const queryProfissoes = 'SELECT * FROM profissoes'
@@ -206,158 +229,30 @@ app.post("/formulario", (req, res) => {
         if (err) {
           console.error('Erro ao resgatar profissoes do BD')
         }
-        const planoCompleto = result[0];
-        res.render("formulario", { planoSelecionado: planoCompleto, profissoes: resultProfissoes });
+        const planoSelecionado = result[0];
+        /* req.session.planoSelecionado = planoSelecionado; */
+        res.render("form", { planoSelecionado: planoSelecionado, profissoes: resultProfissoes });
       })
     }
   });
-});
 
-app.get("/buscar-corretor", async (req, res) => {
-  try {
-    const cpfCorretor = req.query.cpfcorretor;
+})
 
-    const token = 'X43ADVSEXM';
-    const senhaApi = 'kgt87pkxc2';
-
-    const config = {
-      headers: {
-        'Content-Type': 'text/plain;charset=UTF-8',
-        'token': `${token}`,
-        'senhaApi': senhaApi,
-      },
-    };
-
-    // Fazer a solicitação à API
-    const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`;
-    const response = await axios.get(apiUrl, config);
-
-    // Verificar se a API retornou algum resultado
-    if (response.data.length === 0) {
-      return res.status(404).json({ error: 'Corretor não encontrado' });
-    }
-
-    // Extrair os dados relevantes
-    const corretorData = response.data;
-    const nomeCorretor = corretorData[0].nome;
-    const telefoneCorretor = corretorData[0].telefone;
-
-    // Manipular os dados do produtor (se existirem)
-    let dadosProdutores = [];
-
-    if (corretorData.length > 0) {
-        corretorData.forEach(corretor => {
-            if (corretor.produtor && corretor.produtor.nome) {
-                dadosProdutores.push({nome: corretor.produtor.nome, numeroDocumento: corretor.produtor.numeroDocumento});
-            } else {
-                nomeProdutores.push("Nome do produtor não encontrado");
-            }
-        });
-    } else {
-        if (corretorData.produtor && corretorData.produtor.nome) {
-          dadosProdutores.push({ nome: corretorData.produtor.nome, numeroDocumento: corretorData.produtor.numeroDocumento });
-        } else {
-          nomeProdutores.push("Nome do produtor não encontrado");
-    }
-    }
-    
-    const responseData = {
-      nome: nomeCorretor,
-      telefone: telefoneCorretor,
-      nomeProdutores: dadosProdutores,
-    };
-
-    console.log(responseData)
-
-    res.json(responseData);
-    
-  } catch (error) {
-    console.error('Erro ao consultar a API:', error);
-    logger.error({
-      message: 'Erro ao consultar API de busca de corretores do Digital',
-      error: err.message,
-      stack: err.stack,
-      timestamp: new Date().toISOString()
-    });
-    return res.status(500).json({ error: 'Erro ao processar consulta à API' });
-  }
-});
-
-app.get('/buscar-cep', async (req, res) => {
-  const { cep } = req.query;
-
-  try {
-    const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-    const data = response.data;
-    res.json(data);
-  } catch (error) {
-    console.error('Erro na busca de CEP:', error.message);
-    res.status(500).json({ error: 'Erro na busca de CEP' });
-  }
-});
-
-function generateRandomDigits(length) {
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += Math.floor(Math.random() * 10);
-  }
-  return result;
-}
-
-async function generateUniqueProposalNumber() {
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Mês com 2 dígitos
-  const day = currentDate.getDate().toString().padStart(2, '0'); // Dia com 2 dígitos
-  let randomPart;
-
-  // Tente gerar um número único até encontrar um que não exista no banco de dados
-  while (true) {
-    randomPart = generateRandomDigits(4); // 4 dígitos aleatórios
-    const proposalNumber = `${year}${month}${day}${randomPart}`;
-
-    const exists = await checkProposalExists(proposalNumber);
-    if (!exists) {
-      return proposalNumber; // Retorna o número único
-    }
-  }
-}
-
-function checkProposalExists(proposalNumber) {
-  return new Promise((resolve, reject) => {
-    db.query(
-      'SELECT * FROM implantacoes WHERE numeroProposta = ?',
-      [proposalNumber],
-      (err, results) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(results.length > 0);
-        }
-      }
-    );
-  });
-}
-
-async function sendStatus(idImplantacao, idStatus, mensagem){
-  const query = 'INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)'
-  db.query(query, [idStatus, idImplantacao, mensagem], (err, result) => {
-    if (err){
-      console.log('Erro ao inserir valores na tabela de status' + err)
-      logger.error({
-        message: 'Erro ao inserir valores na tabela de status',
-        error: err.message,
-        stack: err.stack,
-        timestamp: new Date().toISOString()
-      });
-    }
-    return
-  })
-}
-
-app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 }, { name: 'comprovanteResidencia', maxCount: 1 }]), async (req, res) => {
-  const dados = req.body;
+app.post("/enviadados", async (req, res) => {
   const dependentes = [];
+
+  req.session.planoSelecionado;
+  req.session.dadosTitular;
+  req.session.dadosResponsavelFinanceiro;
+  req.session.dadosEndereco;
+  req.session.dadosCorretor;
+  req.session.dadosDependentes;
+  req.session.dadosDocumentos;
+
+  let planoSelecionado = req.session.planoSelecionado;
+  let dadosTitular = req.session.dadosTitular
+
+  const dadosAceite = req.body
 
   const numeroProposta = await generateUniqueProposalNumber();
 
@@ -561,6 +456,148 @@ app.post("/enviadados", uploadForm.fields([{ name: 'documentoFoto', maxCount: 1 
     });
   }
 });
+
+app.get("/buscar-corretor", async (req, res) => {
+  try {
+    const cpfCorretor = req.query.cpfcorretor;
+
+    const token = 'X43ADVSEXM';
+    const senhaApi = 'kgt87pkxc2';
+
+    const config = {
+      headers: {
+        'Content-Type': 'text/plain;charset=UTF-8',
+        'token': `${token}`,
+        'senhaApi': senhaApi,
+      },
+    };
+
+    // Fazer a solicitação à API
+    const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`;
+    const response = await axios.get(apiUrl, config);
+
+    // Verificar se a API retornou algum resultado
+    if (response.data.length === 0) {
+      return res.status(404).json({ error: 'Corretor não encontrado' });
+    }
+
+    // Extrair os dados relevantes
+    const corretorData = response.data;
+    const nomeCorretor = corretorData[0].nome;
+    const telefoneCorretor = corretorData[0].telefone;
+
+    // Manipular os dados do produtor (se existirem)
+    let dadosProdutores = [];
+
+    if (corretorData.length > 0) {
+        corretorData.forEach(corretor => {
+            if (corretor.produtor && corretor.produtor.nome) {
+                dadosProdutores.push({nome: corretor.produtor.nome, numeroDocumento: corretor.produtor.numeroDocumento});
+            } else {
+                nomeProdutores.push("Nome do produtor não encontrado");
+            }
+        });
+    } else {
+        if (corretorData.produtor && corretorData.produtor.nome) {
+          dadosProdutores.push({ nome: corretorData.produtor.nome, numeroDocumento: corretorData.produtor.numeroDocumento });
+        } else {
+          nomeProdutores.push("Nome do produtor não encontrado");
+    }
+    }
+    
+    const responseData = {
+      nome: nomeCorretor,
+      telefone: telefoneCorretor,
+      nomeProdutores: dadosProdutores,
+    };
+
+    console.log(responseData)
+
+    res.json(responseData);
+    
+  } catch (err) {
+    console.error('Erro ao consultar a API:', err);
+    logger.error({
+      message: 'Erro ao consultar API de busca de corretores do Digital',
+      error: err.message,
+      stack: err.stack,
+      timestamp: new Date().toISOString()
+    });
+    return res.status(500).json({ error: 'Erro ao processar consulta à API' });
+  }
+});
+
+app.get('/buscar-cep', async (req, res) => {
+  const { cep } = req.query;
+
+  try {
+    const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = response.data;
+    res.json(data);
+  } catch (error) {
+    console.error('Erro na busca de CEP:', error.message);
+    res.status(500).json({ error: 'Erro na busca de CEP' });
+  }
+});
+
+function generateRandomDigits(length) {
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += Math.floor(Math.random() * 10);
+  }
+  return result;
+}
+
+async function generateUniqueProposalNumber() {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Mês com 2 dígitos
+  const day = currentDate.getDate().toString().padStart(2, '0'); // Dia com 2 dígitos
+  let randomPart;
+
+  // Tente gerar um número único até encontrar um que não exista no banco de dados
+  while (true) {
+    randomPart = generateRandomDigits(4); // 4 dígitos aleatórios
+    const proposalNumber = `${year}${month}${day}${randomPart}`;
+
+    const exists = await checkProposalExists(proposalNumber);
+    if (!exists) {
+      return proposalNumber; // Retorna o número único
+    }
+  }
+}
+
+function checkProposalExists(proposalNumber) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      'SELECT * FROM implantacoes WHERE numeroProposta = ?',
+      [proposalNumber],
+      (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(results.length > 0);
+        }
+      }
+    );
+  });
+}
+
+async function sendStatus(idImplantacao, idStatus, mensagem){
+  const query = 'INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)'
+  db.query(query, [idStatus, idImplantacao, mensagem], (err, result) => {
+    if (err){
+      console.log('Erro ao inserir valores na tabela de status' + err)
+      logger.error({
+        message: 'Erro ao inserir valores na tabela de status',
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString()
+      });
+    }
+    return
+  })
+}
 
 app.get('/preview-email', (req, res) => {
   const dadosEmail = {
@@ -838,6 +875,10 @@ app.post('/login-verifica', (req, res) => {
     res.redirect(originalUrl);
   });
 });
+
+app.get('/sucesso', (req, res) => {
+  res.render('sucesso', {numeroPropostaGerado: '264646464'})
+})
 
 app.get('/implantacoes', verificaAutenticacao, (req, res) => {
   const query = 'SELECT i.id, i.numeroProposta, i.cpftitular, i.nomecompleto, i.data_implantacao, i.planoSelecionado, p.nome_do_plano FROM implantacoes i JOIN planos p ON i.planoSelecionado = p.id';
@@ -1186,10 +1227,11 @@ app.get("/logout", (req, res) => {
   });
 });
 
+app.post('/error404', (res,req) => {
+  res.render('404');
+})
+
 app.use((req, res, next) => {
   res.status(404).render('404');
 });
 
-app.listen(porta, () => {
-  console.log(`Servidor rodando na porta ${porta}`);
-});

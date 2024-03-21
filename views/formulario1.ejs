@@ -1,0 +1,125 @@
+<h3 class="text-center">Dados do Titular</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomecompleto">Nome Completo:</label>
+                <input type="text" class="form-control" id="nomecompleto" name="nomecompleto"
+                    placeholder="Nome completo do titular do plano" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="datadenascimento">Data de Nascimento:</label>
+                <input type="date" class="form-control" id="datadenascimento" name="datadenascimento"
+                    placeholder="Data de Nascimento" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="cpftitular">CPF</label>
+                <input type="number" class="form-control" id="cpftitular" name="cpftitular" placeholder="Cpf do titular"
+                    onblur="validarCPF(this)" required>
+                <span class="valid-feedback"></span>
+                <span class="invalid-feedback"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="nomemaetitular">Nome da Mãe:</label>
+                <input type="text" class="form-control" id="nomemaetitular" name="nomemaetitular"
+                    placeholder="Nome da mãe" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="rgtitular">RG</label>
+                <input type="text" class="form-control" id="rgtitular" name="rgtitular" placeholder="RG do titular"
+                    required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="orgaoexpedidor">Orgão expedidor</label>
+                <input type="text" class="form-control" id="orgaoexpedidor" name="orgaoexpedidor"
+                    placeholder="Nome da mãe" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="dataexpedicaorgtitular">Data Expedição RG</label>
+                <input type="date" class="form-control" id="dataexpedicaorgtitular" name="dataexpedicaorgtitular"
+                    placeholder="RG do titular" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="sexotitular">Selecione uma opção:</label>
+                <select class="form-control" id="sexotitular" name="sexotitular" required>
+                    <option disabled selected value="">Selecione ...</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="estadociviltitular">Estado Civil:</label>
+                <select class="form-control" id="estadociviltitular" name="estadociviltitular" required>
+                    <option disabled selected value="">Selecione ...</option>
+                    <option value="Solteiro">Solteiro</option>
+                    <option value="Casado">Casado</option>
+                    <option value="Divorciado">Divorciado</option>
+                    <option value="Viúvo">Viúvo</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="telefonetitular">Telefone</label>
+                <input type="tel" class="form-control required" id="telefonetitular" name="telefonetitular"
+                    placeholder="Telefone" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="celulartitular">Celular</label>
+                <input type="text" class="form-control" id="celulartitular" name="celulartitular"
+                    placeholder="Informe telefone celular" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="emailtitular">Email</label>
+                <input type="email" class="form-control" id="emailtitular" name="emailtitular"
+                    placeholder="Email titular" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="profissaotitular">Profissão:</label>
+                <select class="form-control" id="profissaotitular" name="profissaotitular" required>
+                    <option disabled selected value="">Selecione ...</option>
+                    <% profissoes.forEach(function(profissao) { %>
+                        <option value="<%= profissao.idEntidade %>">
+                            <%= profissao.nome %>
+                        </option>
+                        <% }); %>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
