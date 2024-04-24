@@ -64,7 +64,7 @@ document.querySelector('.file-input').addEventListener('change', function () {
                 let percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                 li_el.querySelector('.buffer').style.width = percent + '%';
                 li_el.querySelector('.percentage').innerHTML = percent + '%';
-                li_el.querySelector('.urlArchive').value = fileData.filepath
+                //li_el.querySelector('.urlArchive').value = fileData.filepath
 
                 if (progressEvent.loaded === progressEvent.total) {
                     li_el.querySelector('.completed').style.display = li_el.querySelector('.remove').style.display = 'flex';
@@ -79,7 +79,7 @@ document.querySelector('.file-input').addEventListener('change', function () {
 
             const li_el = document.querySelector(`[data-filename="${originalName}"]`);
             li_el.dataset.fileNameBack = modifiedName;
-            li_el.querySelector('.urlArchive').value = fileData.filepath;
+            //li_el.querySelector('.urlArchive').value = fileData.filepath;
         })
         .catch(error => {
             console.error(error);

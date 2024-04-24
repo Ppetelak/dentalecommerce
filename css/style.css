@@ -8,6 +8,34 @@
 body {
     font-family: 'Kanit', sans-serif;
     padding: 20px;
+    overscroll-behavior-y:auto;
+    min-height: 100vh;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    background: #0E3178;
+    justify-content: center;
+}
+
+.col-12 {
+    padding: 0px;
+}
+
+.tudoFormulario {
+    display: flex;
+    flex-direction: row;
+}
+
+.containerFormulario {
+    background: #ffffff;
+    width: 50vw;
+    border-radius: 12px;
+}
+
+.forms {
+    max-height: 80vh; 
+    overflow-y: auto;
+    padding: 2rem;
 }
 
 .content{
@@ -40,7 +68,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     background-repeat: no-repeat;
     background-color: var(--CorMHAmarelo);
     background-image: url(/img/background.png);
@@ -52,6 +80,12 @@ body {
     background-color: var(--Cinza);
     font-family: 'Kanit', sans-serif;
     padding: 20px;
+}
+
+.btnAcoes {
+    background: #DCDCDC;
+    padding: 1rem;
+    border-radius: 5px;
 }
 
 .contentImplantacoes{
@@ -67,6 +101,18 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: inset;
+}
+
+.logoMountHermon {
+    position: fixed;
+    top: 3px;
+    left: 3px;
+}
+
+.header{
+    background: #DCDCDC;
+    border-radius: 12px;
+    padding: 2rem;
 }
 
 .preview-container {
@@ -102,17 +148,59 @@ body {
     font-weight: 300;
 }
 
+.stages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 
 label {
     font-weight: 300;
 }
 
-::placeholder, select option {
-    font-weight: 200;
+.numbers {
+    display: flex;
+    width: fit-content;
+    top: 3px;
+    right: 10px;
 }
 
-#Naoeresponsavel {
+.number {
+    display: inline-block;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 50%;
+    border: 2px solid var(--CorMHAmarelo);
+    background: var(--CorMHAzul);
+    color: white;
+}
+
+.number span {
+    display: block;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+}
+
+.number.active {
+    background: var(--CorMHAmarelo);
+    border: 2px solid var(--CorMHAzul);
+    opacity: 1;
+
+}
+
+.number.active span {
+    color: var(--CorMHAzul);
+}
+
+#add-dependente{
     display: none;
+}
+
+::placeholder, select option {
+    font-weight: 200;
 }
 
 .dependente {
@@ -157,8 +245,7 @@ label {
 }
 
 .existing-images {
-    max-height: 500px; 
-    overflow-y: auto; 
+    max-height: 500px;  
     width: 50%;
 }
 

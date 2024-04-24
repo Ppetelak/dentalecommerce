@@ -209,7 +209,7 @@ app.get("/", (req, res) => {
       console.error('Erro ao consultar o banco de dados:', err);
       return res.status(500).json({ error: 'Erro ao processar consulta ao BD' })
     }
-    res.render("index", { planos: resultPlanos });
+    res.render("index", { planos: resultPlanos});
   })
 });
 

@@ -1,101 +1,13 @@
-<h3>Dependentes</h3>
+<!-- dependentes -->
 <div class="form-group">
     <label>Possui Dependentes?</label>
     <select class="form-control required" id="possuidependentes" onchange="handlePossuiDependentesChange.call(this)">
-        <option value="Sim" required>Sim</option>
         <option value="Não">Não</option>
+        <option value="Sim" required>Sim</option>
     </select>
 </div>
 <input type="hidden" class="nDependentes" value="1" name="nDependentes">
 <div id="existeSim">
-    <div class="dependente pl-3" data-id="dependente-1">
-        <div class="row">
-            <div class="col-md-4"></div>
-            <div class="col-md-4"></div>
-            <div class="col-md-4">
-                <button class="btn btn-danger excluir-dependente"
-                    onclick="handleExcluirDependenteClick.call(this)">Excluir
-                    dependente</button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="cpfdependente">CPF:</label>
-                    <input type="text" class="form-control required dependente-input" name="cpfdependente"
-                        id="cpfdependente" rows="3" placeholder="CPF do dependente" onblur="validarCPF(this)" required>
-                    <span class="valid-feedback"></span>
-                    <span class="invalid-feedback"></span>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="nomecompletodependente">Nome completo do
-                        dependente:</label>
-                    <input type="text" class="form-control dependente-input" name="nomecompletodependente"
-                        placeholder="Nome completo do dependente" required>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="nomemaedependente">Nome da mãe do
-                        dependente:</label>
-                    <input type="text" class="form-control required dependente-input" name="nomemaedependente" rows="3"
-                        placeholder="Nome da mãe do dependente" required>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="nascimentodependente">Data de Nascimento
-                        Dependente</label>
-                    <input type="date" class="form-control dependente-input" name="nascimentodependente" required>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="sexodependente">Sexo:</label>
-                    <select class="form-control required dependente-input" name="sexodependente">
-                        <option disabled selected value="">Selecione ...</option>
-                        <option value="masculino" required>Masculino</option>
-                        <option value="feminino">Feminino</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="estadocivildependente">Estado Civil
-                        Dependente:</label>
-                    <select class="form-control required dependente-input" name="estadocivildependente">
-                        <option disabled selected value="">Selecione ...</option>
-                        <option value="Solteiro(a)" required>Solteiro(a)</option>
-                        <option value="Casado(a)">Casado(a)</option>
-                        <option value="Divorciado(a)">Divorciado(a)</option>
-                        <option value="Viúvo(a)">Viúvo(a)</option>
-                        <option value="Outros">Outros</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="grauparentescodependente">Grau de
-                        parentesco:</label>
-                    <select class="form-control required dependente-input" name="grauparentescodependente">
-                        <option disabled selected value="">Selecione ...</option>
-                        <option value="Conjugê" required>Conjugê</option>
-                        <option value="Filhos">Filhos</option>
-                        <option value="Pai/Mãe">Pai/Mãe</option>
-                        <option value="Avô/Avó">Avô/Avó</option>
-                        <option value="Tio/Tia">Tio/Tia</option>
-                        <option value="Outros">Outros</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 </br>
 <div class="row border-left" id="add-dependente">
