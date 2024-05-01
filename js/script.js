@@ -1,6 +1,11 @@
 let etapaAtual = 1;
 var quantidadeDependentes = 0;
 
+let anexosObjeto = []
+
+var fileInput = document.querySelector('.file-input');
+fileInput.removeAttribute('multiple');
+
 let valorAnual = document.querySelector("#valorAnualBD").value;
 let valorAnualCartao = document.querySelector("#valorAnualCartaoBD").value;
 let valorAnualCartao3Vezes = document.querySelector("#valorAnualCartao3VezesBD").value;
@@ -10,6 +15,23 @@ function validarFormulario(etapa) {
   let form = document.getElementById(`formEtapa${etapa}`);
   let stage = document.getElementById(`number-${etapa}`)
   let stageNext = document.getElementById(`number-${etapa + 1}`)
+
+  const attachmentRequiredElements = form.querySelectorAll('.attachment-required');
+  if (attachmentRequiredElements.length > 0) {
+      // Se houver, verificar se pelo menos um deles possui anexos
+      let hasAttachments = false;
+      attachmentRequiredElements.forEach(element => {
+          const fileItems = element.querySelectorAll('.file-list');
+          if (fileItems.length > 0) {
+              hasAttachments = true;
+          }
+      });
+
+      if (!hasAttachments) {
+          exibirAlerta('É necessário pelo menos um anexo.');
+          return false;
+      }
+  }
 
   if(etapa === 8) {
     if (form.checkValidity()) {
@@ -38,35 +60,44 @@ function validarFormulario(etapa) {
 }
 
 function pegaDados() {
-  // Objeto para armazenar todos os inputs
-  var inputs = {};
-  
-  // Seleciona todos os inputs nos formulários
-  $('input, select, radio').each(function() {
-      var nome = $(this).attr('name');
-      var valor = $(this).val();
-      
-      // Adiciona ao objeto inputs
-      inputs[nome] = valor;
-  });
-  console.log(inputs);
-}
 
-function handleTitularResponsavelChange() {
-  var selectedOption = this.value;
-  var naoEResponsavel = document.getElementById("Naoeresponsavel");
-  var tabTwo = document.getElementById("pills-step2");
+  var dados = {};
+  var dependentes = [];
+  var inputs = [];
 
-  if (selectedOption === "Não") {
-    naoEResponsavel.style.display = "block";
-    addEventListenersToFields();
-    validateRequiredFields();
-  } else {
-    console.log("entrou no else");
-    naoEResponsavel.style.display = "none";
-    clearFields(naoEResponsavel);
-    tabTwo.querySelector(".next").disabled = false;
+  if(quantidadeDependentes > 0){
+    for(i = 1; i <= quantidadeDependentes; i++){
+      let divDependente = document.querySelector(`[data-id="dependente-${i}"]`);
+      let dependente = {};
+      let inputs = divDependente.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        dependente[input.name] = input.value;
+      });
+      dependentes.push(dependente);
+    }
   }
+
+  $('input, select, radio').each(function() {
+    var nome = $(this).attr('name');
+    var valor = $(this).val();
+    
+    // Adiciona ao objeto inputs
+    inputs[nome] = valor;
+  });
+
+  dados['dependentes'] = dependentes;
+  dados['anexos'] = anexosObjeto;
+  dados['inputs'] = inputs;
+  console.log(dados);
+  var jsonDados = JSON.stringify(dados, null, 2);
+
+  var blob = new Blob([jsonDados], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  
+  var linkDownload = document.createElement('a');
+  linkDownload.href = url;
+  linkDownload.download = 'dados.json';
+  linkDownload.click();
 }
 
 function voltar() {
@@ -98,6 +129,11 @@ function enviarFormulario() {
   document.getElementById("meuFormulario").submit();
 }
 
+$(document).on('change', 'input[name="file-input"]', function () {
+  var formularioAtual = document.getElementById(`formEtapa${etapaAtual}`)
+  upload(formularioAtual);
+})
+
 document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("titularresponsavelfinanceiro")
@@ -106,16 +142,6 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("possuidependentes")
     .addEventListener("change", handlePossuiDependentesChange);
-
-  document
-    .querySelector(".adicionar-dependente")
-    .addEventListener("click", handleAdicionarDependenteClick);
-
-  document.addEventListener("click", function (event) {
-    if (event.target.classList.contains("excluir-dependente")) {
-      handleExcluirDependenteClick(event.target);
-    }
-  });
 
   const cpfCorretorInput = document.getElementById("cpfcorretor");
   const btnBuscarCorretor = document.getElementById("btnBuscarCorretor");
@@ -350,17 +376,11 @@ function handleTitularResponsavelChange() {
 
   var divNaoResponsavel = document.getElementById('Naoeresponsavel');
   var selectedOption = this.value;
-  var naoEResponsavel = document.getElementById("Naoeresponsavel");
-  var tabTwo = document.getElementById("pills-step2");
 
   if (selectedOption === "Não") {
     divNaoResponsavel.innerHTML = divTitularFinanceiro;
-    addEventListenersToFields();
-    validateRequiredFields();
   } else {
     divNaoResponsavel.innerHTML = ''
-    clearFields(naoEResponsavel);
-    tabTwo.querySelector(".next").disabled = false;
   }
 }
 
@@ -521,7 +541,6 @@ function atualizarDataIdDependentes() {
 }
 
 function handleAdicionarDependenteClick(event) {
-  event.preventDefault();
 
   var totalDependentes = document.querySelectorAll(".dependente").length;
   var novoId = "dependente-" + (totalDependentes + 1);
@@ -651,4 +670,105 @@ function validarPagamento () {
   $('.confirmacaoPgtoCartao').show()
   $('input[name="formaPagamento"]').prop('disabled', true);
 
+}
+
+function upload(etapa) {
+
+  let allowed_mime_types = [];
+  let allowed_size_mb = 100;
+
+  var files_input = etapa.querySelector('.file-input').files;
+
+  if(files_input.lenght == 0) {
+      exibirAlerta('Nenhum arquivo selecionado')
+      return;
+  }
+
+  for(i = 0; i < files_input.length; i ++) {
+      let file = files_input[i];
+
+      if(file.size > allowed_size_mb * 1024 * 1024) {
+          exibirAlerta('Erro: Limite de tamanho excedido => ' +file.name);
+          return;
+      }
+
+      let uniq = 'id-' + btoa(file.name).replace(/=/g, '').substring(0, 7);
+      let filetype = file.type.match(/([^\/]+)\//) / allowed_mime_types;
+
+      let li = `
+          <li class="file-list ${filetype[i]}" id="${uniq}" data-filename="${file.name}" data-file-name-back>
+              <div class="thumbnail">
+                  <ion-icon name="document-outline"></ion-icon>
+                  <ion-icon name="image-outline"></ion-icon>
+                  <ion-icon name="musical-notes-outline"></ion-icon>
+                  <ion-icon name="videocam-outline"></ion-icon>
+                  <span class="completed">
+                      <ion-icon name="checkmark"></ion-icon>
+                  </span>
+              </div>
+              <div class="properties">
+                  <span class="title"><strong></strong></span>
+                  <span class="size"></span>
+                  <span class="progress">
+                      <span class="buffer"></span>
+                      <span class="percentage">0%</span>
+                  </span>
+              </div>
+              <input type="hidden" value="" class="urlArchive">
+              <input type="hidden" value="" class="nameBack">
+              <button class="remove" onclick="remove(this)" type="button"">
+                  <ion-icon name="close"></ion-icon>
+              </button>
+          </li>
+          `;
+
+      etapa.querySelector('.list-upload ul').innerHTML = li + etapa.querySelector('.list-upload ul').innerHTML;
+
+      let li_el = etapa.querySelector('#' + uniq);
+
+      let name = li_el.querySelector('.title strong');
+      let size = li_el.querySelector('.size');
+
+      name.innerHTML = file.name;
+      size.innerHTML = bytesToSize(file.size);
+
+      var data = new FormData();
+      data.append('file', file);
+
+      axios.post('/upload', data, {
+          onUploadProgress: function(progressEvent) {
+              let percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              li_el.querySelector('.buffer').style.width = percent + '%';
+              li_el.querySelector('.percentage').innerHTML = percent + '%';
+              
+
+              if (progressEvent.loaded === progressEvent.total) {
+                  li_el.querySelector('.completed').style.display = li_el.querySelector('.remove').style.display = 'flex';
+              }
+          }
+      })
+      .then(response => {
+          const fileData = response.data.filepaths[0];
+          li_el.querySelector('.nameBack').value = fileData.modifiedName;
+          li_el.querySelector('.urlArchive').value = fileData.filepath;
+
+          anexosObjeto[fileData.modifiedName] = fileData.filepath;
+      })
+      .catch(error => {
+          console.error(error);
+      });  
+  }
+}
+
+function remove(button) {
+  const li = button.closest('.file-list');
+  const modifiedFileName = li.querySelector('.nameBack').value;
+  axios.post('/remove', { removefile: modifiedFileName })
+      .then(response => {
+          if(anexosObjeto.hasOwnProperty(modifiedFileName)) {
+              delete anexosObjeto[modifiedFileName]
+          }
+          li.remove();
+      })
+      .catch(error => console.error(error));
 }
