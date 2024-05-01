@@ -4,20 +4,20 @@
     <div class="custom-control custom-radio">
         <input type="radio" id="pgtoAnualAvista" name="formaPagamento" class="custom-control-input" value="1" required>
         <label class="custom-control-label" for="pgtoAnualAvista"> Valor anual á vista para pgto no boleto ou pix
-            <strong>R$ <%= planoSelecionado.pgtoAnualAvista %> </strong>
+            <strong>R$ <span class="valorAnual"><%= planoSelecionado.pgtoAnualAvista %></span> </strong>
         </label>
     </div>
     <div class="custom-control custom-radio">
         <input type="radio" name="formaPagamento" id="pgtoAnualCartao" class="custom-control-input" value="2" required>
         <label class="custom-control-label" for="pgtoAnualCartao">Valor anual no cartão de crédito em 12x de <strong> R$
-                <%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %> </strong>
+            <span class="valorAnualCartao"><%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %> </span> </strong>
         </label>
     </div>
     <div class="custom-control custom-radio">
         <input type="radio" name="formaPagamento" id="pgtoAnualCartao3x" class="custom-control-input" value="3"
             required>
-        <label class="custom-control-label" for="pgtoAnualCartao3x"> Anual cartão em 3x de <strong> R$ <%=
-                    (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %> </strong>
+        <label class="custom-control-label" for="pgtoAnualCartao3x"> Anual cartão em 3x de <strong> R$ 
+                    <span class="valorAnualCartao3Vezes"><%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %> </span></strong>
         </label>
     </div>
 </div>

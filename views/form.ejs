@@ -27,6 +27,7 @@
     
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/uploadArquivos.css">
+    <link rel="stylesheet" href="./css/styleCartao.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
@@ -34,6 +35,12 @@
 
 </head>
 <body>
+
+    <div class="uteis">
+        <input type="hidden" id="valorAnualBD" value="<%= planoSelecionado.pgtoAnualAvista %>">
+        <input type="hidden" id="valorAnualCartaoBD" value="<%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %>">
+        <input type="hidden" id="valorAnualCartao3VezesBD" value="<%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %>">
+    </div>
     <div class="logoMountHermon">
         <img src="./img/logoMH_branca.png" alt="Logo Mount Hermon">
     </div>
@@ -44,10 +51,30 @@
                     <div class="row">
                         <div class="col-12">
                             <% if (planoSelecionado) { %>
-                                <h3>Plano escolhido</h3>
-                                <p><strong>Nome do Plano:</strong>
-                                    <%= planoSelecionado.nome_do_plano %>
-                                </p>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <h3>Plano escolhido</h3>
+                                        <p><strong>Nome do Plano:</strong><br>
+                                            <%= planoSelecionado.nome_do_plano %>
+                                        </p>
+                                    </div>
+                                    <div class="col-4">
+                                        <h3>Valores</h3>
+                                        <p><strong>Valor Anual á vista:</strong>
+                                            R$ <span class="valorAnual"><%= planoSelecionado.pgtoAnualAvista %></span>
+                                        </p>
+                                        <p><strong>Valor Mensal Plano Anual (12x):</strong>
+                                            R$ <span class="valorAnualCartao"><%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %> </span>
+                                        </p>
+                                        <p><strong>Valor Anual no cartão em (3x):</strong>
+                                            R$ <span class="valorAnualCartao3Vezes"><%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %> </span>
+                                        </p>
+                                    </div>
+                                    <div class="col-4">
+                                        <h3>Dependentes</h3>
+                                        <span id="qtdDependentes"> 0</span> Dependentes adicionados
+                                    </div>
+                                </div>
                                 <% } else { %>
                                     <p>Nenhum plano selecionado ainda.</p>
                                 <% } %>
@@ -143,16 +170,41 @@
                         <div class="forms">
                             <%- include('formulario8') %>
                         </div>
+                        <div class="confirmacaoBoleto" style="display: none;">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-warning" role="alert">
+                                        <strong>Atenção!</strong> Escolhendo a opção via boleto nossa equipe irá entrar em contato para lhe enviar o boleto e confirmar a contratação.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="confirmacaoPgtoCartao" style="display: none;">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-warning" role="alert">
+                                        <strong>Atenção!</strong> Pagamento realizado com sucesso! Clique em "Finalizar" e conclua o envio dos dados para finalizar a contratação.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="btnAcoes">
                             <button class="btn btn-secondary float-start btnPrev"  onclick="voltar()" type="button">Voltar</button>
                             <button class="btn btn-primary float-end btnproximo" type="button" onclick="return validarFormulario(8)">Finalizar</button>
                         </div>
                     </form>
+                    <form id="formEtapa9" style="display: none;">
+                        <%- include('formulario9') %>
+                    </form>
                 </div>         
             </div>
         </div>
     </div>
+    <div id="modalCartaoCredito">
+        <%- include('cartao') %>
+    </div>
 </body>
 <script src="/js/script.js"></script>
+<script src="/js/scriptCartao.js"></script>
 <script src="/js/uploadArquivos.js"></script>
 </html>

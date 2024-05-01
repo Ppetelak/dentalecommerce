@@ -1,8 +1,18 @@
 :root {
     --CorMHAmarelo: #BE7512;
+    --bodyColor: #111827;
     --CorMHAzul: #0E3178;
     --Branco: #ffffff;
     --Cinza: #DCDCDC;
+    --formColor: #0E3178;
+	--buttonColor: #BE7512;
+	--labelColor: #F3F4F6;
+	--placeholderColor: #9CA3AF;
+	--statusError: #FB7185;
+	--borderForm: #374151;
+	--nameCardColor: #F9FAFB;
+	--borderInputDefault: #374151;
+	--borderInputFocus: #BE7512;
 }
 
 body {
@@ -80,6 +90,35 @@ body {
     background-color: var(--Cinza);
     font-family: 'Kanit', sans-serif;
     padding: 20px;
+}
+
+#qtdDependentes {
+    background: var(--CorMHAzul);
+    padding: 0.5rem;
+    border-radius: 5px;
+    color: #FFF;
+}
+
+#modalCartaoCredito {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Cor de fundo com transparência */
+    z-index: 9999; /* Certifique-se de que o modal está na frente de outros elementos */
+    display: none; /* Inicialmente oculto */
+    transition: opacity 0.3s ease;
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border-radius: 5px;
+    background: none;
 }
 
 .btnAcoes {
@@ -313,4 +352,72 @@ label {
     content: '\26A0 CPF Inválido'; /* Warning Unicode character */
     color: red;
     margin-right: 5px;
+}
+
+.loader {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100px;
+    height: 50px;
+    margin: 0 auto;
+    animation: slide-in 2s;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(-100vw);
+    }
+
+    to {
+        transform: translateX(0%);
+    }
+}
+
+@keyframes leap {
+    0% {
+        transform: translateY(0);
+    }
+
+    7% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(1.3);
+    }
+
+    50% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    75% {
+        transform: translateY(10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.dot {
+    width: 25px;
+    height: 25px;
+    border-radius: 100%;
+}
+
+.dot:nth-child(1) {
+    background-color: var(--CorMHAzul);
+    animation: leap 1s ease-in-out alternate 0.4s infinite;
+}
+
+.dot:nth-child(2) {
+    background-color: var(--CorMHAmarelo);
+    animation: leap 1s ease-in-out alternate 0.6s infinite;
+}
+
+.dot:nth-child(3) {
+    background-color: var(--borderInputDefault);
+    animation: leap 1s ease-in-out alternate 0.8s infinite;
 }

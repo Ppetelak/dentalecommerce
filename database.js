@@ -1,11 +1,13 @@
 const mysql = require("mysql2");
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
     host: "localhost",
     user: "root",
     password: "pmp078917",
     database: "mhdentalvendas",
-    port: "3306",
+    waitForConnections: true,
+    connectionLimit: 1, // Ajuste conforme necessário
+    queueLimit: 0
 });
 
 /* const db = mysql.createConnection({
@@ -18,12 +20,14 @@ const db = mysql.createConnection({
 
 function connectToDatabase() {
     return new Promise((resolve, reject) => {
-        db.connect((error) => {
+        db.getConnection((error, connection) => {
             if (error) {
                 console.error('Erro ao conectar ao banco de dados:', error);
                 reject(error);
             } else {
                 console.log('Conexão bem-sucedida ao banco de dados');
+                // Libera a conexão quando não estiver mais em uso
+                connection.release();
                 resolve();
             }
         });
@@ -31,3 +35,4 @@ function connectToDatabase() {
 }
 
 module.exports = { db, connectToDatabase };
+

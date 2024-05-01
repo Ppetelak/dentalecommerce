@@ -485,6 +485,7 @@ app.get("/buscar-corretor", async (req, res) => {
     const corretorData = response.data;
     const nomeCorretor = corretorData[0].nome;
     const telefoneCorretor = corretorData[0].telefone;
+    const codigoCorretor = corretorData[0].codigo;
 
     // Manipular os dados do produtor (se existirem)
     let dadosProdutores = [];
@@ -509,6 +510,7 @@ app.get("/buscar-corretor", async (req, res) => {
       nome: nomeCorretor,
       telefone: telefoneCorretor,
       nomeProdutores: dadosProdutores,
+      idCorretor: codigoCorretor
     };
 
     console.log(responseData)

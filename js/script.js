@@ -1,20 +1,55 @@
 let etapaAtual = 1;
+var quantidadeDependentes = 0;
+
+let valorAnual = document.querySelector("#valorAnualBD").value;
+let valorAnualCartao = document.querySelector("#valorAnualCartaoBD").value;
+let valorAnualCartao3Vezes = document.querySelector("#valorAnualCartao3VezesBD").value;
+
 
 function validarFormulario(etapa) {
   let form = document.getElementById(`formEtapa${etapa}`);
   let stage = document.getElementById(`number-${etapa}`)
   let stageNext = document.getElementById(`number-${etapa + 1}`)
 
-  if (form.checkValidity()) {
-    document.getElementById(`formEtapa${etapa}`).style.display = "none";
-    stage.classList.remove('active');
-    stageNext.classList.add('active');
-    etapaAtual = etapaAtual + 1;
-    document.getElementById(`formEtapa${etapa + 1}`).style.display = "block";
+  if(etapa === 8) {
+    if (form.checkValidity()) {
+      document.getElementById(`formEtapa${etapa}`).style.display = "none";
+      $('.stages').hide();
+      $('.header').hide();
+      etapaAtual = etapaAtual + 1;
+      document.getElementById(`formEtapa${etapa + 1}`).style.display = "block";
+      pegaDados();
+    } else {
+      form.reportValidity();
+      return false;
+    }
   } else {
-    form.reportValidity();
-    return false;
+    if (form.checkValidity()) {
+      document.getElementById(`formEtapa${etapa}`).style.display = "none";
+      stage.classList.remove('active');
+      stageNext.classList.add('active');
+      etapaAtual = etapaAtual + 1;
+      document.getElementById(`formEtapa${etapa + 1}`).style.display = "block";
+    } else {
+      form.reportValidity();
+      return false;
+    }
   }
+}
+
+function pegaDados() {
+  // Objeto para armazenar todos os inputs
+  var inputs = {};
+  
+  // Seleciona todos os inputs nos formulários
+  $('input, select, radio').each(function() {
+      var nome = $(this).attr('name');
+      var valor = $(this).val();
+      
+      // Adiciona ao objeto inputs
+      inputs[nome] = valor;
+  });
+  console.log(inputs);
 }
 
 function handleTitularResponsavelChange() {
@@ -100,6 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
           document.getElementById("nomecorretor").value = data.nome || "";
           document.getElementById("celularcorretor").value =
             data.telefone || "";
+          document.getElementById("idCorretor").value = data.idCorretor || "";
 
           const corretoraSelect = document.getElementById("corretora");
           const numeroDocumentoInput =
@@ -422,9 +458,19 @@ function handlePossuiDependentesChange() {
   `
   var existeSim = document.getElementById("existeSim");
   var dependentes = document.querySelectorAll(".dependente");
+  quantidadeDependentes = dependentes.length;
+  var spanQtdDependentes = document.querySelector("#qtdDependentes");
+  spanQtdDependentes.textContent = quantidadeDependentes;
   var botao = document.querySelector("#add-dependente");
+  var spanValorAnual = document.querySelectorAll(".valorAnual");
+  var spanValorAnaulCartao = document.querySelectorAll(".valorAnualCartao");
+  var spanValorAnualCartao3Vezes = document.querySelectorAll(".valorAnualCartao3Vezes");
 
   if (selecionado === "Sim") {
+    var multiplicador = quantidadeDependentes + 1;
+    atualizarValores(spanValorAnual, valorAnual, multiplicador);
+    atualizarValores(spanValorAnaulCartao, valorAnualCartao, multiplicador);
+    atualizarValores(spanValorAnualCartao3Vezes, valorAnualCartao3Vezes, multiplicador);
     existeSim.innerHTML = divPrimeiroDependente;
     botao.style.display = "block";
     nDependentes.value = 1;
@@ -432,6 +478,10 @@ function handlePossuiDependentesChange() {
     existeSim.innerHTML = '';
     botao.style.display = "none";
     nDependentes.value = 0;
+    var multiplicador = 1;
+    atualizarValores(spanValorAnual, valorAnual, multiplicador);
+    atualizarValores(spanValorAnaulCartao, valorAnualCartao, multiplicador);
+    atualizarValores(spanValorAnualCartao3Vezes, valorAnualCartao3Vezes, multiplicador);
 
     for (var i = 1; i < dependentes.length; i++) {
       dependentes[i].remove();
@@ -439,8 +489,26 @@ function handlePossuiDependentesChange() {
   }
 }
 
+function atualizarValores(spans, valorInicial, multiplicador) {
+  spans.forEach(function(span) { 
+    var valorAtualizado = valorInicial * multiplicador; 
+    span.textContent = valorAtualizado.toFixed(2); 
+  });
+}
+
 function atualizarDataIdDependentes() {
   var dependentes = document.querySelectorAll(".dependente");
+  quantidadeDependentes = dependentes.length;
+  var spanQtdDependentes = document.querySelector("#qtdDependentes");
+  spanQtdDependentes.textContent = quantidadeDependentes;
+  var spanValorAnual = document.querySelectorAll(".valorAnual");
+  var spanValorAnaulCartao = document.querySelectorAll(".valorAnualCartao");
+  var spanValorAnualCartao3Vezes = document.querySelectorAll(".valorAnualCartao3Vezes");
+
+  var multiplicador = quantidadeDependentes + 1;
+  atualizarValores(spanValorAnual, valorAnual, multiplicador);
+  atualizarValores(spanValorAnaulCartao, valorAnualCartao, multiplicador);
+  atualizarValores(spanValorAnualCartao3Vezes, valorAnualCartao3Vezes, multiplicador);
 
   dependentes.forEach(function (dependente, index) {
     dependente.dataset.id = "dependente-" + (index + 1);
@@ -560,4 +628,27 @@ function removeErrorMessage() {
   if (errorMessage) {
     errorMessage.parentNode.removeChild(errorMessage);
   }
+}
+
+$('input[name="formaPagamento"]').on('change', function() {
+  var formaPagamentoSelecionada = $(this).val();
+  if (formaPagamentoSelecionada === '2' || formaPagamentoSelecionada === '3') {
+    $('.confirmacaoBoleto').hide();
+    funcaoParaCartao();
+  }
+  if (formaPagamentoSelecionada === '1') {
+    $('.confirmacaoBoleto').show()
+  }
+});
+
+function funcaoParaCartao() {
+  $('#modalCartaoCredito').modal('show');
+}
+
+function validarPagamento () {
+  $('#modalCartaoCredito').hide()
+  $('.modal-backdrop').hide()
+  $('.confirmacaoPgtoCartao').show()
+  $('input[name="formaPagamento"]').prop('disabled', true);
+
 }
