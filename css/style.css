@@ -421,3 +421,14 @@ label {
     background-color: var(--borderInputDefault);
     animation: leap 1s ease-in-out alternate 0.8s infinite;
 }
+
+#customAlert {
+    width: 50%;
+    position: fixed;
+    top: 0;
+}
+
+.btn-close {
+    background: #0000;
+    border: none;
+}

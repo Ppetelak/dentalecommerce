@@ -1,7 +1,7 @@
 let etapaAtual = 1;
 var quantidadeDependentes = 0;
 
-let anexosObjeto = []
+let anexosObjeto = {};
 
 var fileInput = document.querySelector('.file-input');
 fileInput.removeAttribute('multiple');
@@ -63,7 +63,7 @@ function pegaDados() {
 
   var dados = {};
   var dependentes = [];
-  var inputs = [];
+  var inputs = {};
 
   if(quantidadeDependentes > 0){
     for(i = 1; i <= quantidadeDependentes; i++){
@@ -78,11 +78,14 @@ function pegaDados() {
   }
 
   $('input, select, radio').each(function() {
-    var nome = $(this).attr('name');
-    var valor = $(this).val();
-    
-    // Adiciona ao objeto inputs
-    inputs[nome] = valor;
+    // Verifica se o input está dentro de um dependente
+    if (!$(this).closest('.dependente').length) {
+        var nome = $(this).attr('name');
+        var valor = $(this).val();
+        
+        // Adiciona ao objeto inputs
+        inputs[nome] = valor;
+    }
   });
 
   dados['dependentes'] = dependentes;
@@ -393,7 +396,7 @@ function handlePossuiDependentesChange() {
             <div class="col-md-4"></div>
             <div class="col-md-4">
                 <button class="btn btn-danger excluir-dependente"
-                    onclick="handleExcluirDependenteClick.call(this)">Excluir
+                    onclick="handleExcluirDependenteClick(this)">Excluir
                     dependente</button>
             </div>
         </div>
@@ -437,7 +440,7 @@ function handlePossuiDependentesChange() {
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="sexodependente">Sexo:</label>
-                    <select class="form-control required dependente-input" name="sexodependente">
+                    <select class="form-control dependente-input" name="sexodependente">
                         <option disabled selected value="">Selecione ...</option>
                         <option value="masculino" required>Masculino</option>
                         <option value="feminino">Feminino</option>
@@ -448,7 +451,7 @@ function handlePossuiDependentesChange() {
                 <div class="form-group">
                     <label for="estadocivildependente">Estado Civil
                         Dependente:</label>
-                    <select class="form-control required dependente-input" name="estadocivildependente">
+                    <select class="form-control dependente-input" name="estadocivildependente">
                         <option disabled selected value="">Selecione ...</option>
                         <option value="Solteiro(a)" required>Solteiro(a)</option>
                         <option value="Casado(a)">Casado(a)</option>
@@ -462,7 +465,7 @@ function handlePossuiDependentesChange() {
                 <div class="form-group">
                     <label for="grauparentescodependente">Grau de
                         parentesco:</label>
-                    <select class="form-control required dependente-input" name="grauparentescodependente">
+                    <select class="form-control dependente-input" name="grauparentescodependente">
                         <option disabled selected value="">Selecione ...</option>
                         <option value="Conjugê" required>Conjugê</option>
                         <option value="Filhos">Filhos</option>
@@ -753,6 +756,7 @@ function upload(etapa) {
           li_el.querySelector('.urlArchive').value = fileData.filepath;
 
           anexosObjeto[fileData.modifiedName] = fileData.filepath;
+          console.log(anexosObjeto);
       })
       .catch(error => {
           console.error(error);
@@ -771,4 +775,21 @@ function remove(button) {
           li.remove();
       })
       .catch(error => console.error(error));
+}
+
+
+function exibirAlerta(mensagem) {
+  mensagem = mensagem.replace(/\n/g, '<br>');
+  document.getElementById("customAlertMessage").innerHTML = mensagem;
+  document.getElementById("customAlert").style.display = "block";
+  document.querySelector("#customAlert .btn-close").addEventListener("click", function() {
+      // Oculta o alerta quando o botão de fechar é clicado
+      document.getElementById("customAlert").style.display = "none";
+  })
+}
+
+function bytesToSize(bytes) {
+  const units = ['byte', "kilobyte", "megabyte", "terabyte", "petabyte"];
+  const unit = Math.floor(Math.log(bytes) / Math.log(2014));
+  return new Intl.NumberFormat('en', { style: "unit", unit: units[unit] }).format(bytes / 1024 ** unit);
 }
