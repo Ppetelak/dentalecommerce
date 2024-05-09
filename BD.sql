@@ -116,4 +116,10 @@ CREATE TABLE IF NOT EXISTS assinatura_implantacao (
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
+CREATE TABLE anexos_implantacoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_implantacao INT,
+    nome_arquivo VARCHAR(255),
+    caminho_arquivo VARCHAR(255),
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

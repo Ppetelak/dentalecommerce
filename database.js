@@ -1,6 +1,6 @@
 const mysql = require("mysql2");
 
-const db = mysql.createPool({
+/* const db = mysql.createPool({
     host: "localhost",
     user: "root",
     port: "3306",
@@ -9,9 +9,9 @@ const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 1, // Ajuste conforme necessário
     queueLimit: 0
-});
+}); */
 
-/* const db = mysql.createPool({
+const db = mysql.createPool({
     host: "pablopetelak.com",
     user: "u654656997_dev",
     port: "3306",
@@ -20,7 +20,7 @@ const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 1, // Ajuste conforme necessário
     queueLimit: 0
-}); */
+});
 
 /* const db = mysql.createConnection({
     host: "localhost",

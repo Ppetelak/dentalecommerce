@@ -140,7 +140,7 @@
                         </div>
                         <div class="col-6">
                             <p>Profissão: <span>
-                                    <%= implantacao.profissaotitular %>
+                                    <!-- <%= implantacao.profissaotitular %> -->
                                 </span></p>
                         </div>
                     </div>
@@ -1412,18 +1412,11 @@
             <div class="row dados documentos">
                 <div class="col-12">
                     <h6> Documentos vinculados a Proposta</h6>
+                    <% documentos.forEach(documento => { %> 
                     <div class="row">
-                        <label>Documento com foto:</label>
-                        <div class="preview-image">
-                            <img src="/<%= documento.documentoFoto %>"/>
-                        </div>
+                        <a  target="_blank" href="<%= documento.caminho_arquivo %>"> <%= documento.nome_arquivo %> </a>
                     </div>
-                    <div class="row">
-                        <label> Comprovante de endereço: </label>
-                        <div class="preview-image">
-                            <img src="/<%= documento.comprovanteResidencia %>"/>
-                        </div>
-                    </div>
+                    <% }) %>
                 </div>
             </div>
 

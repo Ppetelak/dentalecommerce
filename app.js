@@ -157,7 +157,8 @@ async function sendContractEmail(
   idImplantacao,
   numeroProposta,
   cpfTitularFinanceiro,
-  nomeTitularFinanceiro
+  nomeTitularFinanceiro,
+  idEntidade
 ) {
   return new Promise(async (resolve, reject) => {
     const transporter = nodemailer.createTransport({
@@ -173,7 +174,7 @@ async function sendContractEmail(
       },
     });
 
-    const linkAleatorio = `${appUrl}/assinar/${idImplantacao}/${numeroProposta}/${cpfTitularFinanceiro}`;
+    const linkAleatorio = `${appUrl}/assinar/${idImplantacao}/${numeroProposta}/${cpfTitularFinanceiro}/${idEntidade}`;
 
     const html = await ejs.renderFile(
       path.join(__dirname, "../DentalEcommerce/views/emailTemplate.ejs"),
@@ -195,17 +196,65 @@ async function sendContractEmail(
     try {
       await transporter.sendMail(mailOptions);
       resolve(); // Resolva a promessa se o e-mail for enviado com sucesso
-    } catch (error) {
+    } catch (err) {
       logger.error({
         message: "Erro no envio do email ao beneficiário para assinatura",
         error: err.message,
         stack: err.stack,
         timestamp: new Date().toISOString(),
       });
-      reject(error); // Rejeite a promessa se houver um erro no envio do e-mail
+      reject(err); // Rejeite a promessa se houver um erro no envio do e-mail
     }
   });
 }
+
+function consultarNumeroProposta(idImplantacao) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT numeroProposta FROM implantacoes WHERE id=?",
+      [idImplantacao],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result[0].numeroProposta);
+        }
+      }
+    );
+  });
+}
+
+async function salvarAnexos(idImplantacao, anexos) {
+  const query = "INSERT INTO anexos_implantacoes (id_implantacao, nome_arquivo, caminho_arquivo) VALUES (?, ?, ?)";
+  const promises = []; // Array para armazenar todas as promessas de inserção
+
+  // Iterar sobre cada anexo e criar uma promessa para inseri-lo no banco de dados
+  for (const [nomeArquivo, caminhoArquivo] of Object.entries(anexos)) {
+    // Adicionar a promessa de inserção ao array de promessas
+    promises.push(
+      new Promise((resolve, reject) => {
+        db.query(query, [idImplantacao, nomeArquivo, caminhoArquivo], (err, result) => {
+          if (err) {
+            reject(err); // Rejeitar a promessa em caso de erro
+          } else {
+            resolve(result); // Resolver a promessa se a inserção for bem-sucedida
+          }
+        });
+      })
+    );
+  }
+
+  // Esperar que todas as inserções sejam concluídas antes de retornar
+  try {
+    await Promise.all(promises);
+    console.log("Todos os anexos foram inseridos com sucesso.");
+  } catch (error) {
+    console.error("Erro ao inserir anexos:", error);
+    throw error; // Lançar o erro novamente para tratamento externo, se necessário
+  }
+}
+
+
 
 /* ---------------------------------------- ROTAS ---------------------------------------- */
 
@@ -381,7 +430,88 @@ app.post("/testeFormulario", async (req, res) => {
     aceitoTermos: dados.aceitoTermos,
     aceitoPrestacaoServicos: dados.aceitoPrestacaoServicos,
     numeroProposta: numeroProposta,
+    planoSelecionado: dados.planoSelecionado,
   };
+
+  const jsonModeloDS = {
+    "numeroProposta": "00000000000",
+    "dataAssinatura": "26/02/2024",
+    "diaVencimento": 1,
+    "cpfResponsavel": dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
+    "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
+    "observacao": "string",
+    "plano": {
+      "codigo": "VMR5GRUEPJ"
+    },
+    "convenio": {
+      "codigo": "LRYT12JW8T"
+    },
+    "produtor": {
+      "codigo": "E17NJPUZM2"
+    },
+    "corretora": {
+      "codigo": "S62MXENV8X"
+    },
+    "grupo": {
+      "codigo": "V2CAVAD6U2"
+    },
+    "filial": {
+      "codigo": "BETRHPTL2K"
+    },
+    "beneficiarioList": [
+      {
+        "nome": dados.nomecompleto,
+        "dataNascimento": dados.datadenascimento,
+        "rg": dados.rgtitular,
+        "orgaoEmissor": dados.orgaoexpedidor,
+        "cpf": dados.cpftitular,
+        "dnv": "string",
+        "cns": "string",
+        "pis": "string",
+        "nomeMae": dados.nomemaetitular,
+        "endereco": dados.enderecoresidencial,
+        "numero": dados.numeroendereco,
+        "complemento": dados.complementoendereco,
+        "bairro": dados.bairro,
+        "municipio": dados.cidade,
+        "uf": dados.uf,
+        "cep": dados.cep,
+        "dddTelefone": "41",
+        "telefone": "992414553",
+        "dddCelular": "41",
+        "celular": "999665588",
+        "email": dados.emailtitular,
+        "altura": 0,
+        "peso": 0,
+        "imc": 0,
+        "dataVigencia": "26/02/2024",
+        "mensalidade": 0,
+        "estadoCivil": {
+            "id": dados.estadoCivil === "Solteiro" ? 4 : 
+                  dados.estadoCivil === "Casado" ? 5 :
+                  dados.estadoCivil === "Divorciado" ? 6 :
+                  dados.estadoCivil === "Viúvo" ? 7 : 8,
+            "nome": dados.estadociviltitular
+        },
+        "tipoBeneficiario": {
+          "id": 1,
+          "nome": "Titular"
+        },
+        "sexo": {
+          "id": 1,
+          "nome": "Masculino"
+        },
+        "parentesco": {
+          "id": 1,
+          "nome": "Titular"
+        },
+        "statusBeneficiario": {
+          "id": 0,
+          "nome": "Ativo"
+        }
+      }
+    ]
+  }
 
   /* INSERÇÃO DE DADOS AO BANCO DE DADOS DAS INFORMAÇÕES SOBRE A IMPLANTAÇÃO */
   const resultImplantacao = await insertData(qInsImplantacao, dadosImplantacao);
@@ -393,17 +523,21 @@ app.post("/testeFormulario", async (req, res) => {
 
   /* GET DE DADOS PARA USAR NAS DEMAIS FUNÇÕES  */
   const idImplantacao = resultImplantacao.insertId;
-  const numeroPropostaGerado = await consultarNumeroProposta(idImplantacao);
-  const emailTitular = await consultarEmailTitular(idImplantacao);
-  
+
   /* DISPARO DE EMAIL PARA CLIENTE ASSINAR CONTRATO  */
   await sendContractEmail(
-    emailTitular,
+    dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular,
     idImplantacao,
-    numeroPropostaGerado,
+    numeroProposta,
     dados.cpffinanceiro,
-    dados.nomefinanceiro
+    dados.nomefinanceiro,
+    dados.profissaotitular
   );
+
+  await salvarAnexos (
+    idImplantacao,
+    anexos
+  )
 
   /* INSERÇÃO DE STATUS INICIAL AO BANCO DE DADOS PARA ACOMPANHAR IMPLANTAÇÃO */
   await sendStatus(
@@ -683,21 +817,6 @@ app.post("/testeFormulario", async (req, res) => {
   }
 }); */
 
-function consultarNumeroProposta(idImplantacao) {
-  return new Promise((resolve, reject) => {
-    db.query(
-      "SELECT numeroProposta FROM implantacoes WHERE id=?",
-      [idImplantacao],
-      (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result[0].numeroProposta);
-        }
-      }
-    );
-  });
-}
 
 app.get("/buscar-corretor", async (req, res) => {
   try {
@@ -832,10 +951,10 @@ function checkProposalExists(proposalNumber) {
   });
 }
 
-async function sendStatus(connection, idImplantacao, idStatus, mensagem) {
+async function sendStatus(idImplantacao, idStatus, mensagem) {
   const query =
     "INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)";
-    connection(query, [idStatus, idImplantacao, mensagem], (err, result) => {
+    db.query(query, [idStatus, idImplantacao, mensagem], (err, result) => {
     if (err) {
       console.log("Erro ao inserir valores na tabela de status" + err);
       logger.error({
@@ -907,11 +1026,14 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
+/* ROTA PARA ASSINATURA DO CONTRATO */
 app.get(
-  "/assinar/:idImplantacao/:numeroProposta/:cpfTitularFinanceiro",
+  "/assinar/:idImplantacao/:numeroProposta/:cpfTitularFinanceiro/:idEntidade",
   (req, res) => {
     const numeroProposta = req.params.numeroProposta;
     const cpfTitular = req.params.cpfTitularFinanceiro;
+
+    const idEntidade = req.params.idEntidade;
 
     const idImplantacao = req.params.idImplantacao;
     const queryImplantacoes = "SELECT * FROM implantacoes WHERE id=?";
@@ -921,7 +1043,7 @@ app.get(
     const queryDependentes =
       "SELECT * FROM dependentes WHERE id_implantacoes = ?";
     const queryDocumentos =
-      "SELECT * FROM documentos_implantacoes WHERE id_implantacao = ?";
+      "SELECT * FROM anexos_implantacoes WHERE id_implantacao = ?";
     const queryAssinatura =
       "SELECT * FROM assinatura_implantacao WHERE id_implantacao = ?";
 
@@ -952,141 +1074,123 @@ app.get(
 
       const idImplantacao = resultImplantacoes[0].id;
 
-      const nomeProfissao = resultImplantacoes[0].profissaotitular;
-
-      db.query(queryProfissao, [nomeProfissao], (err, resultProfissao) => {
+      db.query(queryEntidade, [idEntidade], (err, resultEntidade) => {
         if (err) {
           logger.error({
-            message:
-              "ROTA: ASSINAR | ERRO: Erro ao buscar dados da entidade relacionada a profissão",
+            message: "ROTA: ASSINAR | ERRO: ao buscar entidade relacionada",
             error: err.message,
             stack: err.stack,
             timestamp: new Date().toISOString(),
           });
-          console.error(
-            "Erro ao buscar dados da entidade relacionada a profissão"
-          );
+          console.error("Erro puxar entidade relacionada", err);
         }
-        const entidadeId = resultProfissao[0].idEntidade;
-
-        db.query(queryEntidade, [entidadeId], (err, resultEntidade) => {
+        const planoId = resultImplantacoes[0].planoSelecionado;
+        db.query(queryPlano, [planoId], (err, resultPlano) => {
           if (err) {
             logger.error({
-              message: "ROTA: ASSINAR | ERRO: ao buscar entidade relacionada",
+              message:
+                "ROTA: ASSINAR | ERRO: ao buscar plano vinculado a implantação",
               error: err.message,
               stack: err.stack,
               timestamp: new Date().toISOString(),
             });
-            console.error("Erro puxar entidade relacionada", err);
+            console.error(
+              "Erro ao buscar plano vinculado à implantação",
+              err
+            );
+            res
+              .status(500)
+              .send("Erro ao buscar plano vinculado à implantação");
+            return;
           }
-          const planoId = resultImplantacoes[0].planoSelecionado;
-          db.query(queryPlano, [planoId], (err, resultPlano) => {
-            if (err) {
-              logger.error({
-                message:
-                  "ROTA: ASSINAR | ERRO: ao buscar plano vinculado a implantação",
-                error: err.message,
-                stack: err.stack,
-                timestamp: new Date().toISOString(),
-              });
-              console.error(
-                "Erro ao buscar plano vinculado à implantação",
-                err
-              );
-              res
-                .status(500)
-                .send("Erro ao buscar plano vinculado à implantação");
-              return;
-            }
-            db.query(
-              queryDependentes,
-              [idImplantacao],
-              (err, resultDependentes) => {
-                if (err) {
-                  logger.error({
-                    message:
-                      "ROTA: ASSINAR | ERRO: Ao buscar dependentes vinculados a essa implantação",
-                    error: err.message,
-                    stack: err.stack,
-                    timestamp: new Date().toISOString(),
-                  });
-                  console.error(
-                    "Erro na busca pelos dependentes vinculados a essa implantacao",
-                    err
-                  );
-                }
-                db.query(
-                  queryDocumentos,
-                  [idImplantacao],
-                  (err, resultDocumentos) => {
-                    if (err) {
-                      logger.error({
-                        message:
-                          "ROTA: ASSINAR | ERRO: ao buscar documentos vinculados a implantação",
-                        error: err.message,
-                        stack: err.stack,
-                        timestamp: new Date().toISOString(),
-                      });
-                      console.error(
-                        "Erro na busca pelos documentos vinculados a implantação",
-                        err
-                      );
-                    }
-                    db.query(
-                      queryAssinatura,
-                      [idImplantacao],
-                      (err, resultAssinatura) => {
-                        if (err) {
-                          logger.error({
-                            message:
-                              "ROTA: ASSINAR | ERRO: ao pegar a assinatura vinculada",
-                            error: err.message,
-                            stack: err.stack,
-                            timestamp: new Date().toISOString(),
-                          });
-                          console.error("Erro ao pegar assinatura", err);
-                        }
-                        const data_implantacao = new Date(
-                          resultImplantacoes[0].data_implantacao
-                        );
-                        const dia = String(data_implantacao.getDate()).padStart(
-                          2,
-                          "0"
-                        );
-                        const mes = String(
-                          data_implantacao.getMonth() + 1
-                        ).padStart(2, "0");
-                        const ano = data_implantacao.getFullYear();
-                        const dataFormatada = `${dia}/${mes}/${ano}`;
-
-                        const assinaturaBase64 =
-                          resultAssinatura.length > 0 && resultAssinatura[0]
-                            ? resultAssinatura[0].assinatura_base64
-                            : null;
-
-                        res.render("contrato", {
-                          implantacao: resultImplantacoes[0],
-                          plano: resultPlano[0],
-                          dataFormatada: dataFormatada,
-                          entidade: resultEntidade[0],
-                          profissao: resultProfissao[0],
-                          dependentes: resultDependentes,
-                          documento: resultDocumentos[0],
-                          assinaturaBase64: assinaturaBase64,
-                        });
-                      }
-                    );
-                  }
+          db.query(
+            queryDependentes,
+            [idImplantacao],
+            (err, resultDependentes) => {
+              if (err) {
+                logger.error({
+                  message:
+                    "ROTA: ASSINAR | ERRO: Ao buscar dependentes vinculados a essa implantação",
+                  error: err.message,
+                  stack: err.stack,
+                  timestamp: new Date().toISOString(),
+                });
+                console.error(
+                  "Erro na busca pelos dependentes vinculados a essa implantacao",
+                  err
                 );
               }
-            );
-          });
+              db.query(
+                queryDocumentos,
+                [idImplantacao],
+                (err, resultDocumentos) => {
+                  if (err) {
+                    logger.error({
+                      message:
+                        "ROTA: ASSINAR | ERRO: ao buscar documentos vinculados a implantação",
+                      error: err.message,
+                      stack: err.stack,
+                      timestamp: new Date().toISOString(),
+                    });
+                    console.error(
+                      "Erro na busca pelos documentos vinculados a implantação",
+                      err
+                    );
+                  }
+                  db.query(
+                    queryAssinatura,
+                    [idImplantacao],
+                    (err, resultAssinatura) => {
+                      if (err) {
+                        logger.error({
+                          message:
+                            "ROTA: ASSINAR | ERRO: ao pegar a assinatura vinculada",
+                          error: err.message,
+                          stack: err.stack,
+                          timestamp: new Date().toISOString(),
+                        });
+                        console.error("Erro ao pegar assinatura", err);
+                      }
+                      const data_implantacao = new Date(
+                        resultImplantacoes[0].data_implantacao
+                      );
+                      const dia = String(data_implantacao.getDate()).padStart(
+                        2,
+                        "0"
+                      );
+                      const mes = String(
+                        data_implantacao.getMonth() + 1
+                      ).padStart(2, "0");
+                      const ano = data_implantacao.getFullYear();
+                      const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                      const assinaturaBase64 =
+                        resultAssinatura.length > 0 && resultAssinatura[0]
+                          ? resultAssinatura[0].assinatura_base64
+                          : null;
+
+                      res.render("contrato", {
+                        implantacao: resultImplantacoes[0],
+                        plano: resultPlano[0],
+                        dataFormatada: dataFormatada,
+                        entidade: resultEntidade[0],
+                        dependentes: resultDependentes,
+                        documentos: resultDocumentos,
+                        assinaturaBase64: assinaturaBase64,
+                      });
+                    }
+                  );
+                }
+              );
+            }
+          );
         });
       });
     });
   }
 );
 
+/* ROTA PARA SALVAR ASSINATURA DO CONTRATO */
 app.post("/salva-assinatura", (req, res) => {
   const idImplantacao = req.body.idImplantacao;
   const assinatura = req.body.assinatura_base64;
