@@ -1,215 +1,351 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Mount Hermon - Contratação Dental</title>
 
     <!-- IMPORTAÇÕES JQUERY  -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js" integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"
+      integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <!-- Adicione este link no head do seu HTML -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
 
     <!-- IMPORTAÇÕES BOOTSTRAP  -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
-        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-    crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+      integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+      integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e"
+      crossorigin="anonymous"
+    />
     <script src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
-    
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/uploadArquivos.css">
-    <link rel="stylesheet" href="./css/styleCartao.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap" rel="stylesheet">
-    <link rel="shortcut icon" href="img/favicon.svg" type="image/x-icon">
 
-</head>
-<body>
-
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/uploadArquivos.css" />
+    <link rel="stylesheet" href="./css/styleCartao.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;500;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="shortcut icon" href="img/favicon.svg" type="image/x-icon" />
+  </head>
+  <body>
     <div class="uteis">
-        <input type="hidden" id="valorAnualBD" value="<%= planoSelecionado.pgtoAnualAvista %>">
-        <input type="hidden" id="valorAnualCartaoBD" value="<%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %>">
-        <input type="hidden" id="valorAnualCartao3VezesBD" value="<%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %>">
+      <input
+        type="hidden"
+        id="valorAnualBD"
+        value="<%= planoSelecionado.pgtoAnualAvista %>"
+      />
+      <input
+        type="hidden"
+        id="valorAnualCartaoBD"
+        value="<%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %>"
+      />
+      <input
+        type="hidden"
+        id="valorAnualCartao3VezesBD"
+        value="<%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %>"
+      />
     </div>
     <div class="logoMountHermon">
-        <img src="./img/logoMH_branca.png" alt="Logo Mount Hermon">
+      <img src="./img/logoMH_branca.png" alt="Logo Mount Hermon" />
     </div>
     <div class="containerFormulario">
-        <div class="tudoFormulario">
-            <div class="col-12">
-                <div class="header">
-                    <div class="row">
-                        <input type="hidden" value="<%= planoSelecionado.id %>" name="planoSelecionado">
-                        <div class="col-12">
-                            <% if (planoSelecionado) { %>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <h3>Plano escolhido</h3>
-                                        <p><strong>Nome do Plano:</strong><br>
-                                            <%= planoSelecionado.nome_do_plano %>
-                                        </p>
-                                    </div>
-                                    <div class="col-4">
-                                        <h3>Valores</h3>
-                                        <p><strong>Valor Anual á vista:</strong>
-                                            R$ <span class="valorAnual"><%= planoSelecionado.pgtoAnualAvista %></span>
-                                        </p>
-                                        <p><strong>Valor Mensal Plano Anual (12x):</strong>
-                                            R$ <span class="valorAnualCartao"><%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %> </span>
-                                        </p>
-                                        <p><strong>Valor Anual no cartão em (3x):</strong>
-                                            R$ <span class="valorAnualCartao3Vezes"><%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %> </span>
-                                        </p>
-                                    </div>
-                                    <div class="col-4">
-                                        <h3>Dependentes</h3>
-                                        <span id="qtdDependentes"> 0</span> Dependentes adicionados
-                                    </div>
-                                </div>
-                                <% } else { %>
-                                    <p>Nenhum plano selecionado ainda.</p>
-                                <% } %>
-                        </div>
-                    </div>
+      <div class="tudoFormulario">
+        <div class="col-12">
+          <div class="header">
+            <div class="row">
+              <input
+                type="hidden"
+                value="<%= planoSelecionado.id %>"
+                name="planoSelecionado"
+              />
+              <div class="col-12">
+                <% if (planoSelecionado) { %>
+                <div class="row">
+                  <div class="col-4">
+                    <h3>Plano escolhido</h3>
+                    <p>
+                      <strong>Nome do Plano:</strong><br />
+                      <%= planoSelecionado.nome_do_plano %>
+                    </p>
+                  </div>
+                  <div class="col-4">
+                    <h3>Valores</h3>
+                    <p>
+                      <strong>Valor Anual á vista:</strong> R$
+                      <span class="valorAnual"
+                        ><%= planoSelecionado.pgtoAnualAvista %></span
+                      >
+                    </p>
+                    <p>
+                      <strong>Valor Mensal Plano Anual (12x):</strong> R$
+                      <span class="valorAnualCartao"
+                        ><%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2)
+                        %>
+                      </span>
+                    </p>
+                    <p>
+                      <strong>Valor Anual no cartão em (3x):</strong> R$
+                      <span class="valorAnualCartao3Vezes"
+                        ><%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2)
+                        %>
+                      </span>
+                    </p>
+                  </div>
+                  <div class="col-4">
+                    <h3>Dependentes</h3>
+                    <span id="qtdDependentes"> 0</span> Dependentes adicionados
+                  </div>
                 </div>
-                <div class="stepsForm">
-                    <div class="row">
-                        <div class="col-12 stages">
-                            <div class="numbers">
-                                <div class="number active" id="number-1"><span>1</span></div>
-                                <div class="number" id="number-2"><span>2</span></div>
-                                <div class="number" id="number-3"><span>3</span></div>
-                                <div class="number" id="number-4"><span>4</span></div>
-                                <div class="number" id="number-5"><span>5</span></div>
-                                <div class="number" id="number-6"><span>6</span></div>
-                                <div class="number" id="number-7"><span>7</span></div>
-                                <div class="number" id="number-8"><span>8</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <form id="formEtapa1" style="max-height: 80vh; overflow-y: auto;">
-                        <h3 class="text-center">Dados do Titular</h3>
-                        <div class="forms">
-                            <%- include('formulario1') %>
-                        </div>
-                        <div class="btnAcoes">
-                            <button class="btn btn-primary float-end btnproximo" type="button" onclick="return validarFormulario(1)">Próxima</button>
-                        </div>
-                    </form>
-                    <form id="formEtapa2" style="display: none; ">
-                        <h3 class="text-center">Dados Responsável Financeiro</h3>
-                        <div class="forms">
-                            <%- include('formulario2') %>
-                        </div>
-                        <div class="btnAcoes">
-                            <button class="btn btn-secondary float-start btnPrev"  onclick="voltar()" type="button">Voltar</button>
-                            <button class="btn btn-primary float-end btnproximo" type="button" onclick="return validarFormulario(2)">Próxima</button>
-                        </div>
-                    </form>
-                    <form id="formEtapa3" style="display: none;">
-                        <h3 class="text-center">Endereço</h3>
-                        <div class="forms">
-                            <%- include('formulario3') %>
-                        </div>
-                        <div class="btnAcoes">
-                            <button class="btn btn-secondary float-start btnPrev"  onclick="voltar()" type="button">Voltar</button>
-                            <button class="btn btn-primary float-end btnproximo" type="button" onclick="return validarFormulario(3)">Próxima</button>
-                        </div>
-                    </form>
-                    <form id="formEtapa4" style="display: none;">
-                        <h3 class="text-center">Corretor</h3>
-                        <div class="forms">
-                            <%- include('formulario4') %>
-                        </div>
-                        <div class="btnAcoes">
-                            <button class="btn btn-secondary float-start btnPrev"  onclick="voltar()" type="button">Voltar</button>
-                            <button class="btn btn-primary float-end btnproximo" type="button" onclick="return validarFormulario(4)">Próxima</button>
-                        </div>
-                    </form>
-                    <form id="formEtapa5" style="display: none;">
-                        <h3 class="text-center">Dependentes</h3>
-                        <div class="forms">
-                            <%- include('formulario5') %>
-                        </div>
-                        <div class="btnAcoes">
-                            <button class="btn btn-secondary float-start btnPrev"  onclick="voltar()" type="button">Voltar</button>
-                            <button class="btn btn-primary float-end btnproximo" type="button" onclick="return validarFormulario(5)">Próxima</button>
-                        </div>
-                    </form>
-                    <form id="formEtapa6" style="display: none;">
-                        <h3 class="text-center">Envio de documentos</h3>
-                        <div class="forms">
-                            <%- include('formulario6') %>
-                        </div>
-                        <div class="btnAcoes">
-                            <button class="btn btn-secondary float-start btnPrev"  onclick="voltar()" type="button">Voltar</button>
-                            <button class="btn btn-primary float-end btnproximo" type="button" onclick="return validarFormulario(6)">Próxima</button>
-                        </div>
-                    </form>
-                    <form id="formEtapa7" style="display: none;">
-                        <h3 class="text-center">Aceito dos Termos</h3>
-                        <div class="forms">
-                            <%- include('formulario7') %>
-                        </div>
-                        <div class="btnAcoes">
-                            <button class="btn btn-secondary float-start btnPrev"  onclick="voltar()" type="button">Voltar</button>
-                            <button class="btn btn-primary float-end btnproximo" type="button" onclick="return validarFormulario(7)">Próxima</button>
-                        </div>
-                    </form>
-                    <form id="formEtapa8" style="display: none;">
-                        <h3 class="text-center">Escolha forma de Pagamento</h3>
-                        <div class="forms">
-                            <%- include('formulario8') %>
-                        </div>
-                        <div class="confirmacaoBoleto" style="display: none;">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="alert alert-warning" role="alert">
-                                        <strong>Atenção!</strong> Escolhendo a opção via boleto nossa equipe irá entrar em contato para lhe enviar o boleto e confirmar a contratação.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="confirmacaoPgtoCartao" style="display: none;">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="alert alert-warning" role="alert">
-                                        <strong>Atenção!</strong> Pagamento realizado com sucesso! Clique em "Finalizar" e conclua o envio dos dados para finalizar a contratação.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="btnAcoes">
-                            <button class="btn btn-secondary float-start btnPrev"  onclick="voltar()" type="button">Voltar</button>
-                            <button class="btn btn-primary float-end btnproximo" type="button" onclick="return validarFormulario(8)">Finalizar</button>
-                        </div>
-                    </form>
-                    <form id="formEtapa9" style="display: none;">
-                        <%- include('formulario9') %>
-                    </form>
-                </div>         
+                <% } else { %>
+                <p>Nenhum plano selecionado ainda.</p>
+                <% } %>
+              </div>
             </div>
+          </div>
+          <div class="stepsForm">
+            <div class="row">
+              <div class="col-12 stages">
+                <div class="numbers">
+                  <div class="number active" id="number-1"><span>1</span></div>
+                  <div class="number" id="number-2"><span>2</span></div>
+                  <div class="number" id="number-3"><span>3</span></div>
+                  <div class="number" id="number-4"><span>4</span></div>
+                  <div class="number" id="number-5"><span>5</span></div>
+                  <div class="number" id="number-6"><span>6</span></div>
+                  <div class="number" id="number-7"><span>7</span></div>
+                  <div class="number" id="number-8"><span>8</span></div>
+                </div>
+              </div>
+            </div>
+            <form id="formEtapa1" style="max-height: 80vh; overflow-y: auto">
+              <h3 class="text-center">Dados do Titular</h3>
+              <div class="forms"><%- include('formulario1') %></div>
+              <div class="btnAcoes">
+                <button
+                  class="btn btn-primary float-end btnproximo"
+                  type="button"
+                  onclick="return validarFormulario(1)"
+                >
+                  Próxima
+                </button>
+              </div>
+            </form>
+            <form id="formEtapa2" style="display: none">
+              <h3 class="text-center">Dados Responsável Financeiro</h3>
+              <div class="forms"><%- include('formulario2') %></div>
+              <div class="btnAcoes">
+                <button
+                  class="btn btn-secondary float-start btnPrev"
+                  onclick="voltar()"
+                  type="button"
+                >
+                  Voltar
+                </button>
+                <button
+                  class="btn btn-primary float-end btnproximo"
+                  type="button"
+                  onclick="return validarFormulario(2)"
+                >
+                  Próxima
+                </button>
+              </div>
+            </form>
+            <form id="formEtapa3" style="display: none">
+              <h3 class="text-center">Endereço</h3>
+              <div class="forms"><%- include('formulario3') %></div>
+              <div class="btnAcoes">
+                <button
+                  class="btn btn-secondary float-start btnPrev"
+                  onclick="voltar()"
+                  type="button"
+                >
+                  Voltar
+                </button>
+                <button
+                  class="btn btn-primary float-end btnproximo"
+                  type="button"
+                  onclick="return validarFormulario(3)"
+                >
+                  Próxima
+                </button>
+              </div>
+            </form>
+            <form id="formEtapa4" style="display: none">
+              <h3 class="text-center">Corretor</h3>
+              <div class="forms"><%- include('formulario4') %></div>
+              <div class="btnAcoes">
+                <button
+                  class="btn btn-secondary float-start btnPrev"
+                  onclick="voltar()"
+                  type="button"
+                >
+                  Voltar
+                </button>
+                <button
+                  class="btn btn-primary float-end btnproximo"
+                  type="button"
+                  onclick="return validarFormulario(4)"
+                >
+                  Próxima
+                </button>
+              </div>
+            </form>
+            <form id="formEtapa5" style="display: none">
+              <h3 class="text-center">Dependentes</h3>
+              <div class="forms"><%- include('formulario5') %></div>
+              <div class="btnAcoes">
+                <button
+                  class="btn btn-secondary float-start btnPrev"
+                  onclick="voltar()"
+                  type="button"
+                >
+                  Voltar
+                </button>
+                <button
+                  class="btn btn-primary float-end btnproximo"
+                  type="button"
+                  onclick="return validarFormulario(5)"
+                >
+                  Próxima
+                </button>
+              </div>
+            </form>
+            <form id="formEtapa6" style="display: none">
+              <h3 class="text-center">Envio de documentos</h3>
+              <div class="forms"><%- include('formulario6') %></div>
+              <div class="btnAcoes">
+                <button
+                  class="btn btn-secondary float-start btnPrev"
+                  onclick="voltar()"
+                  type="button"
+                >
+                  Voltar
+                </button>
+                <button
+                  class="btn btn-primary float-end btnproximo"
+                  type="button"
+                  onclick="return validarFormulario(6)"
+                >
+                  Próxima
+                </button>
+              </div>
+            </form>
+            <form id="formEtapa7" style="display: none">
+              <h3 class="text-center">Aceito dos Termos</h3>
+              <div class="forms"><%- include('formulario7') %></div>
+              <div class="btnAcoes">
+                <button
+                  class="btn btn-secondary float-start btnPrev"
+                  onclick="voltar()"
+                  type="button"
+                >
+                  Voltar
+                </button>
+                <button
+                  class="btn btn-primary float-end btnproximo"
+                  type="button"
+                  onclick="return validarFormulario(7)"
+                >
+                  Próxima
+                </button>
+              </div>
+            </form>
+            <form id="formEtapa8" style="display: none">
+              <h3 class="text-center">Escolha forma de Pagamento</h3>
+              <div class="forms"><%- include('formulario8') %></div>
+              <div class="confirmacaoBoleto" style="display: none">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="alert alert-warning" role="alert">
+                      <strong>Atenção!</strong> Escolhendo a opção via boleto
+                      nossa equipe irá entrar em contato para lhe enviar o
+                      boleto e confirmar a contratação.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="confirmacaoPgtoCartao" style="display: none">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="alert alert-warning" role="alert">
+                      <strong>Atenção!</strong> Pagamento realizado com sucesso!
+                      Clique em "Finalizar" e conclua o envio dos dados para
+                      finalizar a contratação.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="btnAcoes">
+                <button
+                  class="btn btn-secondary float-start btnPrev"
+                  onclick="voltar()"
+                  type="button"
+                >
+                  Voltar
+                </button>
+                <button
+                  class="btn btn-primary float-end btnproximo"
+                  type="button"
+                  onclick="return validarFormulario(8)"
+                >
+                  Finalizar
+                </button>
+              </div>
+            </form>
+            <form id="formEtapa9" style="display: none">
+              <%- include('formulario9') %>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
-    <div id="customAlert" class="alert alert-danger alert-dismissible fade show" role="alert" style="display: none;">
-        <strong>Atenção!</strong> <span id="customAlertMessage"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    <div
+      id="customAlert"
+      class="alert alert-danger alert-dismissible fade show"
+      role="alert"
+      style="display: none"
+    >
+      <strong>Atenção!</strong> <span id="customAlertMessage"></span>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
-    <div id="modalCartaoCredito">
-        <%- include('cartao') %>
-    </div>
-</body>
-<script src="/js/script.js"></script>
-<script src="/js/scriptCartao.js"></script>
-<!-- <script src="/js/uploadArquivos.js"></script> -->
+    <div id="modalCartaoCredito"><%- include('cartao') %></div>
+  </body>
+  <script src="/js/script.js"></script>
+  <script src="/js/scriptCartao.js"></script>
+  <!-- <script src="/js/uploadArquivos.js"></script> -->
 </html>

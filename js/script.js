@@ -442,8 +442,8 @@ function handlePossuiDependentesChange() {
                     <label for="sexodependente">Sexo:</label>
                     <select class="form-control dependente-input" name="sexodependente">
                         <option disabled selected value="">Selecione ...</option>
-                        <option value="masculino" required>Masculino</option>
-                        <option value="feminino">Feminino</option>
+                        <option value="Masculino" required>Masculino</option>
+                        <option value="Feminino">Feminino</option>
                     </select>
                 </div>
             </div>
@@ -453,11 +453,11 @@ function handlePossuiDependentesChange() {
                         Dependente:</label>
                     <select class="form-control dependente-input" name="estadocivildependente">
                         <option disabled selected value="">Selecione ...</option>
-                        <option value="Solteiro(a)" required>Solteiro(a)</option>
-                        <option value="Casado(a)">Casado(a)</option>
-                        <option value="Divorciado(a)">Divorciado(a)</option>
-                        <option value="Viúvo(a)">Viúvo(a)</option>
-                        <option value="Outros">Outros</option>
+                        <option value="Casado">Casado(a)</option>
+                        <option value="Divorciado">Divorciado(a)</option>
+                        <option value="Separado">Separado(a)</option>
+                        <option value="Solteiro">Solteiro(a)</option>
+                        <option value="Viúvo">Viúvo (a)</option>
                     </select>
                 </div>
             </div>
@@ -467,12 +467,32 @@ function handlePossuiDependentesChange() {
                         parentesco:</label>
                     <select class="form-control dependente-input" name="grauparentescodependente">
                         <option disabled selected value="">Selecione ...</option>
-                        <option value="Conjugê" required>Conjugê</option>
-                        <option value="Filhos">Filhos</option>
-                        <option value="Pai/Mãe">Pai/Mãe</option>
-                        <option value="Avô/Avó">Avô/Avó</option>
-                        <option value="Tio/Tia">Tio/Tia</option>
-                        <option value="Outros">Outros</option>
+                        <option value="Agregado" required>Agregado</option>
+                        <option value="Companheiro">Companheiro</option>
+                        <option value="Cônjuge">Cônjuge</option>
+                        <option value="Filho(a)">Filho(a)</option>
+                        <option value="Filho Adotivo">Filho Adotivo</option>
+                        <option value="Irmão(a)">Irmão(a)</option>
+                        <option value="Mãe">Mãe</option>
+                        <option value="Pai">Pai</option>
+                        <option value="Neto(a)">Neto(a)</option>
+                        <option value="Sobrinho(a)">Sobrinho(a)</option>
+                        <option value="Sogro">Sogro</option>
+                        <option value="Enteado">Enteado</option>
+                        <option value="Tutelado">Tutelado</option>
+                        <option value="Sogra">Sogra</option>
+                        <option value="Genro">Genro</option>
+                        <option value="Nora">Nora</option>
+                        <option value="Cunhado(a)">Cunhado(a)</option>
+                        <option value="Primo(a)">Primo(a)</option>
+                        <option value="Avô">Avô</option>
+                        <option value="Avó">Avó</option>
+                        <option value="Tio">Tio</option>
+                        <option value="Tia">Tia</option>
+                        <option value="Bisneto">Bisneto</option>
+                        <option value="Madrasta">Madrasta</option>
+                        <option value="Padrasto">Padrasto</option>
+
                     </select>
                 </div>
             </div>

@@ -1,17 +1,17 @@
 const mysql = require("mysql2");
 
-/* const db = mysql.createPool({
+const db = mysql.createPool({
     host: "localhost",
     user: "root",
     port: "3306",
     password: "pmp078917",
     database: "mhdentalvendas",
     waitForConnections: true,
-    connectionLimit: 1, // Ajuste conforme necessário
+    connectionLimit: 10, // Ajuste conforme necessário
     queueLimit: 0
-}); */
+});
 
-const db = mysql.createPool({
+/* const db = mysql.createPool({
     host: "pablopetelak.com",
     user: "u654656997_dev",
     port: "3306",
@@ -20,7 +20,7 @@ const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 1, // Ajuste conforme necessário
     queueLimit: 0
-});
+}); */
 
 /* const db = mysql.createConnection({
     host: "localhost",
@@ -48,7 +48,6 @@ function connectToDatabase() {
 
 /* Inserir dados da implantação */
 const qInsImplantacao = `
-    /* Inserir dados da implantação */
     INSERT INTO implantacoes SET ?
     `;
 

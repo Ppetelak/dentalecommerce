@@ -16,6 +16,7 @@ const { format } = require("date-fns");
 const { ptBR } = require("date-fns/locale");
 const nodemailer = require("nodemailer");
 const juice = require("juice");
+const { default: parseJSON } = require("date-fns/parseJSON");
 const port = process.env.PORT || 5586;
 const appUrl = process.env.APP_URL || "http://localhost:5586";
 
@@ -60,23 +61,6 @@ connectToDatabase()
   });
 
 /* FUNÇÃO DE INSERÇÃO AO BANCO DE DADOS */
-async function insertData(query, values) {
-  return new Promise((resolve, reject) => {
-    db.query(query, values, (err, result) => {
-      if (err) {
-        logger.error({
-          message: `Erro ao inserir pela Query ${query}`,
-          error: err.message,
-          stack: err.stack,
-          timestamp: new Date().toISOString(),
-        });
-        reject(err);
-      } else {
-        resolve(result);
-      }
-    });
-  });
-}
 
 const generateSecretKey = () => {
   return crypto.randomBytes(32).toString("hex");
@@ -254,7 +238,54 @@ async function salvarAnexos(idImplantacao, anexos) {
   }
 }
 
+async function insertData(query, values) {
+  return new Promise((resolve, reject) => {
+    db.query(query, values, (err, result) => {
+      if (err) {
+        logger.error({
+          message: `Erro ao inserir pela Query ${query}`,
+          error: err.message,
+          stack: err.stack,
+          timestamp: new Date().toISOString(),
+        });
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
 
+function formatarDataDs(data) {
+  var partesData = data.split('-');
+  var dataFormatada = partesData[2] + '/' + partesData[1] + '/' + partesData[0];
+  return dataFormatada;
+}
+
+async function enviarPropostaDigitalSaude(jsonModeloDS) {
+  const token = "X43ADVSEXM";
+  const senhaApi = "kgt87pkxc2";
+  const apiUrl = "https://digitalsaude.com.br/api/v2/contrato/";
+
+  const data = JSON.stringify(jsonModeloDS);
+
+  const config = {
+    headers: {
+      "Content-Type": "application/json", // Define o tipo de conteúdo como JSON
+      "token": token, // Adiciona o token como um cabeçalho da solicitação
+      "senhaApi": senhaApi // Adiciona a senha da API como um cabeçalho da solicitação
+    }
+  };
+
+  console.log(data);
+
+  try {
+    const response = await axios.post(apiUrl, data, config);
+    console.log(response.data, jsonModeloDS);
+  } catch (error) {
+    console.error("Erro ao enviar a proposta:", error);
+  }
+}
 
 /* ---------------------------------------- ROTAS ---------------------------------------- */
 
@@ -385,7 +416,7 @@ app.post("/formulario", (req, res) => {
   });
 });
 
-app.post("/testeFormulario", async (req, res) => {
+app.post("/testeFormularioDS", async (req, res) => {
   const dados = req.body.inputs;
   const dependentes = req.body.dependentes;
   const anexos = req.body.anexos;
@@ -406,11 +437,11 @@ app.post("/testeFormulario", async (req, res) => {
     emailtitular: dados.emailtitular,
     profissaotitular: dados.profissaotitular,
     titularresponsavelfinanceiro: dados.titularresponsavelfinanceiro,
-    cpffinanceiro: 
+    cpffinanceiro:
       dados.cpffinanceiro || dados.cpftitular,
-    nomefinanceiro: 
+    nomefinanceiro:
       dados.nomefinanceiro || dados.nomecompleto,
-    datadenascimentofinanceiro: 
+    datadenascimentofinanceiro:
       dados.datadenascimentofinanceiro || dados.datadenascimento,
     telefonetitularfinanceiro:
       dados.telefonetitularfinanceiro || dados.telefonetitular,
@@ -433,13 +464,15 @@ app.post("/testeFormulario", async (req, res) => {
     planoSelecionado: dados.planoSelecionado,
   };
 
+  console.log(dadosImplantacao)
+
   const jsonModeloDS = {
-    "numeroProposta": "00000000000",
+    "numeroProposta": `${numeroProposta}`,
     "dataAssinatura": "26/02/2024",
     "diaVencimento": 1,
     "cpfResponsavel": dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
     "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
-    "observacao": "string",
+    "observacao": `teste`,
     "plano": {
       "codigo": "VMR5GRUEPJ"
     },
@@ -461,7 +494,7 @@ app.post("/testeFormulario", async (req, res) => {
     "beneficiarioList": [
       {
         "nome": dados.nomecompleto,
-        "dataNascimento": dados.datadenascimento,
+        "dataNascimento": formatarDataDs(dados.datadenascimento),
         "rg": dados.rgtitular,
         "orgaoEmissor": dados.orgaoexpedidor,
         "cpf": dados.cpftitular,
@@ -474,7 +507,7 @@ app.post("/testeFormulario", async (req, res) => {
         "complemento": dados.complementoendereco,
         "bairro": dados.bairro,
         "municipio": dados.cidade,
-        "uf": dados.uf,
+        "uf": dados.estado,
         "cep": dados.cep,
         "dddTelefone": "41",
         "telefone": "992414553",
@@ -487,10 +520,11 @@ app.post("/testeFormulario", async (req, res) => {
         "dataVigencia": "26/02/2024",
         "mensalidade": 0,
         "estadoCivil": {
-            "id": dados.estadoCivil === "Solteiro" ? 4 : 
-                  dados.estadoCivil === "Casado" ? 5 :
-                  dados.estadoCivil === "Divorciado" ? 6 :
-                  dados.estadoCivil === "Viúvo" ? 7 : 8,
+            "id": dados.estadociviltitular === "Casado" ? 1 :
+                  dados.estadociviltitular === "Divorciado" ? 2 :
+                  dados.estadociviltitular === "Separado" ? 3 :
+                  dados.estadociviltitular === "Solteiro" ? 4 :
+                  dados.estadociviltitular === "Viúvo" ? 5: '',
             "nome": dados.estadociviltitular
         },
         "tipoBeneficiario": {
@@ -498,8 +532,8 @@ app.post("/testeFormulario", async (req, res) => {
           "nome": "Titular"
         },
         "sexo": {
-          "id": 1,
-          "nome": "Masculino"
+          "id": dados.sexotitular === "Masculino" ? 1 : 2,
+          "nome": dados.sexotitular
         },
         "parentesco": {
           "id": 1,
@@ -513,11 +547,351 @@ app.post("/testeFormulario", async (req, res) => {
     ]
   }
 
+  adicionarDependentes()
+
+  async function adicionarDependentes () {
+    dependentes.forEach((dependente) => {
+      //insertData(qInsDependentes, [resultImplantacao.insertId, dependente]);
+      const dependenteObj = {
+        "nome": dependente.nomecompletodependente,
+        "dataNascimento": formatarDataDs(dependente.nascimentodependente),
+        "rg": "null",
+        "orgaoEmissor": "null",
+        "cpf": dependente.cpfdependente,
+        "dnv": "string",
+        "cns": "string",
+        "pis": "string",
+        "nomeMae": dependente.nomemaedependente,
+        "endereco": dados.enderecoresidencial,
+        "numero": dados.numeroendereco,
+        "complemento": dados.complementoendereco,
+        "bairro": dados.bairro,
+        "municipio": dados.cidade,
+        "uf": dados.estado,
+        "cep": dados.cep,
+        "dddTelefone": "41",
+        "telefone": "999998888",
+        "dddCelular": "41",
+        "celular": "999998888",
+        "email": "dependente@dependente.com.br",
+        "altura": 0,
+        "peso": 0,
+        "imc": 0,
+        "dataVigencia": "26/02/2024",
+        "mensalidade": 0,
+        "estadoCivil": {
+            "id": dependente.estadocivildependente === "Casado" ? 1 :
+                  dependente.estadocivildependente === "Divorciado" ? 2 :
+                  dependente.estadocivildependente === "Separado" ? 3 :
+                  dependente.estadocivildependente === "Solteiro" ? 4 :
+                  dependente.estadocivildependente === "Viúvo" ? 5: '',
+            "nome": dependente.estadocivildependente
+        },
+        "tipoBeneficiario": {
+          "id": 2,
+          "nome": "Dependente"
+        },
+        "sexo": {
+          "id": dependente.sexodependente === "Masculino" ? 1 : 2,
+          "nome": dependente.sexodependente
+        },
+        "parentesco": {
+          "id": dependente.grauparentescodependente === "Agregado" ? 2 :
+                dependente.grauparentescodependente === "Companheiro" ? 3 :
+                dependente.grauparentescodependente === "Cônjuge" ? 4 :
+                dependente.grauparentescodependente === "Filho(a)" ? 5 :
+                dependente.grauparentescodependente === "Filho Adotivo" ? 6 :
+                dependente.grauparentescodependente === "Irmão(a)" ? 7 :
+                dependente.grauparentescodependente === "Mãe" ? 8 :
+                dependente.grauparentescodependente === "Pai" ? 9 :
+                dependente.grauparentescodependente === "Neto(a)" ? 10 :
+                dependente.grauparentescodependente === "Sobrinho(a)" ? 11 :
+                dependente.grauparentescodependente === "Sogro" ? 12 :
+                dependente.grauparentescodependente === "Enteado" ? 13 :
+                dependente.grauparentescodependente === "Tutelado" ? 14 :
+                dependente.grauparentescodependente === "Sogra" ? 15 :
+                dependente.grauparentescodependente === "Genro" ? 16 :
+                dependente.grauparentescodependente === "Nora" ? 17 :
+                dependente.grauparentescodependente === "Cunhado(a)" ? 18 :
+                dependente.grauparentescodependente === "Primo(a)" ? 19 :
+                dependente.grauparentescodependente === "Avô" ? 20 :
+                dependente.grauparentescodependente === "Avó" ? 21 :
+                dependente.grauparentescodependente === "Tio" ? 22 :
+                dependente.grauparentescodependente === "Tia" ? 23 :
+                dependente.grauparentescodependente === "Bisneto" ? 24 :
+                dependente.grauparentescodependente === "Madrasta" ? 25 : 26,
+          "nome": dependente.grauparentescodependente
+        },
+        "statusBeneficiario": {
+          "id": 0,
+          "nome": "Ativo"
+        }
+      };
+      jsonModeloDS.beneficiarioList.push(dependenteObj);
+    });
+  };
+
+  await enviarPropostaDigitalSaude(jsonModeloDS);
+
+  console.log(jsonModeloDS)
+
+  console.log('Foi')
+  res.send('Sucesso na rota, se páh na implantação também')
+});
+
+app.post("/testeFormulario", async (req, res) => {
+  const dados = req.body.inputs;
+  const dependentes = req.body.dependentes;
+  const anexos = req.body.anexos;
+
+  const numeroProposta = await generateUniqueProposalNumber();
+  const dadosImplantacao = {
+    nomecompleto: dados.nomecompleto,
+    datadenascimento: dados.datadenascimento,
+    cpftitular: dados.cpftitular,
+    nomemaetitular: dados.nomemaetitular,
+    rgtitular: dados.rgtitular,
+    orgaoexpedidor: dados.orgaoexpedidor,
+    dataexpedicaorgtitular: dados.dataexpedicaorgtitular,
+    sexotitular: dados.sexotitular,
+    estadociviltitular: dados.estadociviltitular,
+    telefonetitular: dados.telefonetitular,
+    celulartitular: dados.celulartitular,
+    emailtitular: dados.emailtitular,
+    profissaotitular: dados.profissaotitular,
+    titularresponsavelfinanceiro: dados.titularresponsavelfinanceiro,
+    cpffinanceiro: 
+      dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
+    nomefinanceiro: 
+      dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
+    datadenascimentofinanceiro: 
+      dados.datadenascimentofinanceiro ? dados.datadenascimentofinanceiro : dados.datadenascimento,
+    sexotitularfinanceiro: dados.sexotitularfinanceiro ? dados.sexotitularfinanceiro : dados.sexotitular,
+    estadociviltitularfinanceiro: dados.estadociviltitularfinanceiro ? dados.estadociviltitularfinanceiro : dados.estadociviltitular,
+    telefonetitularfinanceiro: 
+      dados.telefonetitularfinanceiro ? dados.telefonetitularfinanceiro : dados.telefonetitular,
+    emailtitularfinanceiro: 
+      dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular,
+    grauparentesco: dados.grauparentesco,
+    cep: dados.cep,
+    enderecoresidencial: dados.enderecoresidencial,
+    numeroendereco: dados.numeroendereco,
+    complementoendereco: dados.complementoendereco,
+    bairro: dados.bairro,
+    cidade: dados.cidade,
+    estados: dados.estado,
+    cpfcorretor: dados.cpfcorretor,
+    nomecorretor: dados.nomecorretor,
+    corretora: dados.corretora,
+    celularcorretor: dados.celularcorretor,
+    formaPagamento: dados.formaPagamento,
+    aceitoTermos: dados.aceitoTermos,
+    aceitoPrestacaoServicos: dados.aceitoPrestacaoServicos,
+    planoSelecionado: dados.planoSelecionado,
+    numeroProposta: numeroProposta
+  };
+
+  async function obsDigitalSaude () {
+
+    if(dados.titularresponsavelfinanceiro === "Sim") {
+      return `O TITULAR É O MESMO TITULAR FINANCEIRO`;
+    } else {
+      return ( 
+        `
+        O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
+        ----> Dados responsável Financeiro <---- \n
+        CPF: ${dados.cpffinanceiro} \n
+        Nome: ${dados.nomefinanceiro} \n
+        Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
+        Telefone: ${dados.telefonetitularfinanceiro} \n
+        Email: ${dados.emailtitularfinanceiro} \n
+        Sexo: ${dados.sexotitularfinanceiro} \n
+        Estado Civil: ${dados.estadociviltitularfinanceiro} \n
+        Grau de Parentesco: ${dados.grauparentescofinanceiro} \n
+        `
+      ) ;
+    }
+
+  }
+
+  let observacoesDigitalSaude = await obsDigitalSaude ();
+
+  observacoesDigitalSaude += 
+    `
+    \n
+    Pagamento: 
+      ${dados.formaPagamento === 1 ? "Boleto" : 
+        dados.formaPagamento === 2? "Cartão de Crédito em 12x" : "Cartão de Crédito em 3x"} \n
+    `;
+
+  console.log(`Query:  ${qInsImplantacao}`)
+  console.log({dadosImplantacao})
+  
   /* INSERÇÃO DE DADOS AO BANCO DE DADOS DAS INFORMAÇÕES SOBRE A IMPLANTAÇÃO */
   const resultImplantacao = await insertData(qInsImplantacao, dadosImplantacao);
-  const resultDependentes = async function () {
+  
+  const jsonModeloDS = {
+    "numeroProposta": `${numeroProposta}`,
+    "dataAssinatura": "26/02/2024",
+    "diaVencimento": 1,
+    "cpfResponsavel": dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
+    "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
+    "observacao": `teste`,
+    "plano": {
+      "codigo": "VMR5GRUEPJ"
+    },
+    "convenio": {
+      "codigo": "LRYT12JW8T"
+    },
+    "produtor": {
+      "codigo": "E17NJPUZM2"
+    },
+    "corretora": {
+      "codigo": "S62MXENV8X"
+    },
+    "grupo": {
+      "codigo": "V2CAVAD6U2"
+    },
+    "filial": {
+      "codigo": "BETRHPTL2K"
+    },
+    "beneficiarioList": [
+      {
+        "nome": dados.nomecompleto,
+        "dataNascimento": formatarDataDs(dados.datadenascimento),
+        "rg": dados.rgtitular,
+        "orgaoEmissor": dados.orgaoexpedidor,
+        "cpf": dados.cpftitular,
+        "dnv": "string",
+        "cns": "string",
+        "pis": "string",
+        "nomeMae": dados.nomemaetitular,
+        "endereco": dados.enderecoresidencial,
+        "numero": dados.numeroendereco,
+        "complemento": dados.complementoendereco,
+        "bairro": dados.bairro,
+        "municipio": dados.cidade,
+        "uf": dados.estado,
+        "cep": dados.cep,
+        "dddTelefone": "41",
+        "telefone": "992414553",
+        "dddCelular": "41",
+        "celular": "999665588",
+        "email": dados.emailtitular,
+        "altura": 0,
+        "peso": 0,
+        "imc": 0,
+        "dataVigencia": "26/02/2024",
+        "mensalidade": 0,
+        "estadoCivil": {
+            "id": dados.estadociviltitular === "Casado" ? 1 :
+                  dados.estadociviltitular === "Divorciado" ? 2 :
+                  dados.estadociviltitular === "Separado" ? 3 :
+                  dados.estadociviltitular === "Solteiro" ? 4 :
+                  dados.estadociviltitular === "Viúvo" ? 5: '',
+            "nome": dados.estadociviltitular
+        },
+        "tipoBeneficiario": {
+          "id": 1,
+          "nome": "Titular"
+        },
+        "sexo": {
+          "id": dados.sexotitular === "Masculino" ? 1 : 2,
+          "nome": dados.sexotitular
+        },
+        "parentesco": {
+          "id": 1,
+          "nome": "Titular"
+        },
+        "statusBeneficiario": {
+          "id": 0,
+          "nome": "Ativo"
+        }
+      }
+    ]
+  }
+
+  adicionarDependentes()
+
+  async function adicionarDependentes () {
     dependentes.forEach((dependente) => {
       insertData(qInsDependentes, [resultImplantacao.insertId, dependente]);
+      const dependenteObj = {
+        "nome": dependente.nomecompletodependente,
+        "dataNascimento": formatarDataDs(dependente.nascimentodependente),
+        "rg": "null",
+        "orgaoEmissor": "null",
+        "cpf": dependente.cpfdependente,
+        "dnv": "string",
+        "cns": "string",
+        "pis": "string",
+        "nomeMae": dependente.nomemaedependente,
+        "endereco": dados.enderecoresidencial,
+        "numero": dados.numeroendereco,
+        "complemento": dados.complementoendereco,
+        "bairro": dados.bairro,
+        "municipio": dados.cidade,
+        "uf": dados.estado,
+        "cep": dados.cep,
+        "dddTelefone": "41",
+        "telefone": "999998888",
+        "dddCelular": "41",
+        "celular": "999998888",
+        "email": "dependente@dependente.com.br",
+        "altura": 0,
+        "peso": 0,
+        "imc": 0,
+        "dataVigencia": "26/02/2024",
+        "mensalidade": 0,
+        "estadoCivil": {
+            "id": dependente.estadocivildependente === "Casado" ? 1 :
+                  dependente.estadocivildependente === "Divorciado" ? 2 :
+                  dependente.estadocivildependente === "Separado" ? 3 :
+                  dependente.estadocivildependente === "Solteiro" ? 4 :
+                  dependente.estadocivildependente === "Viúvo" ? 5: '',
+            "nome": dependente.estadocivildependente
+        },
+        "tipoBeneficiario": {
+          "id": 2,
+          "nome": "Dependente"
+        },
+        "sexo": {
+          "id": dependente.sexodependente === "Masculino" ? 1 : 2,
+          "nome": dependente.sexodependente
+        },
+        "parentesco": {
+          "id": dependente.grauparentescodependente === "Agregado" ? 2 :
+                dependente.grauparentescodependente === "Companheiro" ? 3 :
+                dependente.grauparentescodependente === "Cônjuge" ? 4 :
+                dependente.grauparentescodependente === "Filho(a)" ? 5 :
+                dependente.grauparentescodependente === "Filho Adotivo" ? 6 :
+                dependente.grauparentescodependente === "Irmão(a)" ? 7 :
+                dependente.grauparentescodependente === "Mãe" ? 8 :
+                dependente.grauparentescodependente === "Pai" ? 9 :
+                dependente.grauparentescodependente === "Neto(a)" ? 10 :
+                dependente.grauparentescodependente === "Sobrinho(a)" ? 11 :
+                dependente.grauparentescodependente === "Sogro" ? 12 :
+                dependente.grauparentescodependente === "Enteado" ? 13 :
+                dependente.grauparentescodependente === "Tutelado" ? 14 :
+                dependente.grauparentescodependente === "Sogra" ? 15 :
+                dependente.grauparentescodependente === "Genro" ? 16 :
+                dependente.grauparentescodependente === "Nora" ? 17 :
+                dependente.grauparentescodependente === "Cunhado(a)" ? 18 :
+                dependente.grauparentescodependente === "Primo(a)" ? 19 :
+                dependente.grauparentescodependente === "Avô" ? 20 :
+                dependente.grauparentescodependente === "Avó" ? 21 :
+                dependente.grauparentescodependente === "Tio" ? 22 :
+                dependente.grauparentescodependente === "Tia" ? 23 :
+                dependente.grauparentescodependente === "Bisneto" ? 24 :
+                dependente.grauparentescodependente === "Madrasta" ? 25 : 26,
+          "nome": dependente.grauparentescodependente
+        },
+        "statusBeneficiario": {
+          "id": 0,
+          "nome": "Ativo"
+        }
+      };
+      jsonModeloDS.beneficiarioList.push(dependenteObj);
     });
   };
 
@@ -533,6 +907,8 @@ app.post("/testeFormulario", async (req, res) => {
     dados.nomefinanceiro,
     dados.profissaotitular
   );
+
+  await enviarPropostaDigitalSaude(jsonModeloDS);
 
   await salvarAnexos (
     idImplantacao,
