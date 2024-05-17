@@ -540,7 +540,7 @@ app.post("/testeFormularioDS", async (req, res) => {
           "nome": "Titular"
         },
         "statusBeneficiario": {
-          "id": 0,
+          "id": 2,
           "nome": "Ativo"
         }
       }
@@ -623,7 +623,7 @@ app.post("/testeFormularioDS", async (req, res) => {
           "nome": dependente.grauparentescodependente
         },
         "statusBeneficiario": {
-          "id": 0,
+          "id": 2,
           "nome": "Ativo"
         }
       };
@@ -804,7 +804,7 @@ app.post("/testeFormulario", async (req, res) => {
           "nome": "Titular"
         },
         "statusBeneficiario": {
-          "id": 0,
+          "id": 2,
           "nome": "Ativo"
         }
       }
