@@ -1,4 +1,10 @@
-const { db, connectToDatabase, qInsImplantacao, qInsDependentes } = require("./database");
+const { 
+  db,
+  connectToDatabase,
+  insertData, 
+  qInsImplantacao, 
+  qInsDependentes 
+} = require("./database");
 const express = require("express");
 const app = new express();
 const ejs = require("ejs");
@@ -47,6 +53,8 @@ app.use(express.json());
 /* CONEXÃO COM BANCO DE DADOS */
 
 connectToDatabase()
+
+/* connectToDatabase()
   .then(() => {
     app.listen(port, () => {
       console.log(`Servidor rodando na porta ${port}`);
@@ -58,7 +66,7 @@ connectToDatabase()
     });
     console.error("Erro ao conectar ao banco de dados:", error);
     process.exit(1);
-  });
+  }); */
 
 /* FUNÇÃO DE INSERÇÃO AO BANCO DE DADOS */
 
@@ -238,7 +246,7 @@ async function salvarAnexos(idImplantacao, anexos) {
   }
 }
 
-async function insertData(query, values) {
+/* async function insertData(query, values) {
   return new Promise((resolve, reject) => {
     db.query(query, values, (err, result) => {
       if (err) {
@@ -254,7 +262,7 @@ async function insertData(query, values) {
       }
     });
   });
-}
+} */
 
 function formatarDataDs(data) {
   var partesData = data.split('-');
@@ -690,7 +698,6 @@ app.post("/testeFormulario", async (req, res) => {
     planoSelecionado: dados.planoSelecionado,
     numeroProposta: numeroProposta
   };
-
   async function obsDigitalSaude () {
 
     if(dados.titularresponsavelfinanceiro === "Sim") {
@@ -729,6 +736,7 @@ app.post("/testeFormulario", async (req, res) => {
   
   /* INSERÇÃO DE DADOS AO BANCO DE DADOS DAS INFORMAÇÕES SOBRE A IMPLANTAÇÃO */
   const resultImplantacao = await insertData(qInsImplantacao, dadosImplantacao);
+
   
   const jsonModeloDS = {
     "numeroProposta": `${numeroProposta}`,
@@ -908,7 +916,7 @@ app.post("/testeFormulario", async (req, res) => {
     dados.profissaotitular
   );
 
-  await enviarPropostaDigitalSaude(jsonModeloDS);
+  //await enviarPropostaDigitalSaude(jsonModeloDS);
 
   await salvarAnexos (
     idImplantacao,
