@@ -1,54 +1,25 @@
-const mysql = require("mysql2");
+//const mysql = require('mysql2/promise');
 
-/* const db = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  port: "3306",
-  password: "pmp078917",
-  database: "mhdentalvendas",
-  waitForConnections: true,
-  connectionLimit: 10, // Ajuste conforme necessário
-  queueLimit: 0,
-}); */
+const mysql = require('promise-mysql');
 
-/* const db = mysql.createConnection({
-    host: "pablopetelak.com",
-    user: "u654656997_dev",
+
+const config = {
+    host: "localhost",
+    user: "root",
     port: "3306",
-    password: "0Uc0d53^w",
-    database: "u654656997_mhvendasdev",
-}) */
-
-const db = mysql.createPool({
-    host: "pablopetelak.com",
-    user: "u654656997_dev",
-    port: "3306",
-    password: "0Uc0d53^w",
-    database: "u654656997_mhvendasdev",
+    password: "pmp078917",
+    database: "mhdentalvendas",
     waitForConnections: true,
-    connectionLimit: 10, // Ajuste conforme necessário
-    queueLimit: 0
-});
+    connectionLimit: 50, // Ajuste conforme necessário
+    queueLimit: 0,
+}
 
-/* const db = mysql.createConnection({
+const configProd = {
     host: "localhost",
     user: "mhdentalvendas_user",
     password: "6_64idh9V",
     database: "mhdentalvendas2",
     port: "3306",
-}); */
-
-function connectToDatabase() {
-    db.getConnection((error, connection) => {
-        if (error) {
-            console.error('Erro ao conectar ao banco de dados:', error);
-        } else {
-            console.log('Conexão bem-sucedida ao banco de dados');
-            // Libera a conexão quando não estiver mais em uso
-            //connection.release();
-            //resolve();
-        }
-    });
 }
 
 /* Inserir dados da implantação */
@@ -64,6 +35,7 @@ const qInsImplantacao = `
         sexotitular,
         estadociviltitular,
         telefonetitular,
+        celulartitular,
         emailtitular,
         profissaotitular,
         titularresponsavelfinanceiro,
@@ -91,34 +63,29 @@ const qInsImplantacao = `
         AceitoPrestacaoServicos,
         planoSelecionado,
         numeroProposta
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
-async function insertData(query, values) {
-    return new Promise((resolve, reject) => {
-        db.getConnection(function (err, connection) {
-            if (err) throw err;
-            connection.query(query, values, (err, result) => {
-                if (err) {
-                    logger.error({
-                        message: `Erro ao inserir pela Query ${query}`,
-                        error: err.message,
-                        stack: err.stack,
-                        timestamp: new Date().toISOString(),
-                    });
-                    reject(err);
-                } else {
-                    resolve(result);
-                    connection.release();
-                }
-            });
-        });
-    });
-}
+const qInsDependentes = `INSERT INTO dependentes (
+    cpfdependente,
+    nomecompletodependente,
+    nomemaedependente,
+    nascimentodependente,
+    sexodependente,
+    estadocivildependente,
+    grauparentescodependente,
+    id_implantacoes
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+`;
+
+const  qInsEntidade =`
+  UPDATE entidades SET nome=?, descricao=?, publico=?, documentos=?, taxa=? WHERE id=?
+  `;
 
 module.exports = {
-  db,
-  connectToDatabase,
-  insertData,
-  qInsImplantacao,
+    mysql,
+    config,
+    qInsImplantacao,
+    qInsDependentes,
+    qInsEntidade
 };

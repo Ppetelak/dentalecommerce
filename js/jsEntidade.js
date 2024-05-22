@@ -157,22 +157,13 @@ $('.editar-form').submit(function (e) {
 
     const divTags = form.find('.divTag');
 
-    if (divTags.length > 0) {
-        divTags.each(function () {
-            const tagText = $(this).text().trim();
-            tags.push(tagText);
-        });
-    }
-
     const formData = {
         nome: form.find('#nome').val(),
         descricao: form.find('#descricao').val(),
         publico: form.find('#publico').val(),
         documentos: form.find('#documentos').val(),
         taxa: form.find('#taxa').val(),
-        profissoes: tags
     };
-    console.log(formData);
 
     $.ajax({
         type: 'POST',
@@ -217,23 +208,13 @@ $('.cadastrar').click(function (e) {
         return;
     }
 
-    const tags = [];
-
-    $('.divTag').each(function () {
-        const tagText = $(this).text().trim();
-        tags.push(tagText);
-    });
-
     const formData = {
         nome: $('#nome').val(),
         descricao: $('#descricao').val(),
         publico: $('#publico').val(),
         documentos: $('#documentos').val(),
         taxa: $('#taxa').val(),
-        profissoes: tags
     };
-
-    console.log(formData)
 
     // Envie os dados do formulário para a rota no servidor
     $.ajax({

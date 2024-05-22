@@ -1,9 +1,9 @@
 const { 
-  db,
-  connectToDatabase,
-  insertData, 
+  mysql,
   qInsImplantacao, 
-  qInsDependentes 
+  qInsDependentes,
+  config,
+  qInsEntidade
 } = require("./database");
 const express = require("express");
 const app = new express();
@@ -50,23 +50,7 @@ app.set("view engine", "ejs");
 app.use(cookie());
 app.use(express.json());
 
-/* CONEXÃO COM BANCO DE DADOS */
 
-connectToDatabase()
-
-/* connectToDatabase()
-  .then(() => {
-    app.listen(port, () => {
-      console.log(`Servidor rodando na porta ${port}`);
-    });
-  })
-  .catch((error) => {
-    app.get("*", (req, res) => {
-      res.redirect("/error404");
-    });
-    console.error("Erro ao conectar ao banco de dados:", error);
-    process.exit(1);
-  }); */
 
 /* FUNÇÃO DE INSERÇÃO AO BANCO DE DADOS */
 
@@ -217,6 +201,7 @@ function consultarNumeroProposta(idImplantacao) {
 }
 
 async function salvarAnexos(idImplantacao, anexos) {
+  const db = await mysql.createPool(config);
   const query = "INSERT INTO anexos_implantacoes (id_implantacao, nome_arquivo, caminho_arquivo) VALUES (?, ?, ?)";
   const promises = []; // Array para armazenar todas as promessas de inserção
 
@@ -289,10 +274,82 @@ async function enviarPropostaDigitalSaude(jsonModeloDS) {
 
   try {
     const response = await axios.post(apiUrl, data, config);
-    console.log(response.data, jsonModeloDS);
+    console.log(response.data);
   } catch (error) {
     console.error("Erro ao enviar a proposta:", error);
   }
+}
+
+function generateRandomDigits(length) {
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += Math.floor(Math.random() * 10);
+  }
+  return result;
+}
+
+async function generateUniqueProposalNumber() {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0"); // Mês com 2 dígitos
+  const day = currentDate.getDate().toString().padStart(2, "0"); // Dia com 2 dígitos
+  let randomPart;
+
+  // Tente gerar um número único até encontrar um que não exista no banco de dados
+  while (true) {
+    randomPart = generateRandomDigits(4); // 4 dígitos aleatórios
+    const proposalNumber = `${year}${month}${day}${randomPart}`;
+
+    const exists = await checkProposalExists(proposalNumber);
+    if (!exists) {
+      return proposalNumber; // Retorna o número único
+    }
+  }
+}
+
+async function checkProposalExists(proposalNumber) {
+  const db = await mysql.createPool(config);
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT * FROM implantacoes WHERE numeroProposta = ?",
+      [proposalNumber],
+      (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(results.length > 0);
+        }
+      }
+    );
+  });
+}
+
+async function sendStatus(idImplantacao, idStatus, mensagem) {
+  const db = await mysql.createPool(config);
+  const query =
+    "INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)";
+    db.query(query, [idStatus, idImplantacao, mensagem], (err, result) => {
+    if (err) {
+      console.log("Erro ao inserir valores na tabela de status" + err);
+      logger.error({
+        message: "Erro ao inserir valores na tabela de status",
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString(),
+      });
+    }
+    return;
+  });
+}
+
+function rollbackAndRespond(res, message) {
+  // Finalize a transação com rollback
+  db.query("ROLLBACK;", [], (err) => {
+    if (err) {
+      console.error("Erro ao realizar rollback:", err);
+    }
+    res.status(500).json({ message });
+  });
 }
 
 /* ---------------------------------------- ROTAS ---------------------------------------- */
@@ -382,7 +439,8 @@ app.post("/salvarLogo", verificaAutenticacao, (req, res) => {
 
 /* FIM DE SEÇÃO DE UPLOAD INTERNO DAS MÍDIAS */
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  const db = await mysql.createPool(config);
   const queryPlanos = "SELECT * FROM planos";
   db.query(queryPlanos, (err, resultPlanos) => {
     if (err) {
@@ -395,7 +453,8 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/formulario", (req, res) => {
+app.post("/formulario", async (req, res) => {
+  const db = await mysql.createPool(config);
   const planoId = req.body.planoSelecionado;
   const query = "SELECT * FROM planos WHERE id = ?";
   const queryProfissoes = "SELECT * FROM profissoes";
@@ -648,559 +707,320 @@ app.post("/testeFormularioDS", async (req, res) => {
 });
 
 app.post("/testeFormulario", async (req, res) => {
-  const dados = req.body.inputs;
-  const dependentes = req.body.dependentes;
-  const anexos = req.body.anexos;
+  const db = await mysql.createPool(config);
+  try {
+    const dados = req.body.inputs;
+    const dependentes = req.body.dependentes;
+    const anexos = req.body.anexos;
 
-  const numeroProposta = await generateUniqueProposalNumber();
-  const dadosImplantacao = {
-    nomecompleto: dados.nomecompleto,
-    datadenascimento: dados.datadenascimento,
-    cpftitular: dados.cpftitular,
-    nomemaetitular: dados.nomemaetitular,
-    rgtitular: dados.rgtitular,
-    orgaoexpedidor: dados.orgaoexpedidor,
-    dataexpedicaorgtitular: dados.dataexpedicaorgtitular,
-    sexotitular: dados.sexotitular,
-    estadociviltitular: dados.estadociviltitular,
-    telefonetitular: dados.telefonetitular,
-    celulartitular: dados.celulartitular,
-    emailtitular: dados.emailtitular,
-    profissaotitular: dados.profissaotitular,
-    titularresponsavelfinanceiro: dados.titularresponsavelfinanceiro,
-    cpffinanceiro: 
-      dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
-    nomefinanceiro: 
-      dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
-    datadenascimentofinanceiro: 
-      dados.datadenascimentofinanceiro ? dados.datadenascimentofinanceiro : dados.datadenascimento,
-    sexotitularfinanceiro: dados.sexotitularfinanceiro ? dados.sexotitularfinanceiro : dados.sexotitular,
-    estadociviltitularfinanceiro: dados.estadociviltitularfinanceiro ? dados.estadociviltitularfinanceiro : dados.estadociviltitular,
-    telefonetitularfinanceiro: 
-      dados.telefonetitularfinanceiro ? dados.telefonetitularfinanceiro : dados.telefonetitular,
-    emailtitularfinanceiro: 
-      dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular,
-    grauparentesco: dados.grauparentesco,
-    cep: dados.cep,
-    enderecoresidencial: dados.enderecoresidencial,
-    numeroendereco: dados.numeroendereco,
-    complementoendereco: dados.complementoendereco,
-    bairro: dados.bairro,
-    cidade: dados.cidade,
-    estados: dados.estado,
-    cpfcorretor: dados.cpfcorretor,
-    nomecorretor: dados.nomecorretor,
-    corretora: dados.corretora,
-    celularcorretor: dados.celularcorretor,
-    formaPagamento: dados.formaPagamento,
-    aceitoTermos: dados.aceitoTermos,
-    aceitoPrestacaoServicos: dados.aceitoPrestacaoServicos,
-    planoSelecionado: dados.planoSelecionado,
-    numeroProposta: numeroProposta
-  };
-  async function obsDigitalSaude () {
+    var cpffinanceiro = dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular
+    var nomefinanceiro = dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto;
+    var datadenascimentofinanceiro = dados.datadenascimentofinanceiro ? dados.datadenascimentofinanceiro : dados.datadenascimento;
+    var sexotitularfinanceiro = dados.sexotitularfinanceiro ? dados.sexotitularfinanceiro : dados.sexotitular;
+    var estadociviltitularfinanceiro = dados.estadociviltitularfinanceiro ? dados.estadociviltitularfinanceiro : dados.estadociviltitular;
+    var telefonetitularfinanceiro = 
+    dados.telefonetitularfinanceiro ? dados.telefonetitularfinanceiro : dados.telefonetitular;
+    var emailtitularfinanceiro = 
+    dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular;
 
-    if(dados.titularresponsavelfinanceiro === "Sim") {
-      return `O TITULAR É O MESMO TITULAR FINANCEIRO`;
-    } else {
-      return ( 
-        `
-        O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
-        ----> Dados responsável Financeiro <---- \n
-        CPF: ${dados.cpffinanceiro} \n
-        Nome: ${dados.nomefinanceiro} \n
-        Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
-        Telefone: ${dados.telefonetitularfinanceiro} \n
-        Email: ${dados.emailtitularfinanceiro} \n
-        Sexo: ${dados.sexotitularfinanceiro} \n
-        Estado Civil: ${dados.estadociviltitularfinanceiro} \n
-        Grau de Parentesco: ${dados.grauparentescofinanceiro} \n
-        `
-      ) ;
+    const numeroProposta = await generateUniqueProposalNumber();
+    const dadosImplantacao = [
+      dados.nomecompleto,
+      dados.datadenascimento,
+      dados.cpftitular,
+      dados.nomemaetitular,
+      dados.rgtitular,
+      dados.orgaoexpedidor,
+      dados.dataexpedicaorgtitular,
+      dados.sexotitular,
+      dados.estadociviltitular,
+      dados.telefonetitular,
+      dados.celulartitular,
+      dados.emailtitular,
+      dados.profissaotitular,
+      dados.titularresponsavelfinanceiro,
+      cpffinanceiro,
+      nomefinanceiro,
+      datadenascimentofinanceiro,
+      sexotitularfinanceiro,
+      estadociviltitularfinanceiro,
+      telefonetitularfinanceiro,
+      emailtitularfinanceiro,
+      dados.grauparentesco,
+      dados.cep,
+      dados.enderecoresidencial,
+      dados.numeroendereco,
+      dados.complementoendereco,
+      dados.bairro,
+      dados.cidade,
+      dados.estado,
+      dados.cpfcorretor,
+      dados.nomecorretor,
+      dados.corretora,
+      dados.celularcorretor,
+      dados.formaPagamento,
+      dados.aceitoTermos,
+      dados.aceitoPrestacaoServicos,
+      dados.planoSelecionado,
+      numeroProposta
+    ];
+
+    const jsonModeloDS = {
+      "numeroProposta": `${numeroProposta}`,
+      "dataAssinatura": "26/02/2024",
+      "diaVencimento": 1,
+      "cpfResponsavel": dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
+      "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
+      "observacao": `teste`,
+      "plano": {
+        "codigo": "VMR5GRUEPJ"
+      },
+      "convenio": {
+        "codigo": "LRYT12JW8T"
+      },
+      "produtor": {
+        "codigo": "E17NJPUZM2"
+      },
+      "corretora": {
+        "codigo": "S62MXENV8X"
+      },
+      "grupo": {
+        "codigo": "V2CAVAD6U2"
+      },
+      "filial": {
+        "codigo": "BETRHPTL2K"
+      },
+      "beneficiarioList": [
+        {
+          "nome": dados.nomecompleto,
+          "dataNascimento": formatarDataDs(dados.datadenascimento),
+          "rg": dados.rgtitular,
+          "orgaoEmissor": dados.orgaoexpedidor,
+          "cpf": dados.cpftitular,
+          "dnv": "string",
+          "cns": "string",
+          "pis": "string",
+          "nomeMae": dados.nomemaetitular,
+          "endereco": dados.enderecoresidencial,
+          "numero": dados.numeroendereco,
+          "complemento": dados.complementoendereco,
+          "bairro": dados.bairro,
+          "municipio": dados.cidade,
+          "uf": dados.estado,
+          "cep": dados.cep,
+          "dddTelefone": "41",
+          "telefone": "992414553",
+          "dddCelular": "41",
+          "celular": "999665588",
+          "email": dados.emailtitular,
+          "altura": 0,
+          "peso": 0,
+          "imc": 0,
+          "dataVigencia": "26/02/2024",
+          "mensalidade": 0,
+          "estadoCivil": {
+              "id": dados.estadociviltitular === "Casado" ? 1 :
+                    dados.estadociviltitular === "Divorciado" ? 2 :
+                    dados.estadociviltitular === "Separado" ? 3 :
+                    dados.estadociviltitular === "Solteiro" ? 4 :
+                    dados.estadociviltitular === "Viúvo" ? 5: '',
+              "nome": dados.estadociviltitular
+          },
+          "tipoBeneficiario": {
+            "id": 1,
+            "nome": "Titular"
+          },
+          "sexo": {
+            "id": dados.sexotitular === "Masculino" ? 1 : 2,
+            "nome": dados.sexotitular
+          },
+          "parentesco": {
+            "id": 1,
+            "nome": "Titular"
+          },
+          "statusBeneficiario": {
+            "id": 2,
+            "nome": "Ativo"
+          }
+        }
+      ]
     }
 
-  }
+    async function obsDigitalSaude () {
 
-  let observacoesDigitalSaude = await obsDigitalSaude ();
-
-  observacoesDigitalSaude += 
-    `
-    \n
-    Pagamento: 
-      ${dados.formaPagamento === 1 ? "Boleto" : 
-        dados.formaPagamento === 2? "Cartão de Crédito em 12x" : "Cartão de Crédito em 3x"} \n
-    `;
-
-  console.log(`Query:  ${qInsImplantacao}`)
-  console.log({dadosImplantacao})
-  
-  /* INSERÇÃO DE DADOS AO BANCO DE DADOS DAS INFORMAÇÕES SOBRE A IMPLANTAÇÃO */
-  const resultImplantacao = await insertData(qInsImplantacao, dadosImplantacao);
-
-  
-  const jsonModeloDS = {
-    "numeroProposta": `${numeroProposta}`,
-    "dataAssinatura": "26/02/2024",
-    "diaVencimento": 1,
-    "cpfResponsavel": dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
-    "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
-    "observacao": `teste`,
-    "plano": {
-      "codigo": "VMR5GRUEPJ"
-    },
-    "convenio": {
-      "codigo": "LRYT12JW8T"
-    },
-    "produtor": {
-      "codigo": "E17NJPUZM2"
-    },
-    "corretora": {
-      "codigo": "S62MXENV8X"
-    },
-    "grupo": {
-      "codigo": "V2CAVAD6U2"
-    },
-    "filial": {
-      "codigo": "BETRHPTL2K"
-    },
-    "beneficiarioList": [
-      {
-        "nome": dados.nomecompleto,
-        "dataNascimento": formatarDataDs(dados.datadenascimento),
-        "rg": dados.rgtitular,
-        "orgaoEmissor": dados.orgaoexpedidor,
-        "cpf": dados.cpftitular,
-        "dnv": "string",
-        "cns": "string",
-        "pis": "string",
-        "nomeMae": dados.nomemaetitular,
-        "endereco": dados.enderecoresidencial,
-        "numero": dados.numeroendereco,
-        "complemento": dados.complementoendereco,
-        "bairro": dados.bairro,
-        "municipio": dados.cidade,
-        "uf": dados.estado,
-        "cep": dados.cep,
-        "dddTelefone": "41",
-        "telefone": "992414553",
-        "dddCelular": "41",
-        "celular": "999665588",
-        "email": dados.emailtitular,
-        "altura": 0,
-        "peso": 0,
-        "imc": 0,
-        "dataVigencia": "26/02/2024",
-        "mensalidade": 0,
-        "estadoCivil": {
-            "id": dados.estadociviltitular === "Casado" ? 1 :
-                  dados.estadociviltitular === "Divorciado" ? 2 :
-                  dados.estadociviltitular === "Separado" ? 3 :
-                  dados.estadociviltitular === "Solteiro" ? 4 :
-                  dados.estadociviltitular === "Viúvo" ? 5: '',
-            "nome": dados.estadociviltitular
-        },
-        "tipoBeneficiario": {
-          "id": 1,
-          "nome": "Titular"
-        },
-        "sexo": {
-          "id": dados.sexotitular === "Masculino" ? 1 : 2,
-          "nome": dados.sexotitular
-        },
-        "parentesco": {
-          "id": 1,
-          "nome": "Titular"
-        },
-        "statusBeneficiario": {
-          "id": 2,
-          "nome": "Ativo"
-        }
-      }
-    ]
-  }
-
-  adicionarDependentes()
-
-  async function adicionarDependentes () {
-    dependentes.forEach((dependente) => {
-      insertData(qInsDependentes, [resultImplantacao.insertId, dependente]);
-      const dependenteObj = {
-        "nome": dependente.nomecompletodependente,
-        "dataNascimento": formatarDataDs(dependente.nascimentodependente),
-        "rg": "null",
-        "orgaoEmissor": "null",
-        "cpf": dependente.cpfdependente,
-        "dnv": "string",
-        "cns": "string",
-        "pis": "string",
-        "nomeMae": dependente.nomemaedependente,
-        "endereco": dados.enderecoresidencial,
-        "numero": dados.numeroendereco,
-        "complemento": dados.complementoendereco,
-        "bairro": dados.bairro,
-        "municipio": dados.cidade,
-        "uf": dados.estado,
-        "cep": dados.cep,
-        "dddTelefone": "41",
-        "telefone": "999998888",
-        "dddCelular": "41",
-        "celular": "999998888",
-        "email": "dependente@dependente.com.br",
-        "altura": 0,
-        "peso": 0,
-        "imc": 0,
-        "dataVigencia": "26/02/2024",
-        "mensalidade": 0,
-        "estadoCivil": {
-            "id": dependente.estadocivildependente === "Casado" ? 1 :
-                  dependente.estadocivildependente === "Divorciado" ? 2 :
-                  dependente.estadocivildependente === "Separado" ? 3 :
-                  dependente.estadocivildependente === "Solteiro" ? 4 :
-                  dependente.estadocivildependente === "Viúvo" ? 5: '',
-            "nome": dependente.estadocivildependente
-        },
-        "tipoBeneficiario": {
-          "id": 2,
-          "nome": "Dependente"
-        },
-        "sexo": {
-          "id": dependente.sexodependente === "Masculino" ? 1 : 2,
-          "nome": dependente.sexodependente
-        },
-        "parentesco": {
-          "id": dependente.grauparentescodependente === "Agregado" ? 2 :
-                dependente.grauparentescodependente === "Companheiro" ? 3 :
-                dependente.grauparentescodependente === "Cônjuge" ? 4 :
-                dependente.grauparentescodependente === "Filho(a)" ? 5 :
-                dependente.grauparentescodependente === "Filho Adotivo" ? 6 :
-                dependente.grauparentescodependente === "Irmão(a)" ? 7 :
-                dependente.grauparentescodependente === "Mãe" ? 8 :
-                dependente.grauparentescodependente === "Pai" ? 9 :
-                dependente.grauparentescodependente === "Neto(a)" ? 10 :
-                dependente.grauparentescodependente === "Sobrinho(a)" ? 11 :
-                dependente.grauparentescodependente === "Sogro" ? 12 :
-                dependente.grauparentescodependente === "Enteado" ? 13 :
-                dependente.grauparentescodependente === "Tutelado" ? 14 :
-                dependente.grauparentescodependente === "Sogra" ? 15 :
-                dependente.grauparentescodependente === "Genro" ? 16 :
-                dependente.grauparentescodependente === "Nora" ? 17 :
-                dependente.grauparentescodependente === "Cunhado(a)" ? 18 :
-                dependente.grauparentescodependente === "Primo(a)" ? 19 :
-                dependente.grauparentescodependente === "Avô" ? 20 :
-                dependente.grauparentescodependente === "Avó" ? 21 :
-                dependente.grauparentescodependente === "Tio" ? 22 :
-                dependente.grauparentescodependente === "Tia" ? 23 :
-                dependente.grauparentescodependente === "Bisneto" ? 24 :
-                dependente.grauparentescodependente === "Madrasta" ? 25 : 26,
-          "nome": dependente.grauparentescodependente
-        },
-        "statusBeneficiario": {
-          "id": 0,
-          "nome": "Ativo"
-        }
-      };
-      jsonModeloDS.beneficiarioList.push(dependenteObj);
-    });
-  };
-
-  /* GET DE DADOS PARA USAR NAS DEMAIS FUNÇÕES  */
-  const idImplantacao = resultImplantacao.insertId;
-
-  /* DISPARO DE EMAIL PARA CLIENTE ASSINAR CONTRATO  */
-  await sendContractEmail(
-    dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular,
-    idImplantacao,
-    numeroProposta,
-    dados.cpffinanceiro,
-    dados.nomefinanceiro,
-    dados.profissaotitular
-  );
-
-  //await enviarPropostaDigitalSaude(jsonModeloDS);
-
-  await salvarAnexos (
-    idImplantacao,
-    anexos
-  )
-
-  /* INSERÇÃO DE STATUS INICIAL AO BANCO DE DADOS PARA ACOMPANHAR IMPLANTAÇÃO */
-  await sendStatus(
-    idImplantacao,
-    2,
-    "Implantação realizada com sucesso ao Ecommerce"
-  );
-
-  console.log(resultImplantacao);
-  res.send(resultImplantacao);
-});
-
-/* app.post("/enviadados", async (req, res) => {
-  const dados = req.body.inputs;
-  const dependentes = [];
-
-  req.session.planoSelecionado;
-  req.session.dadosTitular;
-  req.session.dadosResponsavelFinanceiro;
-  req.session.dadosEndereco;
-  req.session.dadosCorretor;
-  req.session.dadosDependentes;
-  req.session.dadosDocumentos;
-
-  let planoSelecionado = req.session.planoSelecionado;
-  let dadosTitular = req.session.dadosTitular;
-
-  const dadosAceite = req.body;
-
-  const numeroProposta = await generateUniqueProposalNumber();
-
-  for (let i = 0; i < dados.cpfdependente.length; i++) {
-    dependentes.push({
-      cpfdependente: dados.cpfdependente[i],
-      nomecompletodependente: dados.nomecompletodependente[i],
-      nomemaedependente: dados.nomemaedependente[i],
-      nascimentodependente: dados.nascimentodependente[i],
-      sexodependente: dados.sexodependente[i],
-    });
-  }
-
-  db.beginTransaction(async function (err) {
-    if (err) {
-      console.log("Erro ao iniciar a transação:", err);
-      return res.status(500).send("Erro ao inserir os dados");
-    }
-
-    try {
-      const dataNascimentoFinanceiro = new Date(
-        dados.datadenascimentofinanceiro
-      );
-      const srcDocumentoFoto = req.files["documentoFoto"][0].path;
-      const srcComprovanteResidencia =
-        req.files["comprovanteResidencia"][0].path;
-
-      if (dados.datadenascimentofinanceiro !== "") {
-        if (!isNaN(dataNascimentoFinanceiro.getTime())) {
-          dados.datadenascimentofinanceiro = dataNascimentoFinanceiro
-            .toISOString()
-            .slice(0, 10);
-        } else {
-          throw new Error(
-            "Data de nascimento do responsável financeiro inválida"
-          );
-        }
+      if(dados.titularresponsavelfinanceiro === "Sim") {
+        return `O TITULAR É O MESMO TITULAR FINANCEIRO`;
       } else {
-        dados.datadenascimentofinanceiro = null; // Ou alguma data padrão válida
+        return ( 
+          `
+          O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
+          ----> Dados responsável Financeiro <---- \n
+          CPF: ${dados.cpffinanceiro} \n
+          Nome: ${dados.nomefinanceiro} \n
+          Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
+          Telefone: ${dados.telefonetitularfinanceiro} \n
+          Email: ${dados.emailtitularfinanceiro} \n
+          Sexo: ${dados.sexotitularfinanceiro} \n
+          Estado Civil: ${dados.estadociviltitularfinanceiro} \n
+          Grau de Parentesco: ${dados.grauparentescofinanceiro} \n
+          `
+        ) ;
       }
 
-      const dadosImplantacao = {
-        planoSelecionado: dados.planoSelecionado,
-        nomecompleto: dados.nomecompleto,
-        datadenascimento: dados.datadenascimento,
-        cpftitular: dados.cpftitular,
-        nomemaetitular: dados.nomemaetitular,
-        rgtitular: dados.rgtitular,
-        orgaoexpedidor: dados.orgaoexpedidor,
-        dataexpedicaorgtitular: dados.dataexpedicaorgtitular,
-        sexotitular: dados.sexotitular,
-        estadociviltitular: dados.estadociviltitular,
-        telefonetitular: dados.telefonetitular,
-        celulartitular: dados.celulartitular,
-        emailtitular: dados.emailtitular,
-        profissaotitular: dados.profissaotitular,
-        titularresponsavelfinanceiro: dados.titularresponsavelfinanceiro,
-        cpffinanceiro: dados.cpffinanceiro || dados.cpftitular,
-        nomefinanceiro: dados.nomefinanceiro || dados.nomecompleto,
-        datadenascimentofinanceiro:
-          dados.datadenascimentofinanceiro || dados.datadenascimento,
-        telefonetitularfinanceiro:
-          dados.telefonetitularfinanceiro || dados.telefonetitular,
-        emailtitularfinanceiro:
-          dados.emailtitularfinanceiro || dados.emailtitular,
-        cep: dados.cep,
-        enderecoresidencial: dados.enderecoresidencial,
-        numeroendereco: dados.numeroendereco,
-        complementoendereco: dados.complementoendereco,
-        bairro: dados.bairro,
-        cidade: dados.cidade,
-        cpfcorretor: dados.cpfcorretor,
-        nomecorretor: dados.nomecorretor,
-        corretora: dados.corretora,
-        celularcorretor: dados.celularcorretor,
-        formaPagamento: dados.formaPagamento,
-        aceitoTermos: dados.aceitoTermos,
-        aceitoPrestacaoServicos: dados.aceitoPrestacaoServicos,
-        numeroProposta: numeroProposta,
-      };
-
-      const resultImplantacao = await insertData(
-        "INSERT INTO implantacoes SET ?",
-        dadosImplantacao
-      );
-      const idImplantacao = resultImplantacao.insertId;
-
-      await insertDependentes(idImplantacao, dependentes);
-
-      await insertDocumentPaths(
-        idImplantacao,
-        srcDocumentoFoto,
-        srcComprovanteResidencia
-      );
-
-      const numeroPropostaGerado = await consultarNumeroProposta(connection, idImplantacao);
-
-      const emailTitular = await consultarEmailTitular(idImplantacao);
-
-      if (dados.formaPagamento === 1) {
-        await sendStatus(
-          idImplantacao,
-          3,
-          "Forma de Pagamento escolhida BOLETO"
-        );
-      }
-
-      await sendContractEmail(
-        emailTitular,
-        idImplantacao,
-        numeroPropostaGerado,
-        dados.cpffinanceiro,
-        dados.nomefinanceiro
-      );
-
-      await sendStatus(
-        idImplantacao,
-        2,
-        "Implantação realizada com sucesso ao Ecommerce"
-      );
-
-      await commitTransaction();
-
-      console.log("Dados inseridos com sucesso");
-      res.render("sucesso", { numeroPropostaGerado });
-    } catch (error) {
-      await rollbackTransaction();
-      console.log("Erro durante a transação:", error);
-      res.status(500).send("Erro ao inserir os dados");
     }
-  });
 
-  async function insertDocumentPaths(
-    idImplantacao,
-    srcDocumentoFoto,
-    srcComprovanteResidencia
-  ) {
-    const query =
-      "INSERT INTO documentos_implantacoes (id_implantacao, documentoFoto, comprovanteResidencia) VALUES (?, ?, ?)";
+    let observacoesDigitalSaude = await obsDigitalSaude ();
 
-    await insertData(query, [
-      idImplantacao,
-      srcDocumentoFoto,
-      srcComprovanteResidencia,
-    ]);
-  }
+    observacoesDigitalSaude += 
+      `
+      \n
+      Pagamento: 
+        ${dados.formaPagamento === 1 ? "Boleto" : 
+          dados.formaPagamento === 2? "Cartão de Crédito em 12x" : "Cartão de Crédito em 3x"} \n
+      `;
+    
+    /* INSERÇÃO DE DADOS AO BANCO DE DADOS DAS INFORMAÇÕES SOBRE A IMPLANTAÇÃO */
 
-  async function insertData(query, values) {
-    return new Promise((resolve, reject) => {
-      db.query(query, values, (err, result) => {
-        if (err) {
-          logger.error({
-            message: "Erro ao inserir documentos",
-            error: err.message,
-            stack: err.stack,
-            timestamp: new Date().toISOString(),
-          });
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  async function insertDependentes(connection, idImplantacao, dependentes) {
-    return new Promise((resolve, reject) => {
-      function insertDependente(dependente) {
-        const dadosDependente = {
-          id_implantacoes: idImplantacao,
-          cpfdependente: dependente.cpfdependente,
-          nomecompletodependente: dependente.nomecompletodependente,
-          nomemaedependente: dependente.nomemaedependente,
-          nascimentodependente: dependente.nascimentodependente,
-          sexodependente: dependente.sexodependente,
-        };
-
-        connection(
-          "INSERT INTO dependentes SET ?",
-          dadosDependente,
-          (err, result) => {
-            if (err) {
-              logger.error({
-                message: "Erro ao inserir dependentes",
-                error: err.message,
-                stack: err.stack,
-                timestamp: new Date().toISOString(),
-              });
-              reject(err);
-            } else {
-              if (dependentes.length === 0) {
-                resolve();
-              } else {
-                insertDependente(dependentes.shift());
+    await db.query(qInsImplantacao, dadosImplantacao)
+      .then(async (resultImplantacao) => {
+        const resultImplantacaoId = resultImplantacao.insertId
+        await Promise.all(dependentes.map(async (dependente) => {
+          await db.query(qInsDependentes, 
+          [
+            dependente.cpfdependente,
+            dependente.nomecompletodependente,
+            dependente.nomemaedependente,
+            dependente.nascimentodependente,
+            dependente.sexodependente,
+            dependente.estadocivildependente,
+            dependente.grauparentescodependente,  
+            resultImplantacaoId
+          ]
+        )
+          try {
+            const dependenteObj = {
+              "nome": dependente.nomecompletodependente,
+              "dataNascimento": formatarDataDs(dependente.nascimentodependente),
+              "rg": "null",
+              "orgaoEmissor": "null",
+              "cpf": dependente.cpfdependente,
+              "dnv": "string",
+              "cns": "string",
+              "pis": "string",
+              "nomeMae": dependente.nomemaedependente,
+              "endereco": dados.enderecoresidencial,
+              "numero": dados.numeroendereco,
+              "complemento": dados.complementoendereco,
+              "bairro": dados.bairro,
+              "municipio": dados.cidade,
+              "uf": dados.estado,
+              "cep": dados.cep,
+              "dddTelefone": "41",
+              "telefone": "999998888",
+              "dddCelular": "41",
+              "celular": "999998888",
+              "email": "dependente@dependente.com.br",
+              "altura": 0,
+              "peso": 0,
+              "imc": 0,
+              "dataVigencia": "26/02/2024",
+              "mensalidade": 0,
+              "estadoCivil": {
+                  "id": dependente.estadocivildependente === "Casado" ? 1 :
+                        dependente.estadocivildependente === "Divorciado" ? 2 :
+                        dependente.estadocivildependente === "Separado" ? 3 :
+                        dependente.estadocivildependente === "Solteiro" ? 4 :
+                        dependente.estadocivildependente === "Viúvo" ? 5: '',
+                  "nome": dependente.estadocivildependente
+              },
+              "tipoBeneficiario": {
+                "id": 2,
+                "nome": "Dependente"
+              },
+              "sexo": {
+                "id": dependente.sexodependente === "Masculino" ? 1 : 2,
+                "nome": dependente.sexodependente
+              },
+              "parentesco": {
+                "id": dependente.grauparentescodependente === "Agregado" ? 2 :
+                      dependente.grauparentescodependente === "Companheiro" ? 3 :
+                      dependente.grauparentescodependente === "Cônjuge" ? 4 :
+                      dependente.grauparentescodependente === "Filho(a)" ? 5 :
+                      dependente.grauparentescodependente === "Filho Adotivo" ? 6 :
+                      dependente.grauparentescodependente === "Irmão(a)" ? 7 :
+                      dependente.grauparentescodependente === "Mãe" ? 8 :
+                      dependente.grauparentescodependente === "Pai" ? 9 :
+                      dependente.grauparentescodependente === "Neto(a)" ? 10 :
+                      dependente.grauparentescodependente === "Sobrinho(a)" ? 11 :
+                      dependente.grauparentescodependente === "Sogro" ? 12 :
+                      dependente.grauparentescodependente === "Enteado" ? 13 :
+                      dependente.grauparentescodependente === "Tutelado" ? 14 :
+                      dependente.grauparentescodependente === "Sogra" ? 15 :
+                      dependente.grauparentescodependente === "Genro" ? 16 :
+                      dependente.grauparentescodependente === "Nora" ? 17 :
+                      dependente.grauparentescodependente === "Cunhado(a)" ? 18 :
+                      dependente.grauparentescodependente === "Primo(a)" ? 19 :
+                      dependente.grauparentescodependente === "Avô" ? 20 :
+                      dependente.grauparentescodependente === "Avó" ? 21 :
+                      dependente.grauparentescodependente === "Tio" ? 22 :
+                      dependente.grauparentescodependente === "Tia" ? 23 :
+                      dependente.grauparentescodependente === "Bisneto" ? 24 :
+                      dependente.grauparentescodependente === "Madrasta" ? 25 : 26,
+                "nome": dependente.grauparentescodependente
+              },
+              "statusBeneficiario": {
+                "id": 0,
+                "nome": "Ativo"
               }
-            }
-          }
-        );
-      }
+            };
+            jsonModeloDS.beneficiarioList.push(dependenteObj);
+          } catch (error) {
+            console.error('Erro ao dar push do dependente no objeto dependentes', error)
+          }   
+        }));
 
-      if (dependentes.length > 0) {
-        insertDependente(dependentes.shift());
-      } else {
-        resolve(); // Nenhum dependente para inserir
-      }
-    });
-  }
-
-  function consultarNumeroProposta(connection, idImplantacao) {
-    return new Promise((resolve, reject) => {
-      connection(
-        "SELECT numeroProposta FROM implantacoes WHERE id=?",
-        [idImplantacao],
-        (err, result) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result[0].numeroProposta);
-          }
+        try {
+          await salvarAnexos(resultImplantacaoId, anexos);
+        } catch (error) {
+          console.error("Erro ao salvar anexos:", error);
         }
-      );
-    });
-  }
 
-  async function commitTransaction() {
-    return new Promise((resolve, reject) => {
-      db.commit((err) => {
-        if (err) {
-          logger.error({
-            message: "Erro ao dar Commit no BD das infos",
-            error: err.message,
-            stack: err.stack,
-            timestamp: new Date().toISOString(),
-          });
-          reject(err);
-        } else {
-          resolve();
+        try {
+          await sendContractEmail(
+            dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular,
+            resultImplantacaoId,
+            numeroProposta,
+            dados.cpffinanceiro,
+            dados.nomefinanceiro,
+            dados.profissaotitular
+          );
+        } catch (error){
+          console.error('Erro ao enviar email com contrato', error)
         }
-      });
-    });
-  }
 
-  async function rollbackTransaction() {
-    return new Promise((resolve, reject) => {
-      db.rollback(() => {
-        resolve();
-      });
-    });
-  }
-}); */
+        try {
+          await enviarPropostaDigitalSaude(jsonModeloDS);
+        } catch (error) {
+          console.error('Erro ao enviar proposta pro digital saúde', error)
+        }
 
+        try {
+          await sendStatus(resultImplantacaoId, 2, "Implantação realizada com sucesso ao Ecommerce");
+        } catch (error) {
+          console.error('Erro ao mudar status da proposta', error)
+        }
+        
+        res.status(200).send({ message: "Implantação realizada com sucesso!" });  
+      })
+      .catch((error) => {
+        console.error("Erro durante a implantação:", error);
+        res.status(500).send({ error: error.message });
+      });
+    } catch (error) {
+      console.error("Erro geral:", error);
+      res.status(500).send({ error: error.message });
+    }
+});
 
 app.get("/buscar-corretor", async (req, res) => {
   try {
@@ -1292,66 +1112,6 @@ app.get("/buscar-cep", async (req, res) => {
   }
 });
 
-function generateRandomDigits(length) {
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += Math.floor(Math.random() * 10);
-  }
-  return result;
-}
-
-async function generateUniqueProposalNumber() {
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0"); // Mês com 2 dígitos
-  const day = currentDate.getDate().toString().padStart(2, "0"); // Dia com 2 dígitos
-  let randomPart;
-
-  // Tente gerar um número único até encontrar um que não exista no banco de dados
-  while (true) {
-    randomPart = generateRandomDigits(4); // 4 dígitos aleatórios
-    const proposalNumber = `${year}${month}${day}${randomPart}`;
-
-    const exists = await checkProposalExists(proposalNumber);
-    if (!exists) {
-      return proposalNumber; // Retorna o número único
-    }
-  }
-}
-
-function checkProposalExists(proposalNumber) {
-  return new Promise((resolve, reject) => {
-    db.query(
-      "SELECT * FROM implantacoes WHERE numeroProposta = ?",
-      [proposalNumber],
-      (err, results) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(results.length > 0);
-        }
-      }
-    );
-  });
-}
-
-async function sendStatus(idImplantacao, idStatus, mensagem) {
-  const query =
-    "INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)";
-    db.query(query, [idStatus, idImplantacao, mensagem], (err, result) => {
-    if (err) {
-      console.log("Erro ao inserir valores na tabela de status" + err);
-      logger.error({
-        message: "Erro ao inserir valores na tabela de status",
-        error: err.message,
-        stack: err.stack,
-        timestamp: new Date().toISOString(),
-      });
-    }
-    return;
-  });
-}
-
 app.get("/preview-email", (req, res) => {
   const dadosEmail = {
     nomeTitularFinanceiro: "Nome Exemplo Cliente",
@@ -1368,8 +1128,6 @@ app.get("/preview-success", (req, res) => {
   };
   res.render("sucesso", dados);
 });
-
-
 
 app.get("/enviar-email/:id", async (req, res) => {
   const idImplantacao = req.params.id;
@@ -1604,7 +1362,8 @@ app.post("/salva-assinatura", (req, res) => {
   });
 });
 
-app.post("/login-verifica", (req, res) => {
+app.post("/login-verifica", async (req, res) => {
+  const db = await mysql.createPool(config);
   const { username, password } = req.body;
 
   const query = "SELECT * FROM users WHERE username = ?";
@@ -1638,7 +1397,8 @@ app.get("/sucesso", (req, res) => {
   res.render("sucesso", { numeroPropostaGerado: "264646464" });
 });
 
-app.get("/implantacoes", verificaAutenticacao, (req, res) => {
+app.get("/implantacoes", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   const query =
     "SELECT i.id, i.numeroProposta, i.cpftitular, i.nomecompleto, i.data_implantacao, i.planoSelecionado, p.nome_do_plano FROM implantacoes i JOIN planos p ON i.planoSelecionado = p.id";
 
@@ -1694,11 +1454,12 @@ app.get("/implantacao/:id", verificaAutenticacao, (req, res) => {
   });
 });
 
-app.get("/visualizaImplantacao/:id", verificaAutenticacao, (req, res) => {
+app.get("/visualizaImplantacao/:id", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   const idImplantacao = req.params.id;
   const queryImplantacoes = "SELECT * FROM implantacoes WHERE id=?";
   const queryPlano = "SELECT * FROM planos WHERE id=?";
-  const queryProfissao = "SELECT * FROM profissoes WHERE nome= ?";
+  const queryProfissao = "SELECT * FROM profissoes WHERE id= ?";
   const queryEntidade = "SELECT * FROM entidades WHERE id=?";
   const queryDependentes =
     "SELECT * FROM dependentes WHERE id_implantacoes = ?";
@@ -1810,7 +1571,8 @@ app.get("/visualizaImplantacao/:id", verificaAutenticacao, (req, res) => {
   });
 });
 
-app.get("/planos", verificaAutenticacao, (req, res) => {
+app.get("/planos", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   const queryPlanos = "SELECT * FROM planos";
   const files = fs.readdirSync("arquivos/");
 
@@ -1827,103 +1589,84 @@ app.get("/planos", verificaAutenticacao, (req, res) => {
   });
 });
 
-app.post("/atualiza-planos", verificaAutenticacao, (req, res) => {
+app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   const { plano } = req.body;
-
-  // Inicie a transação
-  db.beginTransaction((err) => {
-    if (err) {
-      console.error("Erro ao iniciar a transação:", err);
-      return res.status(500).json({ message: "Erro interno do servidor" });
+  db.query("SELECT *FROM planos WHERE id = ?", [plano.id], (err, result) => {
+    if(err) {
+      console.error('Erro ao consultar plano ao tentar atualiza-lo', err)
     }
-
-    // Verifique se o plano já existe no banco de dados
-    const selectQuery = "SELECT id FROM planos WHERE id = ?";
-    db.query(selectQuery, [plano.id], (err, rows) => {
-      if (err) {
-        console.error("Erro ao consultar plano:", err);
-        return rollbackAndRespond(res, "Erro interno do servidor");
-      }
-
-      if (rows.length > 0) {
-        // O plano existe, atualize-o
-        const updateQuery =
-          "UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ?, pgtoAnualAvista = ?, pgtoAnualCartao =? , pgtoAnualCartao3x = ? , reajuste = ? WHERE id = ?";
-        db.query(
-          updateQuery,
-          [
-            plano.nome_do_plano,
-            plano.ans,
-            plano.descricao,
-            plano.observacoes,
-            plano.logoSrc,
-            plano.bannerSrc,
-            plano.contratacao,
-            plano.coparticipacao,
-            plano.abrangencia,
-            plano.pgtoAnualAvista,
-            plano.pgtoAnualCartao,
-            plano.pgtoAnualCartao3x,
-            plano.reajuste,
-            plano.id,
-          ],
-          (err, result) => {
-            if (err) {
-              console.error("Erro ao atualizar plano:", err);
-              return rollbackAndRespond(res, "Erro interno do servidor");
-            }
-            res.cookie("alertSuccess", "Plano atualizado com sucesso", {
-              maxAge: 3000,
-            });
-            res.status(200).json({ message: "Plano atualizado com sucesso" });
+    if (result.length > 0) {
+      // O plano existe, atualize-o
+      const updateQuery =
+        "UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ?, pgtoAnualAvista = ?, pgtoAnualCartao =? , pgtoAnualCartao3x = ? , reajuste = ? WHERE id = ?";
+      db.query(
+        updateQuery,
+        [
+          plano.nome_do_plano,
+          plano.ans,
+          plano.descricao,
+          plano.observacoes,
+          plano.logoSrc,
+          plano.bannerSrc,
+          plano.contratacao,
+          plano.coparticipacao,
+          plano.abrangencia,
+          plano.pgtoAnualAvista,
+          plano.pgtoAnualCartao,
+          plano.pgtoAnualCartao3x,
+          plano.reajuste,
+          plano.id,
+        ],
+        (err, result) => {
+          if (err) {
+            console.error("Erro ao atualizar plano:", err);
+            return rollbackAndRespond(res, "Erro interno do servidor");
           }
-        );
-      } else {
-        // O plano não existe, crie-o
-        const createQuery =
-          "INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia, pgtoAnualAvista, pgtoAnualCartao, pgtoAnualCartao3x, reajuste) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        db.query(
-          createQuery,
-          [
-            plano.nome_do_plano,
-            plano.ans,
-            plano.descricao,
-            plano.observacoes,
-            plano.logoSrc,
-            plano.bannerSrc,
-            plano.contratacao,
-            plano.coparticipacao,
-            plano.abrangencia,
-            plano.pgtoAnualAvista,
-            plano.pgtoAnualCartao,
-            plano.pgtoAnualCartao3x,
-            plano.reajuste,
-          ],
-          (err, result) => {
-            if (err) {
-              console.error("Erro ao criar plano:", err);
-              return rollbackAndRespond(res, "Erro interno do servidor");
-            }
-            res.cookie("alertSuccess", "Plano inserido com sucesso", {
-              maxAge: 3000,
-            });
-            res.status(200).json({ message: "Plano inserido com sucesso" });
+          res.cookie("alertSuccess", "Plano atualizado com sucesso", {
+            maxAge: 3000,
+          });
+          res.status(200).json({ message: "Plano atualizado com sucesso" });
+        }
+      );
+    } else {
+      // O plano não existe, crie-o
+      const createQuery =
+        "INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia, pgtoAnualAvista, pgtoAnualCartao, pgtoAnualCartao3x, reajuste) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      db.query(
+        createQuery,
+        [
+          plano.nome_do_plano,
+          plano.ans,
+          plano.descricao,
+          plano.observacoes,
+          plano.logoSrc,
+          plano.bannerSrc,
+          plano.contratacao,
+          plano.coparticipacao,
+          plano.abrangencia,
+          plano.pgtoAnualAvista,
+          plano.pgtoAnualCartao,
+          plano.pgtoAnualCartao3x,
+          plano.reajuste,
+        ],
+        (err, result) => {
+          if (err) {
+            console.error("Erro ao criar plano:", err);
+            return rollbackAndRespond(res, "Erro interno do servidor");
           }
-        );
-      }
-    });
-  });
+          res.cookie("alertSuccess", "Plano inserido com sucesso", {
+            maxAge: 3000,
+          });
+          res.status(200).json({ message: "Plano inserido com sucesso" });
+        }
+      );
+    }
+  })
 });
 
-function rollbackAndRespond(res, message) {
-  // Reverter a transação em caso de erro
-  db.rollback(() => {
-    console.error("Transação revertida.");
-    res.status(500).json({ message });
-  });
-}
-
-app.post("/deleta-plano", verificaAutenticacao, (req, res) => {
+app.post("/deleta-plano", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   const idPlano = req.body.id;
   const query = "DELETE FROM planos WHERE id = ?";
   db.query(query, [idPlano], (err, result) => {
@@ -1937,7 +1680,8 @@ app.post("/deleta-plano", verificaAutenticacao, (req, res) => {
   });
 });
 
-app.get("/entidades", verificaAutenticacao, (req, res) => {
+app.get("/entidades", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   db.query("SELECT * FROM entidades", (error, resultsEntidades) => {
     if (error) throw error;
     res.render("entidades", {
@@ -1947,7 +1691,8 @@ app.get("/entidades", verificaAutenticacao, (req, res) => {
   });
 });
 
-app.get("/api/profissoes/:id", verificaAutenticacao, (req, res) => {
+app.get("/api/profissoes/:id", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   var idEntidade = req.params.id;
   db.query(
     "SELECT * FROM profissoes WHERE idEntidade = ?",
@@ -1962,87 +1707,35 @@ app.get("/api/profissoes/:id", verificaAutenticacao, (req, res) => {
   );
 });
 
-app.post("/editar-entidade/:id", verificaAutenticacao, (req, res) => {
+app.post("/editar-entidade/:id", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   const idEntidade = req.params.id;
   const { nome, descricao, publico, documentos, taxa, profissoes } = req.body;
-
-  const sql =
-    "UPDATE entidades SET nome=?, descricao=?, publico=?, documentos=?, taxa=? WHERE id=?";
-  const sqlDeleteProfissoes = "DELETE FROM profissoes WHERE idEntidade = ?";
-  const sqlInsertProfissoes =
-    "INSERT INTO profissoes (nome, idEntidade) VALUES (?, ?)";
-
-  // Verifique se há algo dentro de profissoes
-  if (Array.isArray(profissoes) && profissoes.length > 0) {
-    db.query(sqlDeleteProfissoes, [idEntidade], (err, result) => {
-      if (err) {
-        console.error("Erro ao deletar profissões relacionadas", err);
-      }
-      db.query(
-        sql,
-        [nome, descricao, publico, documentos, taxa, idEntidade],
-        (error, result) => {
-          if (error) {
-            console.error("Erro ao atualizar entidade:", error);
-            res.cookie(
-              "alertError",
-              "Erro ao atualizar Entidade, verifique e tente novamente",
-              {
-                maxAge: 3000,
-              }
-            );
-            res.status(500).json({ message: "Erro interno do servidor" });
+  
+  await db.query(
+    qInsEntidade,
+    [nome, descricao, publico, documentos, taxa, idEntidade],
+    async (error, result) => {
+      if (error) {
+        console.error("Erro ao atualizar entidade:", error);
+        res.cookie(
+          "alertError",
+          "Erro ao atualizar Entidade, verifique e tente novamente",
+          {
+            maxAge: 3000,
           }
-          profissoes.forEach((profissao) => {
-            db.query(
-              sqlInsertProfissoes,
-              [profissao, idEntidade],
-              (err, result) => {
-                if (err) {
-                  console.error(
-                    "Erro ao CADASTRAR profissões relacionadas",
-                    err
-                  );
-                }
-                res.cookie("alertSuccess", "Entidade atualizada com Sucesso", {
-                  maxAge: 3000,
-                });
-                res
-                  .status(200)
-                  .json({ message: "Entidade atualizada com sucesso" });
-              }
-            );
-          });
-        }
-      );
-    });
-  } else {
-    // Se profissoes estiver vazio, continue sem excluir ou inserir
-    db.query(
-      sql,
-      [nome, descricao, publico, documentos, taxa, idEntidade],
-      (error, result) => {
-        if (error) {
-          console.error("Erro ao atualizar entidade:", error);
-          res.cookie(
-            "alertError",
-            "Erro ao atualizar Entidade, verifique e tente novamente",
-            {
-              maxAge: 3000,
-            }
-          );
-          res.status(500).json({ message: "Erro interno do servidor" });
-        }
-        res.cookie("alertSuccess", "Entidade atualizada com Sucesso", {
-          maxAge: 3000,
-        });
-        res.status(200).json({ message: "Entidade atualizada com sucesso" });
+        );
+        res.status(500).json({ message: "Erro interno do servidor" });
+        return; // Retorne caso haja erro
       }
-    );
-  }
+
+      res.cookie("alertSuccess", "Entidade atualizada com Sucesso", { maxAge: 3000 });
+      res.status(200).json({ message: "Entidade atualizada com sucesso" });
+    });
 });
 
-app.delete("/excluir-entidade/:id", verificaAutenticacao, (req, res) => {
+app.delete("/excluir-entidade/:id", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   const idEntidade = req.params.id;
 
   // Verifique se existem registros na tabela "formularios_entidades" vinculados a esta entidade
@@ -2084,7 +1777,8 @@ app.delete("/excluir-entidade/:id", verificaAutenticacao, (req, res) => {
   });
 });
 
-app.post("/cadastrar-entidade", verificaAutenticacao, (req, res) => {
+app.post("/cadastrar-entidade", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
   const { nome, descricao, publico, documentos, taxa, profissoes } = req.body;
   const sql =
     "INSERT INTO entidades (nome, descricao, publico, documentos, taxa) VALUES (?, ?, ?, ?, ?)";
@@ -2136,6 +1830,10 @@ app.get("/logout", (req, res) => {
 
 app.post("/error404", (res, req) => {
   res.render("404");
+});
+
+app.listen(port, () => {
+  console.log(`Servidor rodando na porta ${port}`);
 });
 
 app.use((req, res, next) => {

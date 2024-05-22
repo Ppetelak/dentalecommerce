@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Entidades</title>
+    <title>Cadastro de Entidades e Profissões</title>
     <link rel="icon" type="image/png" href="./img/faviconV2_mounthermon.png" sizes="32x32">
 
     <!-- IMPORTAÇÕES JQUERY  -->
@@ -73,20 +73,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="col md-6">
-                    <div class="col mb-3 profissoesDiv">
-                        <label for="profissoes" class="form-label">Profissões: </label>
-                       <div class="inputProfissoes">
-
-                        </div>
-                        <span>Adicione a profissão no campo abaixo e de Enter ou clique no "+" </span>
-                        <div class="add">
-                            
-                            <input type="text" class="tags" class="p-4">
-                            <button type="button" class="btn btn-primary addTag"> <i class="bi bi-plus"></i> </button>
-                        </div>
-                    </div>
-                </div>
             </div>
             <button type="submit" class="btn btn-primary cadastrar">Cadastrar</button>
         </form>
@@ -144,19 +130,7 @@
                                                 <input type="text" class="form-control" id="descricao" name="descricao"
                                                     value="<%= entidade.descricao %>" required>
                                             </div>
-                                            <div class="mb-3">
-                                                <div class="col mb-3 profissoesDiv">
-                                                    <label for="profissoes" class="form-label">Profissões: </label><span>Adicione a profissão no campo abaixo e de Enter ou clique no "+" </span>
-                                                   <div class="inputProfissoes">
-                            
-                                                    </div>
-                                                    
-                                                    <div class="add">
-                                                        <input type="text" class="tags" class="p-4">
-                                                        <button type="button" class="btn btn-primary addTag"> <i class="bi bi-plus"></i> </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            
                                         </td>
                                         <!-- Segunda coluna com os campos restantes de edição -->
                                         <td>
