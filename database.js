@@ -1,9 +1,6 @@
-//const mysql = require('mysql2/promise');
-
 const mysql = require('promise-mysql');
 
-
-const config = {
+const configMidia = {
     host: "localhost",
     user: "root",
     port: "3306",
@@ -12,6 +9,17 @@ const config = {
     waitForConnections: true,
     connectionLimit: 50, // Ajuste conforme necessário
     queueLimit: 0,
+}
+
+const configDev = {
+    host: "pablopetelak.com",
+    user: "u654656997_dev",
+    port: "3306",
+    password: "0Uc0d53^w",
+    database: "u654656997_mhvendasdev",
+    waitForConnections: true,
+    connectionLimit: 50, // Ajuste conforme necessário
+    queueLimit: 0
 }
 
 const configProd = {
@@ -79,8 +87,10 @@ const qInsDependentes = `INSERT INTO dependentes (
 `;
 
 const  qInsEntidade =`
-  UPDATE entidades SET nome=?, descricao=?, publico=?, documentos=?, taxa=? WHERE id=?
-  `;
+    UPDATE entidades SET nome=?, descricao=?, publico=?, documentos=?, taxa=? WHERE id=?
+`;
+
+const config = configDev;
 
 module.exports = {
     mysql,
