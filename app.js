@@ -263,7 +263,7 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
 
   const data = JSON.stringify(jsonModeloDS);
 
-  const config = {
+  const configDS = {
     headers: {
       "Content-Type": "application/json",
       "token": token,
@@ -274,7 +274,7 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
   console.log(data);
 
   try {
-    const response = await axios.post(apiUrl, data, config);
+    const response = await axios.post(apiUrl, data, configDS);
     
     // Verificação dos códigos de status
     if (response.status === 200) {
@@ -310,8 +310,6 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
     }
   }
 }
-
-
 
 function generateRandomDigits(length) {
   let result = "";
@@ -383,6 +381,15 @@ function rollbackAndRespond(res, message) {
     }
     res.status(500).json({ message });
   });
+}
+
+async function enviarErroDiscord(mensagem) {
+  try {
+    await axios.post('https://bot.midiaideal.com/mensagem-erros-ecommerce', { mensagem });
+    console.log('Mensagem enviada com sucesso');
+  } catch (error) {
+      console.error('Erro ao enviar mensagem erro:', error);
+  }
 }
 
 /* ---------------------------------------- ROTAS ---------------------------------------- */
@@ -1072,7 +1079,7 @@ app.get("/buscar-corretor", async (req, res) => {
     const token = "X43ADVSEXM";
     const senhaApi = "kgt87pkxc2";
 
-    const config = {
+    const configDS = {
       headers: {
         "Content-Type": "text/plain;charset=UTF-8",
         token: `${token}`,
@@ -1082,10 +1089,16 @@ app.get("/buscar-corretor", async (req, res) => {
 
     // Fazer a solicitação à API
     const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`;
-    const response = await axios.get(apiUrl, config);
+    const response = await axios.get(apiUrl, configDS);
 
     // Verificar se a API retornou algum resultado
     if (response.data.length === 0) {
+      enviarErroDiscord(
+        `
+        Erro na busca pelo corretor \n
+        ${response.data}
+        `
+      )
       return res.status(404).json({ error: "Corretor não encontrado" });
     }
 
