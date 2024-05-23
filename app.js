@@ -44,6 +44,7 @@ app.use("/css", express.static("css"));
 app.use("/js", express.static("js"));
 app.use("/img", express.static("img"));
 app.use("/arquivos", express.static("arquivos"));
+app.use("/uploads", express.static("uploads"));
 app.use("/formulario", express.static("formulario"));
 app.use("/bootstrap-icons", express.static("node_modules/bootstrap-icons"));
 app.set("view engine", "ejs");
@@ -255,7 +256,7 @@ function formatarDataDs(data) {
   return dataFormatada;
 }
 
-async function enviarPropostaDigitalSaude(jsonModeloDS) {
+async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
   const token = "X43ADVSEXM";
   const senhaApi = "kgt87pkxc2";
   const apiUrl = "https://digitalsaude.com.br/api/v2/contrato/";
@@ -264,9 +265,9 @@ async function enviarPropostaDigitalSaude(jsonModeloDS) {
 
   const config = {
     headers: {
-      "Content-Type": "application/json", // Define o tipo de conteúdo como JSON
-      "token": token, // Adiciona o token como um cabeçalho da solicitação
-      "senhaApi": senhaApi // Adiciona a senha da API como um cabeçalho da solicitação
+      "Content-Type": "application/json",
+      "token": token,
+      "senhaApi": senhaApi
     }
   };
 
@@ -274,11 +275,43 @@ async function enviarPropostaDigitalSaude(jsonModeloDS) {
 
   try {
     const response = await axios.post(apiUrl, data, config);
-    console.log(response.data);
+    
+    // Verificação dos códigos de status
+    if (response.status === 200) {
+      await sendStatus(idImplantacao, 4, 'Implantação realizada com sucesso no digital saúde');
+      console.log("Proposta enviada com sucesso:", response.data);
+      //return { success: true, data: response.data };
+    } else {
+      await sendStatus(idImplantacao, 4, "Erro ao enviar proposta para o digital");
+      console.error(`Erro: Recebido status ${response.status}`);
+      //return { success: false, message: `Erro: Recebido status ${response.status}` };
+    }
   } catch (error) {
-    console.error("Erro ao enviar a proposta:", error);
+    await sendStatus(idImplantacao, 4, "Erro ao enviar proposta para o digital");
+    if (error.response) {
+      // A resposta foi recebida e o servidor respondeu com um código de status diferente de 2xx
+      const status = error.response.status;
+      let message = "Erro desconhecido ao enviar a proposta.";
+      
+      if (status === 400) {
+        message = "Requisição inválida (400). Verifique os dados enviados.";
+      } else if (status === 401) {
+        message = "Acesso não autorizado (401). Verifique suas credenciais.";
+      } else if (status === 500) {
+        message = "Erro interno no servidor (500). Tente novamente mais tarde.";
+      }
+      
+      console.error(message, error.response.data);
+      //return { success: false, message: message, data: error.response.data };
+    } else {
+      // Ocorreu um erro ao configurar a solicitação ou algo similar
+      console.error("Erro ao enviar a proposta:", error.message);
+      //return { success: false, message: "Erro ao enviar a proposta.", data: error.message };
+    }
   }
 }
+
+
 
 function generateRandomDigits(length) {
   let result = "";
@@ -713,6 +746,10 @@ app.post("/testeFormulario", async (req, res) => {
     const dependentes = req.body.dependentes;
     const anexos = req.body.anexos;
 
+    console.log({
+      dados, dependentes, anexos
+    })
+
     var cpffinanceiro = dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular
     var nomefinanceiro = dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto;
     var datadenascimentofinanceiro = dados.datadenascimentofinanceiro ? dados.datadenascimentofinanceiro : dados.datadenascimento;
@@ -762,8 +799,42 @@ app.post("/testeFormulario", async (req, res) => {
       dados.aceitoTermos,
       dados.aceitoPrestacaoServicos,
       dados.planoSelecionado,
-      numeroProposta
+      numeroProposta,
+      dados.idEntidade
     ];
+
+    async function obsDigitalSaude () {
+
+      if(dados.titularresponsavelfinanceiro === "Sim") {
+        return `O TITULAR É O MESMO TITULAR FINANCEIRO`;
+      } else {
+        return ( 
+          `
+          O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
+          ----> Dados responsável Financeiro <---- \n
+          CPF: ${dados.cpffinanceiro} \n
+          Nome: ${dados.nomefinanceiro} \n
+          Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
+          Telefone: ${dados.telefonetitularfinanceiro} \n
+          Email: ${dados.emailtitularfinanceiro} \n
+          Sexo: ${dados.sexotitularfinanceiro} \n
+          Estado Civil: ${dados.estadociviltitularfinanceiro} \n
+          Grau de Parentesco: ${dados.grauparentesco} \n
+          `
+        ) ;
+      }
+
+    }
+
+    let observacoesDigitalSaude = await obsDigitalSaude ();
+
+    observacoesDigitalSaude += 
+      `
+      \n
+      Pagamento: 
+        ${dados.formaPagamento === 1 ? "Boleto" : 
+          dados.formaPagamento === 2? "Cartão de Crédito em 12x" : "Cartão de Crédito em 3x"} \n
+      `;
 
     const jsonModeloDS = {
       "numeroProposta": `${numeroProposta}`,
@@ -771,7 +842,7 @@ app.post("/testeFormulario", async (req, res) => {
       "diaVencimento": 1,
       "cpfResponsavel": dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
       "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
-      "observacao": `teste`,
+      "observacao": `${observacoesDigitalSaude}`,
       "plano": {
         "codigo": "VMR5GRUEPJ"
       },
@@ -846,38 +917,7 @@ app.post("/testeFormulario", async (req, res) => {
       ]
     }
 
-    async function obsDigitalSaude () {
-
-      if(dados.titularresponsavelfinanceiro === "Sim") {
-        return `O TITULAR É O MESMO TITULAR FINANCEIRO`;
-      } else {
-        return ( 
-          `
-          O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
-          ----> Dados responsável Financeiro <---- \n
-          CPF: ${dados.cpffinanceiro} \n
-          Nome: ${dados.nomefinanceiro} \n
-          Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
-          Telefone: ${dados.telefonetitularfinanceiro} \n
-          Email: ${dados.emailtitularfinanceiro} \n
-          Sexo: ${dados.sexotitularfinanceiro} \n
-          Estado Civil: ${dados.estadociviltitularfinanceiro} \n
-          Grau de Parentesco: ${dados.grauparentescofinanceiro} \n
-          `
-        ) ;
-      }
-
-    }
-
-    let observacoesDigitalSaude = await obsDigitalSaude ();
-
-    observacoesDigitalSaude += 
-      `
-      \n
-      Pagamento: 
-        ${dados.formaPagamento === 1 ? "Boleto" : 
-          dados.formaPagamento === 2? "Cartão de Crédito em 12x" : "Cartão de Crédito em 3x"} \n
-      `;
+    
     
     /* INSERÇÃO DE DADOS AO BANCO DE DADOS DAS INFORMAÇÕES SOBRE A IMPLANTAÇÃO */
 
@@ -999,18 +1039,21 @@ app.post("/testeFormulario", async (req, res) => {
         }
 
         try {
-          await enviarPropostaDigitalSaude(jsonModeloDS);
+          await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
         } catch (error) {
-          console.error('Erro ao enviar proposta pro digital saúde', error)
+          // Tratamento de erro adicional, se necessário
+          await sendStatus(resultImplantacaoId, 4, "Erro ao enviar proposta para o digital");
+          console.error("Erro inesperado ao enviar proposta:", error);
         }
+        
 
         try {
           await sendStatus(resultImplantacaoId, 2, "Implantação realizada com sucesso ao Ecommerce");
         } catch (error) {
           console.error('Erro ao mudar status da proposta', error)
         }
-        
-        res.status(200).send({ message: "Implantação realizada com sucesso!" });  
+        res.render('sucesso', {numeroPropostaGerado: numeroProposta})
+        //res.status(200).send({ message: "Implantação realizada com sucesso!" });  
       })
       .catch((error) => {
         console.error("Erro durante a implantação:", error);
@@ -1170,8 +1213,8 @@ app.get("/login", (req, res) => {
 
 /* ROTA PARA ASSINATURA DO CONTRATO */
 app.get(
-  "/assinar/:idImplantacao/:numeroProposta/:cpfTitularFinanceiro/:idEntidade",
-  (req, res) => {
+  "/assinar/:idImplantacao/:numeroProposta/:cpfTitularFinanceiro/:idEntidade", async (req, res) => {
+    const db = await mysql.createPool(config);
     const numeroProposta = req.params.numeroProposta;
     const cpfTitular = req.params.cpfTitularFinanceiro;
 
@@ -1180,7 +1223,6 @@ app.get(
     const idImplantacao = req.params.idImplantacao;
     const queryImplantacoes = "SELECT * FROM implantacoes WHERE id=?";
     const queryPlano = "SELECT * FROM planos WHERE id=?";
-    const queryProfissao = "SELECT * FROM profissoes WHERE nome= ?";
     const queryEntidade = "SELECT * FROM entidades WHERE id=?";
     const queryDependentes =
       "SELECT * FROM dependentes WHERE id_implantacoes = ?";
@@ -1215,6 +1257,7 @@ app.get(
       }
 
       const idImplantacao = resultImplantacoes[0].id;
+      const planoId = resultImplantacoes[0].planoSelecionado;
 
       db.query(queryEntidade, [idEntidade], (err, resultEntidade) => {
         if (err) {
@@ -1226,7 +1269,7 @@ app.get(
           });
           console.error("Erro puxar entidade relacionada", err);
         }
-        const planoId = resultImplantacoes[0].planoSelecionado;
+        
         db.query(queryPlano, [planoId], (err, resultPlano) => {
           if (err) {
             logger.error({
@@ -1333,7 +1376,8 @@ app.get(
 );
 
 /* ROTA PARA SALVAR ASSINATURA DO CONTRATO */
-app.post("/salva-assinatura", (req, res) => {
+app.post("/salva-assinatura", async (req, res) => {
+  const db = await mysql.createPool(config);
   const idImplantacao = req.body.idImplantacao;
   const assinatura = req.body.assinatura_base64;
   const sqlInsertAsign =
@@ -1459,113 +1503,106 @@ app.get("/visualizaImplantacao/:id", verificaAutenticacao, async (req, res) => {
   const idImplantacao = req.params.id;
   const queryImplantacoes = "SELECT * FROM implantacoes WHERE id=?";
   const queryPlano = "SELECT * FROM planos WHERE id=?";
-  const queryProfissao = "SELECT * FROM profissoes WHERE id= ?";
   const queryEntidade = "SELECT * FROM entidades WHERE id=?";
   const queryDependentes =
     "SELECT * FROM dependentes WHERE id_implantacoes = ?";
   const queryDocumentos =
-    "SELECT * FROM documentos_implantacoes WHERE id_implantacao = ?";
+    "SELECT * FROM anexos_implantacoes WHERE id_implantacao = ?";
   const queryStatus =
     "SELECT * FROM status_implantacao WHERE idimplantacao = ?";
 
-  db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
-    if (err) {
-      console.log("Erro ao buscar implantação no BD", err);
-      res.status(500).send("Erro ao buscar implantação no BD");
-      return;
-    }
+  
 
-    if (resultImplantacoes.length === 0) {
-      res.status(404).send("Implantação não encontrada");
-      return;
-    }
+db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
+  if (err) {
+    console.log("Erro ao buscar implantação no BD", err);
+    res.status(500).send("Erro ao buscar implantação no BD");
+    return;
+  }
 
-    const idImplantacao = resultImplantacoes[0].id;
+  if (resultImplantacoes.length === 0) {
+    res.status(404).send("Implantação não encontrada");
+    return;
+  }
 
-    const nomeProfissao = resultImplantacoes[0].profissaotitular;
+  const idImplantacao = resultImplantacoes[0].id;
 
-    db.query(queryProfissao, [nomeProfissao], (err, resultProfissao) => {
+  const entidadeId = resultImplantacoes[0].idEntidade;
+
+  const planoId = resultImplantacoes[0].planoSelecionado;
+
+    db.query(queryEntidade, [entidadeId], (err, resultEntidade) => {
       if (err) {
-        console.error(
-          "Erro ao buscar dados da entidade relacionada a profissão"
-        );
+        console.error("Erro puxar entidade relacionada", err);
       }
-      const entidadeId = resultProfissao[0].idEntidade;
-
-      db.query(queryEntidade, [entidadeId], (err, resultEntidade) => {
+      
+      db.query(queryPlano, [planoId], (err, resultPlano) => {
         if (err) {
-          console.error("Erro puxar entidade relacionada", err);
+          console.error("Erro ao buscar plano vinculado à implantação", err);
+          res
+            .status(500)
+            .send("Erro ao buscar plano vinculado à implantação");
+          return;
         }
-        const planoId = resultImplantacoes[0].planoSelecionado;
-        db.query(queryPlano, [planoId], (err, resultPlano) => {
-          if (err) {
-            console.error("Erro ao buscar plano vinculado à implantação", err);
-            res
-              .status(500)
-              .send("Erro ao buscar plano vinculado à implantação");
-            return;
-          }
-          db.query(
-            queryDependentes,
-            [idImplantacao],
-            (err, resultDependentes) => {
-              if (err) {
-                console.error(
-                  "Erro na busca pelos dependentes vinculados a essa implantacao",
-                  err
-                );
-              }
-              db.query(
-                queryDocumentos,
-                [idImplantacao],
-                (err, resultDocumentos) => {
-                  if (err) {
-                    console.error(
-                      "Erro na busca pelos documentos vinculados a implantação",
-                      err
-                    );
-                  }
-                  db.query(
-                    queryStatus,
-                    [idImplantacao],
-                    (err, resultStatus) => {
-                      if (err) {
-                        console.error(
-                          "Erro ao buscar status da implantacao",
-                          err
-                        );
-                      }
-                      const data_implantacao = new Date(
-                        resultImplantacoes[0].data_implantacao
-                      );
-                      const dia = String(data_implantacao.getDate()).padStart(
-                        2,
-                        "0"
-                      );
-                      const mes = String(
-                        data_implantacao.getMonth() + 1
-                      ).padStart(2, "0");
-                      const ano = data_implantacao.getFullYear();
-                      const dataFormatada = `${dia}/${mes}/${ano}`;
-
-                      res.render("detalhes-implantacao", {
-                        implantacao: resultImplantacoes[0],
-                        plano: resultPlano[0],
-                        dataFormatada: dataFormatada,
-                        entidade: resultEntidade[0],
-                        profissao: resultProfissao[0],
-                        dependentes: resultDependentes,
-                        documento: resultDocumentos[0],
-                        status: resultStatus,
-                        rotaAtual: "implantacoes",
-                      });
-                    }
-                  );
-                }
+        db.query(
+          queryDependentes,
+          [idImplantacao],
+          (err, resultDependentes) => {
+            if (err) {
+              console.error(
+                "Erro na busca pelos dependentes vinculados a essa implantacao",
+                err
               );
             }
-          );
-        });
+            db.query(
+              queryDocumentos,
+              [idImplantacao],
+              (err, resultDocumentos) => {
+                if (err) {
+                  console.error(
+                    "Erro na busca pelos documentos vinculados a implantação",
+                    err
+                  );
+                }
+                db.query(
+                  queryStatus,
+                  [idImplantacao],
+                  (err, resultStatus) => {
+                    if (err) {
+                      console.error(
+                        "Erro ao buscar status da implantacao",
+                        err
+                      );
+                    }
+                    const data_implantacao = new Date(
+                      resultImplantacoes[0].data_implantacao
+                    );
+                    const dia = String(data_implantacao.getDate()).padStart(
+                      2,
+                      "0"
+                    );
+                    const mes = String(
+                      data_implantacao.getMonth() + 1
+                    ).padStart(2, "0");
+                    const ano = data_implantacao.getFullYear();
+                    const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                    res.render("detalhes-implantacao", {
+                      implantacao: resultImplantacoes[0],
+                      plano: resultPlano[0],
+                      dataFormatada: dataFormatada,
+                      entidade: resultEntidade[0],
+                      dependentes: resultDependentes,
+                      documento: resultDocumentos,
+                      status: resultStatus,
+                      rotaAtual: "implantacoes",
+                    });
+                  }
+                );
+              }
+            );
+          }
+        );
       });
     });
   });
@@ -1684,14 +1721,18 @@ app.get("/entidades", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   db.query("SELECT * FROM entidades", (error, resultsEntidades) => {
     if (error) throw error;
-    res.render("entidades", {
-      entidades: resultsEntidades,
-      rotaAtual: "entidades",
-    });
+    db.query('SELECT * FROM profissoes', (error, resultProfissoes) => {
+      if(error) throw error;
+      res.render("entidades", {
+        entidades: resultsEntidades,
+        profissoes: resultProfissoes,
+        rotaAtual: "entidades",
+      });
+    })
   });
 });
 
-app.get("/api/profissoes/:id", verificaAutenticacao, async (req, res) => {
+/* app.get("/api/profissoes/:id", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   var idEntidade = req.params.id;
   db.query(
@@ -1705,7 +1746,7 @@ app.get("/api/profissoes/:id", verificaAutenticacao, async (req, res) => {
       }
     }
   );
-});
+}); */
 
 app.post("/editar-entidade/:id", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
@@ -1737,42 +1778,17 @@ app.post("/editar-entidade/:id", verificaAutenticacao, async (req, res) => {
 app.delete("/excluir-entidade/:id", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   const idEntidade = req.params.id;
+  const sqlExcluirEntidade = "DELETE FROM entidades WHERE id = ?";
 
-  // Verifique se existem registros na tabela "formularios_entidades" vinculados a esta entidade
-  const sqlCheckRelacionamento =
-    "SELECT COUNT(*) AS count FROM formularios_entidades WHERE entidade_id = ?";
-
-  db.query(sqlCheckRelacionamento, [idEntidade], (error, result) => {
+  db.query(sqlExcluirEntidade, [idEntidade], (error, result) => {
     if (error) {
-      console.error("Erro ao verificar relacionamentos:", error);
+      console.error("Erro ao excluir a entidade:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
     } else {
-      const countRelacionamentos = result[0].count;
-
-      if (countRelacionamentos > 0) {
-        // Se houver relacionamentos, não é possível excluir a entidade
-        res
-          .status(400)
-          .json({
-            message:
-              "Não é possível excluir a entidade, pois existem formulários vinculados a ela",
-          });
-      } else {
-        // Se não houver relacionamentos, é seguro excluir a entidade
-        const sqlExcluirEntidade = "DELETE FROM entidades WHERE id = ?";
-
-        db.query(sqlExcluirEntidade, [idEntidade], (error, result) => {
-          if (error) {
-            console.error("Erro ao excluir a entidade:", error);
-            res.status(500).json({ message: "Erro interno do servidor" });
-          } else {
-            res.cookie("alertSuccess", "Entidade excluída com sucesso", {
-              maxAge: 3000,
-            });
-            res.status(200).json({ message: "Entidade excluída com sucesso" });
-          }
-        });
-      }
+      res.cookie("alertSuccess", "Entidade excluída com sucesso", {
+        maxAge: 3000,
+      });
+      res.status(200).json({ message: "Entidade excluída com sucesso" });
     }
   });
 });
@@ -1815,6 +1831,60 @@ app.post("/cadastrar-entidade", verificaAutenticacao, async (req, res) => {
       res.status(200).json({ message: "Nova entidade criada com sucesso" });
     }
   );
+});
+
+app.post("/editar-profissao/:id", verificaAutenticacao, async (req,res) => {
+  const db = await mysql.createPool(config);
+  const idProfissao = req.params.id;
+  const { nome, idEntidade } = req.body;
+
+  await db.query("UPDATE profissoes SET nome=?, idEntidade=? WHERE id=?", [nome, idEntidade, idProfissao] ,async (error, result) => {
+    if(error){
+      res.cookie(
+        "alertError",
+        "Erro ao atualizar Entidade, verifique e tente novamente",
+        {
+          maxAge: 3000,
+        }
+      )
+    }
+    res.cookie("alertSuccess", "Profissão atualizada com sucesso", { maxAge: 3000 });
+    res.status(200).json({ message: "Profissão atualizada com sucesso" });
+  })
+})
+
+app.post("/cadastrar-profissao", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
+  const { nome, entidadeVinculada } = req.body;
+  const sqlProfissao =
+    "INSERT INTO profissoes (nome, idEntidade) VALUES (?, ?)";
+  db.query(sqlProfissao, [nome, entidadeVinculada], (err, result) => {
+    if (err) {
+      console.error("Erro ao cadastrar profissao", err);
+    }
+    res.cookie("alertSuccess", "Profissão criada com Sucesso", {
+      maxAge: 3000,
+    });
+    res.status(200).json({ message: "Nova profissão criada com sucesso" });
+  });
+});
+
+app.delete("/excluir-profissao/:id", verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
+  const idProfissao = req.params.id;
+  const sqlExcluirProfissao = "DELETE FROM profissoes WHERE id = ?";
+
+  db.query(sqlExcluirProfissao, [idProfissao], (error, result) => {
+    if (error) {
+      console.error("Erro ao excluir a profissão:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    } else {
+      res.cookie("alertSuccess", "Profissão excluída com sucesso", {
+        maxAge: 3000,
+      });
+      res.status(200).json({ message: "Profissão excluída com sucesso" });
+    }
+  });
 });
 
 app.get("/logout", (req, res) => {

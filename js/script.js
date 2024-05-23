@@ -10,6 +10,11 @@ let valorAnual = document.querySelector("#valorAnualBD").value;
 let valorAnualCartao = document.querySelector("#valorAnualCartaoBD").value;
 let valorAnualCartao3Vezes = document.querySelector("#valorAnualCartao3VezesBD").value;
 
+document.getElementById('profissaotitular').addEventListener('change', function() {
+  var selectedOption = this.options[this.selectedIndex];
+  var idEntidade = selectedOption.getAttribute('data-id');
+  document.getElementById('idEntidade').value = idEntidade;
+});
 
 function validarFormulario(etapa) {
   let form = document.getElementById(`formEtapa${etapa}`);
@@ -91,16 +96,34 @@ function pegaDados() {
   dados['dependentes'] = dependentes;
   dados['anexos'] = anexosObjeto;
   dados['inputs'] = inputs;
-  console.log(dados);
+  
   var jsonDados = JSON.stringify(dados, null, 2);
 
-  var blob = new Blob([jsonDados], {type: 'application/json'});
+  $.ajax({
+    type: 'POST',
+    url: '/testeFormulario',
+    data: jsonDados,
+    contentType: 'application/json',
+    success: function (response) {
+        console.log('Resposta BackEnd', response);
+        //location.reload();
+    },
+    error: function (response) {
+        //showMessageError(response.message)
+        console.error('Erro ao cadastrar entidade:', response);
+    }
+  });
+
+
+  console.log(dados);
+
+  /* var blob = new Blob([jsonDados], {type: 'application/json'});
   var url = URL.createObjectURL(blob);
   
   var linkDownload = document.createElement('a');
   linkDownload.href = url;
   linkDownload.download = 'dados.json';
-  linkDownload.click();
+  linkDownload.click(); */
 }
 
 function voltar() {
@@ -672,7 +695,7 @@ function removeErrorMessage() {
   }
 }
 
-$('input[name="formaPagamento"]').on('change', function() {
+/* $('input[name="formaPagamento"]').on('change', function() {
   var formaPagamentoSelecionada = $(this).val();
   if (formaPagamentoSelecionada === '2' || formaPagamentoSelecionada === '3') {
     $('.confirmacaoBoleto').hide();
@@ -681,19 +704,19 @@ $('input[name="formaPagamento"]').on('change', function() {
   if (formaPagamentoSelecionada === '1') {
     $('.confirmacaoBoleto').show()
   }
-});
+}); */
 
 function funcaoParaCartao() {
   $('#modalCartaoCredito').modal('show');
 }
 
-function validarPagamento () {
+/* function validarPagamento () {
   $('#modalCartaoCredito').hide()
   $('.modal-backdrop').hide()
   $('.confirmacaoPgtoCartao').show()
   $('input[name="formaPagamento"]').prop('disabled', true);
 
-}
+} */
 
 function upload(etapa) {
 
@@ -796,7 +819,6 @@ function remove(button) {
       })
       .catch(error => console.error(error));
 }
-
 
 function exibirAlerta(mensagem) {
   mensagem = mensagem.replace(/\n/g, '<br>');

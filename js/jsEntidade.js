@@ -2,13 +2,13 @@ function mascaras() {
     $('[name="taxa"]').mask('0000.00', { reverse: true });
 }
 
-$(document).ready(function () {
+/* $(document).ready(function () {
     mascaras();
     $('#tags').tagsinput();
     
-});
+}); */
 
-$('.tags').on('keydown', function(event) {
+/* $('.tags').on('keydown', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault(); // Impede o envio do formulário
         $('.addTag').click(); // Aciona o clique no botão addTag
@@ -41,14 +41,14 @@ $('.addTag').click(function () {
 
     // Limpe o valor do campo de entrada
     $container.find('.tags').val('');
-})
+}) */
 
 
-$('.inputProfissoes').on('click', '.removerTag', function() {
+/* $('.inputProfissoes').on('click', '.removerTag', function() {
     $(this).parent('.divTag').remove();
-});
+}); */
 
-function renderizarProfissoes(profissoes) {
+/* function renderizarProfissoes(profissoes) {
     const inputProfissoes = $('.inputProfissoes');
     inputProfissoes.empty(); // Limpa o conteúdo atual
 
@@ -78,7 +78,7 @@ function getProfissoes (idEntidade) {
     .catch(error => {
         console.error('Erro ao buscar dados das profissões:', error);
     });
-}
+} */
 
 function getCookieValue(name) {
     const cookieName = `${name}=`;
@@ -127,10 +127,33 @@ function showMessageError(message) {
 let formularioAberto = false;
 $('.editar-btn').click(function () {
     const idEntidade = $(this).closest('tr').next('.editar-form-container').data('id');
-    getProfissoes(idEntidade);
+    //getProfissoes(idEntidade);
     const tr = $(this).closest('tr');
     const formContainer = tr.next('.editar-form-container');
     const form = formContainer.find('.editar-form');
+
+    if (!formularioAberto) {
+        // Abrir o formulário para edição
+        form.find('.form-control').prop('disabled', false);
+        formContainer.show();
+        mascaras();
+        $(this).text("Cancelar");
+    } else {
+        // Fechar o formulário e desabilitar os campos
+        form.find('.form-control').prop('disabled', true);
+        formContainer.hide();
+        $(this).text("Editar");
+    }
+
+    formularioAberto = !formularioAberto;
+});
+
+$('.editar-btn-profissao').click(function () {
+    const idProfissao = $(this).closest('tr').next('.editar-form-container').data('id');
+    //getProfissoes(idEntidade);
+    const tr = $(this).closest('tr');
+    const formContainer = tr.next('.editar-form-container');
+    const form = formContainer.find('.editar-form-profissao');
 
     if (!formularioAberto) {
         // Abrir o formulário para edição
@@ -153,9 +176,6 @@ $('.editar-form').submit(function (e) {
     const form = $(this);
     const idEntidade = form.data('id');
     console.log('clicou em salvar')
-    const tags = [];
-
-    const divTags = form.find('.divTag');
 
     const formData = {
         nome: form.find('#nome').val(),
@@ -179,7 +199,6 @@ $('.editar-form').submit(function (e) {
         },
     });
 });
-
 
 $('.excluir-btn').click(function () {
     const form = $(this);
@@ -228,6 +247,83 @@ $('.cadastrar').click(function (e) {
         error: function (response) {
             showMessageError(response.message)
             console.error('Erro ao cadastrar entidade:', response);
+        },
+    });
+});
+
+$('.cadastrar-profissao').click(function (e) {
+    e.preventDefault();
+
+    if($('#nomeProfissao').val() != null && $('#entidadeVinculada').val() != null) {
+        const formData = {
+            nome: $('#nomeProfissao').val(),
+            entidadeVinculada: $('#entidadeVinculada').val()
+        };
+    
+        console.log(formData);
+    
+        // Envie os dados do formulário para a rota no servidor
+        $.ajax({
+            type: 'POST',
+            url: '/cadastrar-profissao',
+            data: formData,
+            success: function (response) {
+                console.log('Resposta BackEnd', response);
+                location.reload();
+            },
+            error: function (response) {
+                showMessageError(response.message)
+                console.error('Erro ao cadastrar entidade:', response);
+            },
+        });
+    } else {
+        showMessageError('Preencha os campos nome e selecione uma entidade para relacionar a Profissão')
+    }
+
+    
+});
+
+$('.editar-form-profissao').submit(function (e) {
+    e.preventDefault();
+    const form = $(this);
+    const idProfissao = form.data('id');
+    console.log('chamou aqui')
+
+    const formData = {
+        nome: form.find('#nome-profissao').val(),
+        idEntidade: form.find('#entidadeRelacionada').val(),
+    };
+
+    $.ajax({
+        type: 'POST',
+        url: `/editar-profissao/${idProfissao}`,
+        data: formData,
+        success: function (response) {
+            console.log('Sucesso', response)
+            location.reload();
+        },
+        error: function (err) {
+            showMessageError('Erro ao enviar os dados:', err);
+            console.error('Erro ao enviar os dados:', err);
+        },
+    });
+});
+
+$('.excluir-btn-profissao').click(function () {
+    const form = $(this);
+    const idProfissao = form.data('id');
+
+    $.ajax({
+        type: 'DELETE',
+        url: `/excluir-profissao/${idProfissao}`,
+        success: function (response) {
+            console.log('Sucesso', response)
+            location.reload();
+        },
+        error: function (xhr, status, error) {
+            const response = JSON.parse(xhr.responseText);
+            showMessageError(response.message);
+            console.error('Erro ao excluir a profissão:', error);
         },
     });
 });

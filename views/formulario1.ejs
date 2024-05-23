@@ -114,11 +114,12 @@
                 <select class="form-control" id="profissaotitular" name="profissaotitular" required>
                     <option disabled selected value="">Selecione ...</option>
                     <% profissoes.forEach(function(profissao) { %>
-                        <option value="<%= profissao.idEntidade %>">
+                        <option value="<%= profissao.nome %>" data-id="<%= profissao.idEntidade %>">
                             <%= profissao.nome %>
                         </option>
                         <% }); %>
                 </select>
+                <input type="hidden" id="idEntidade" name="idEntidade" />
             </div>
         </div>
     </div>

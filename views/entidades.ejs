@@ -172,6 +172,113 @@
         </table>
 
     </div>
+
+    <div class="container mt-5 content" id="novaProfissao">
+        <h2>Cadastro de Profissões</h2>
+        <form id="cadastrar-profissoes">
+            <div class="row">
+                <!-- Primeira coluna -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome:</label>
+                        <input type="text" class="form-control" id="nomeProfissao" name="nomeProfissao" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="entidadeVinculada" class="form-label">Entidade Vinculada</label>
+                        <select class="form-select" id="entidadeVinculada">
+                            <option required disabled>Selecione uma Entidade</option>
+                            <% entidades.forEach(function (entidade) { %>
+                                <option value="<%= entidade.id %>"><%= entidade.nome %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary cadastrar-profissao">Cadastrar</button>
+        </form>
+    </div>
+
+    <div class="container mt-5 content">
+        <h2>Profissões Cadastradas</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Entidade</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% function getEntidadeNome(entidades, idEntidade) { 
+                    const entidade = entidades.find(ent => ent.id === idEntidade);
+                    return entidade ? entidade.nome : 'Desconhecido';
+                } %>
+                <% profissoes.forEach(function(profissao) { %>
+                    <tr>
+                        <td>
+                            <%= profissao.nome %>
+                        </td>
+                        <td>
+                            <%= getEntidadeNome(entidades, profissao.idEntidade) %>
+                        </td>
+                        <td>
+                            <!-- Botão "Editar" -->
+                            <button type="button" class="btn btn-primary editar-btn-profissao" data-bs-toggle="collapse"
+                                data-bs-target="#editar<%= profissao.id %>" aria-expanded="false"
+                                aria-controls="editar<%= profissao.id %>">
+                                Editar
+                            </button>
+                            <button type="button" class="btn btn-secondary cancelar-btn d-none">Cancelar</button>
+                        </td>
+                    </tr>
+                    <!-- Formulário de edição (colapsado por padrão) -->
+                    <tr class="collapse editar-form-container" id="editar<%= profissao.id %>"
+                        data-id="<%= profissao.id %>">
+                        <td colspan="4">
+                            <form class="editar-form-profissao" data-id="<%= profissao.id %>">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <!-- Primeira coluna com os primeiros campos de edição -->
+                                        <td>
+                                            <div class="mb-3">
+                                                <label for="nome" class="form-label">Nome:</label>
+                                                <input type="text" class="form-control" id="nome-profissao" name="nome-profissao"
+                                                    value="<%= profissao.nome %>" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="entidadeVinculada" class="form-label">Entidade Vinculada</label>
+                                                <select class="form-select" name="entidadeVinculada" id="entidadeRelacionada">
+                                                    <option value="0">Selecione uma Entidade</option>
+                                                    <% entidades.forEach(function (entidade) { %>
+                                                        <option value="<%= entidade.id %>" <%= profissao.idEntidade === entidade.id ? 'selected' : '' %> >
+                                                            <%= entidade.nome %>
+                                                        </option>
+                                                    <% }) %>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <!-- Segunda coluna com os campos restantes de edição -->
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <!-- Botões "Salvar" e "Cancelar" -->
+                                            <button type="submit" class="btn btn-success salvar-btn-profissao">Salvar</button>
+                                            <button type="button" class="btn btn-danger excluir-btn-profissao"
+                                                data-id="<%= profissao.id %>">Excluir</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+    
+
     <script src="/js/jsEntidade.js"></script>
 </body>
 

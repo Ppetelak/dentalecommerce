@@ -70,11 +70,13 @@ const qInsImplantacao = `
         AceitoTermos,
         AceitoPrestacaoServicos,
         planoSelecionado,
-        numeroProposta
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        numeroProposta,
+        idEntidade
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
-const qInsDependentes = `INSERT INTO dependentes (
+const qInsDependentes = `
+INSERT INTO dependentes (
     cpfdependente,
     nomecompletodependente,
     nomemaedependente,
@@ -90,7 +92,7 @@ const  qInsEntidade =`
     UPDATE entidades SET nome=?, descricao=?, publico=?, documentos=?, taxa=? WHERE id=?
 `;
 
-const config = configDev;
+const config = configMidia;
 
 module.exports = {
     mysql,
