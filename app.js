@@ -250,6 +250,8 @@ async function salvarAnexos(idImplantacao, anexos) {
   });
 } */
 
+
+
 function formatarDataDs(data) {
   var partesData = data.split('-');
   var dataFormatada = partesData[2] + '/' + partesData[1] + '/' + partesData[0];
@@ -280,11 +282,11 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
     if (response.status === 200) {
       await sendStatus(idImplantacao, 4, 'Implantação realizada com sucesso no digital saúde');
       console.log("Proposta enviada com sucesso:", response.data);
-      //return { success: true, data: response.data };
+      return { success: true, data: response.data };
     } else {
       await sendStatus(idImplantacao, 4, "Erro ao enviar proposta para o digital");
       console.error(`Erro: Recebido status ${response.status}`);
-      //return { success: false, message: `Erro: Recebido status ${response.status}` };
+      return { success: false, message: `Erro: Recebido status ${response.status}` };
     }
   } catch (error) {
     await sendStatus(idImplantacao, 4, "Erro ao enviar proposta para o digital");
@@ -302,14 +304,15 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
       }
       
       console.error(message, error.response.data);
-      //return { success: false, message: message, data: error.response.data };
+      return { success: false, message: message, data: error.response.data };
     } else {
       // Ocorreu um erro ao configurar a solicitação ou algo similar
       console.error("Erro ao enviar a proposta:", error.message);
-      //return { success: false, message: "Erro ao enviar a proposta.", data: error.message };
+      return { success: false, message: "Erro ao enviar a proposta.", data: error.message };
     }
   }
 }
+
 
 function generateRandomDigits(length) {
   let result = "";
@@ -355,22 +358,25 @@ async function checkProposalExists(proposalNumber) {
   });
 }
 
+const pool = mysql.createPool(config);
+
 async function sendStatus(idImplantacao, idStatus, mensagem) {
   const db = await mysql.createPool(config);
-  const query =
-    "INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)";
-    db.query(query, [idStatus, idImplantacao, mensagem], (err, result) => {
-    if (err) {
-      console.log("Erro ao inserir valores na tabela de status" + err);
-      logger.error({
-        message: "Erro ao inserir valores na tabela de status",
-        error: err.message,
-        stack: err.stack,
-        timestamp: new Date().toISOString(),
-      });
-    }
-    return;
-  });
+  const query = "INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)";
+  
+  try {
+    const result = await db.query(query, [idStatus, idImplantacao, mensagem]);
+    return result;
+  } catch (err) {
+    console.error("Erro ao inserir valores na tabela de status", err);
+    logger.error({
+      message: "Erro ao inserir valores na tabela de status",
+      error: err.message,
+      stack: err.stack,
+      timestamp: new Date().toISOString(),
+    });
+    throw err; // Relance o erro para que a função chamadora possa tratá-lo
+  }
 }
 
 function rollbackAndRespond(res, message) {
@@ -1039,7 +1045,7 @@ app.post("/testeFormulario", async (req, res) => {
             numeroProposta,
             dados.cpffinanceiro,
             dados.nomefinanceiro,
-            dados.profissaotitular
+            dados.identidade
           );
         } catch (error){
           console.error('Erro ao enviar email com contrato', error)
@@ -1059,7 +1065,8 @@ app.post("/testeFormulario", async (req, res) => {
         } catch (error) {
           console.error('Erro ao mudar status da proposta', error)
         }
-        res.render('sucesso', {numeroPropostaGerado: numeroProposta})
+        res.status(200).json({ numeroPropostaGerado: numeroProposta });
+        //res.render('sucesso', {numeroPropostaGerado: numeroProposta})
         //res.status(200).send({ message: "Implantação realizada com sucesso!" });  
       })
       .catch((error) => {
@@ -1450,8 +1457,9 @@ app.post("/login-verifica", async (req, res) => {
   });
 });
 
-app.get("/sucesso", (req, res) => {
-  res.render("sucesso", { numeroPropostaGerado: "264646464" });
+app.get("/sucesso/:numeroProposta", async (req, res) => {
+  const numeroPropostaGerado = req.params.numeroProposta;
+  res.render("sucesso", numeroPropostaGerado );
 });
 
 app.get("/implantacoes", verificaAutenticacao, async (req, res) => {

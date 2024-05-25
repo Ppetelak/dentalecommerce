@@ -106,11 +106,12 @@ function pegaDados() {
     contentType: 'application/json',
     success: function (response) {
         console.log('Resposta BackEnd', response);
-        //location.reload();
+        window.location.href = `/sucesso/${response.numeroPropostaGerado}`;
     },
     error: function (response) {
-        //showMessageError(response.message)
-        console.error('Erro ao cadastrar entidade:', response);
+        $('.loader').hide()
+        showMessageError(response.message)
+        console.error('Erro ao fazer a implantação:', response);
     }
   });
 
@@ -628,6 +629,7 @@ function handleExcluirDependenteClick(element) {
 
 function validarCPF(inputElement) {
   var cpfCampo = inputElement;
+  // Remove todos os caracteres não numéricos do CPF
   var cpf = cpfCampo.value.replace(/\D/g, "");
 
   var validFeedback = cpfCampo.nextElementSibling
@@ -637,6 +639,7 @@ function validarCPF(inputElement) {
     ? validFeedback.nextElementSibling
     : validFeedback.nextSibling;
 
+  // Verifica se o CPF tem 11 dígitos ou se todos os dígitos são iguais
   if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
     invalidFeedback.style.display = "inline";
     validFeedback.style.display = "none";
@@ -659,6 +662,7 @@ function validarCPF(inputElement) {
   resto = 11 - (soma % 11);
   var digitoVerificador2 = resto === 10 || resto === 11 ? 0 : resto;
 
+  // Verifica se os dígitos verificadores são iguais aos do CPF
   if (
     digitoVerificador1 !== parseInt(cpf.charAt(9)) ||
     digitoVerificador2 !== parseInt(cpf.charAt(10))
@@ -668,9 +672,24 @@ function validarCPF(inputElement) {
     return;
   }
 
+  // CPF válido
   invalidFeedback.style.display = "none";
   validFeedback.style.display = "inline";
 }
+
+function showMessageError(mensagem) {
+  var errorMessageDiv = document.createElement("div");
+  errorMessageDiv.id = "error-message";
+  errorMessageDiv.style.color = "red";
+  errorMessageDiv.innerHTML =
+    `<span style="font-weight: bold; font-size: 16px;">⚠ Erro: </span> <br>
+    <p> ${mensagem} </p>`;
+
+  var errorContainer = document.getElementById("error-container");
+  errorContainer.appendChild(errorMessageDiv);
+}
+
+
 
 function showErrorMessage() {
   var errorMessageDiv = document.createElement("div");

@@ -364,6 +364,12 @@ label {
     animation: slide-in 2s;
 }
 
+.aviso{
+    font-size: 0.7rem;
+    color: #0e3178;
+    font-weight: 400;
+}
+
 @keyframes slide-in {
     from {
         transform: translateX(-100vw);

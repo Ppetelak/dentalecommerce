@@ -19,7 +19,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label for="cpftitular">CPF</label>
+                <label for="cpftitular">CPF <span class="aviso">(Sem pontos, apenas números)</span></label>
                 <input type="number" class="form-control" id="cpftitular" name="cpftitular" placeholder="Cpf do titular"
                     onblur="validarCPF(this)" required>
                 <span class="valid-feedback"></span>
@@ -60,7 +60,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label for="sexotitular">Selecione uma opção:</label>
+                <label for="sexotitular">Sexo:</label>
                 <select class="form-control" id="sexotitular" name="sexotitular" required>
                     <option disabled selected value="">Selecione ...</option>
                     <option value="Masculino">Masculino</option>
