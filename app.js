@@ -759,9 +759,9 @@ app.post("/testeFormulario", async (req, res) => {
     const dependentes = req.body.dependentes;
     const anexos = req.body.anexos;
 
-    console.log({
+    /* console.log({
       dados, dependentes, anexos
-    })
+    }) */
 
     var cpffinanceiro = dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular
     var nomefinanceiro = dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto;
@@ -1035,6 +1035,7 @@ app.post("/testeFormulario", async (req, res) => {
         try {
           await salvarAnexos(resultImplantacaoId, anexos);
         } catch (error) {
+          enviarErroDiscord(`Erro ao salvar Anexos ${error}`)
           console.error("Erro ao salvar anexos:", error);
         }
 
@@ -1048,6 +1049,7 @@ app.post("/testeFormulario", async (req, res) => {
             dados.identidade
           );
         } catch (error){
+          enviarErroDiscord(`Erro ao enviar email para o titular do contrato ${error}`)
           console.error('Erro ao enviar email com contrato', error)
         }
 
@@ -1055,6 +1057,7 @@ app.post("/testeFormulario", async (req, res) => {
           await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
         } catch (error) {
           // Tratamento de erro adicional, se necessário
+          enviarErroDiscord(`Erro ao enviar dados para o DS da proposta ${error}`)
           await sendStatus(resultImplantacaoId, 4, "Erro ao enviar proposta para o digital");
           console.error("Erro inesperado ao enviar proposta:", error);
         }
@@ -1063,6 +1066,7 @@ app.post("/testeFormulario", async (req, res) => {
         try {
           await sendStatus(resultImplantacaoId, 2, "Implantação realizada com sucesso ao Ecommerce");
         } catch (error) {
+          enviarErroDiscord(`Erro ao mudar status da proposta para realizada com sucesso ${error}`)
           console.error('Erro ao mudar status da proposta', error)
         }
         res.status(200).json({ numeroPropostaGerado: numeroProposta });
@@ -1070,10 +1074,12 @@ app.post("/testeFormulario", async (req, res) => {
         //res.status(200).send({ message: "Implantação realizada com sucesso!" });  
       })
       .catch((error) => {
+        enviarErroDiscord(`Erro durante a implantação ${error}`)
         console.error("Erro durante a implantação:", error);
         res.status(500).send({ error: error.message });
       });
     } catch (error) {
+      enviarErroDiscord(`Erro geral ${error}`)
       console.error("Erro geral:", error);
       res.status(500).send({ error: error.message });
     }
