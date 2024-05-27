@@ -405,6 +405,12 @@ app.get("/files", verificaAutenticacao, (req, res) => {
   res.render("uploads", { files: files, rotaAtual: "files" });
 });
 
+app.get('/mandarMensagemRobo/:mensagem', (req,res) => {
+  const mensagem = req.params.mensagem;
+  enviarErroDiscord(mensagem);
+  res.send('mensagem enviada com sucesso')
+})
+
 //Rotas para upload
 app.post("/upload", upload.array("file"), (req, res) => {
   const filepaths = req.files.map((file) => ({
