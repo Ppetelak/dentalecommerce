@@ -30,6 +30,14 @@ const configProd = {
     port: "3306",
 }
 
+const configTeste = {
+    host: "dental.mounthermon.com.br",
+    user: "midiaideal",
+    password: "m956#Igl8",
+    database: "testeDataBase",
+    port: "3306",
+}
+
 /* Inserir dados da implantação */
 const qInsImplantacao = `
     INSERT INTO implantacoes (
@@ -92,7 +100,7 @@ const  qInsEntidade =`
     UPDATE entidades SET nome=?, descricao=?, publico=?, documentos=?, taxa=? WHERE id=?
 `;
 
-const config = configMidia;
+const config = configDev;
 
 module.exports = {
     mysql,

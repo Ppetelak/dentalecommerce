@@ -1052,7 +1052,7 @@ app.post("/testeFormulario", async (req, res) => {
             numeroProposta,
             dados.cpffinanceiro,
             dados.nomefinanceiro,
-            dados.identidade
+            dados.idEntidade
           );
         } catch (error){
           enviarErroDiscord(`Erro ao enviar email para o titular do contrato ${error}`)
@@ -1205,6 +1205,7 @@ app.get("/preview-success", (req, res) => {
 });
 
 app.get("/enviar-email/:id", async (req, res) => {
+  const db = await mysql.createPool(config);
   const idImplantacao = req.params.id;
   const queryImplantacoes = "SELECT * FROM implantacoes WHERE id=?";
   db.query(queryImplantacoes, [idImplantacao], (err, result) => {
@@ -1469,10 +1470,14 @@ app.post("/login-verifica", async (req, res) => {
   });
 });
 
-app.get("/sucesso/:numeroProposta", async (req, res) => {
-  const numeroPropostaGerado = req.params.numeroProposta;
-  res.render("sucesso", numeroPropostaGerado );
+app.get("/sucesso/:numeroProposta", (req, res) => {
+  const dados = {
+    numeroPropostaGerado: req.params.numeroProposta,
+    nomeCliente: "Teste de Nome Cliente",
+  };
+  res.render("sucesso", dados);
 });
+
 
 app.get("/implantacoes", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
