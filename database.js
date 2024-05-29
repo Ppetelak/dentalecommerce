@@ -1,16 +1,5 @@
 const mysql = require('promise-mysql');
 
-const configMidia = {
-    host: "localhost",
-    user: "root",
-    port: "3306",
-    password: "pmp078917",
-    database: "mhdentalvendas",
-    waitForConnections: true,
-    connectionLimit: 50, // Ajuste conforme necessário
-    queueLimit: 0,
-}
-
 const configDev = {
     host: "pablopetelak.com",
     user: "u654656997_dev",
@@ -27,14 +16,6 @@ const configProd = {
     user: "mhdentalvendas_user",
     password: "6_64idh9V",
     database: "mhdentalvendas2",
-    port: "3306",
-}
-
-const configTeste = {
-    host: "dental.mounthermon.com.br",
-    user: "midiaideal",
-    password: "m956#Igl8",
-    database: "testeDataBase",
     port: "3306",
 }
 

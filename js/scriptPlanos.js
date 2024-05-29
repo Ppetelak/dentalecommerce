@@ -224,6 +224,21 @@ $('#addPlano').click(function () {
         </div>
       </div>
     </div>
+    <div class="row">
+      <h1>Parametrização com Digital Saúde</h1>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="numeroConvenio"> Número de Convênio</label>
+          <input name="numeroConvenio" id="numeroConvenio" class="numeroConvenio form-control" value="">
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="codigoPlanoDS"> Código do Plano</label>
+          <input name="codigoPlanoDS" id="codigoPlanoDS" class="codigoPlanoDS form-control" value="">
+        </div>
+      </div>
+    </div>
     <div class="form-group">
       <button class="btn btn-primary btn-salvar" data-id="${novoId}">Salvar Plano</button>
       <button class="btn btn-secondary btn-cancelar" >Cancelar</button>
@@ -308,7 +323,9 @@ function salvarPlano(trElement) {
     pgtoAnualAvista: trElement.find("input[name=pgtoAnualAvista]").val(),
     pgtoAnualCartao: trElement.find("input[name=pgtoAnualCartao]").val(),
     pgtoAnualCartao3x: trElement.find("input[name=pgtoAnualCartao3x]").val(),
-    reajuste: trElement.find("select[name=reajuste]").val()
+    reajuste: trElement.find("select[name=reajuste]").val(),
+    numeroConvenio: trElement.find("input[name='numeroConvenio']").val(),
+    codigoPlanoDS: trElement.find("input[name='codigoPlanoDS']").val()
   }
 
   console.log(plano)

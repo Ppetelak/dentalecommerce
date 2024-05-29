@@ -863,10 +863,10 @@ app.post("/testeFormulario", async (req, res) => {
       "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
       "observacao": `${observacoesDigitalSaude}`,
       "plano": {
-        "codigo": "VMR5GRUEPJ"
+        "codigo": `${dados.codigoPlanoDS}`
       },
       "convenio": {
-        "codigo": "LRYT12JW8T"
+        "codigo": `${dados.numeroConvenio}`
       },
       "produtor": {
         "codigo": "E17NJPUZM2"
@@ -1674,7 +1674,7 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
     if (result.length > 0) {
       // O plano existe, atualize-o
       const updateQuery =
-        "UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ?, pgtoAnualAvista = ?, pgtoAnualCartao =? , pgtoAnualCartao3x = ? , reajuste = ? WHERE id = ?";
+        "UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ?, pgtoAnualAvista = ?, pgtoAnualCartao =? , pgtoAnualCartao3x = ? , reajuste = ? , numeroConvenio = ?, codigoPlanoDS = ? WHERE id = ?";
       db.query(
         updateQuery,
         [
@@ -1691,6 +1691,8 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
           plano.pgtoAnualCartao,
           plano.pgtoAnualCartao3x,
           plano.reajuste,
+          plano.numeroConvenio,
+          plano.codigoPlanoDS,
           plano.id,
         ],
         (err, result) => {
@@ -1707,7 +1709,7 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
     } else {
       // O plano não existe, crie-o
       const createQuery =
-        "INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia, pgtoAnualAvista, pgtoAnualCartao, pgtoAnualCartao3x, reajuste) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia, pgtoAnualAvista, pgtoAnualCartao, pgtoAnualCartao3x, reajuste, numeroConvenio, codigoPlanoDS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       db.query(
         createQuery,
         [
@@ -1724,6 +1726,8 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
           plano.pgtoAnualCartao,
           plano.pgtoAnualCartao3x,
           plano.reajuste,
+          plano.numeroConvenio,
+          plano.codigoPlanoDS
         ],
         (err, result) => {
           if (err) {
