@@ -765,10 +765,6 @@ app.post("/testeFormulario", async (req, res) => {
     const dependentes = req.body.dependentes;
     const anexos = req.body.anexos;
 
-    /* console.log({
-      dados, dependentes, anexos
-    }) */
-
     var cpffinanceiro = dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular
     var nomefinanceiro = dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto;
     var datadenascimentofinanceiro = dados.datadenascimentofinanceiro ? dados.datadenascimentofinanceiro : dados.datadenascimento;
@@ -869,10 +865,10 @@ app.post("/testeFormulario", async (req, res) => {
         "codigo": `${dados.numeroConvenio}`
       },
       "produtor": {
-        "codigo": "E17NJPUZM2"
+        "codigo": `${dados.idCorretor}`
       },
       "corretora": {
-        "codigo": "S62MXENV8X"
+        "codigo": `${dados.codigoCorretora}`
       },
       "grupo": {
         "codigo": "V2CAVAD6U2"
@@ -1136,6 +1132,7 @@ app.get("/buscar-corretor", async (req, res) => {
           dadosProdutores.push({
             nome: corretor.produtor.nome,
             numeroDocumento: corretor.produtor.numeroDocumento,
+            codigoCorretora: corretor.produtor.codigo
           });
         } else {
           nomeProdutores.push("Nome do produtor não encontrado");
@@ -1146,6 +1143,7 @@ app.get("/buscar-corretor", async (req, res) => {
         dadosProdutores.push({
           nome: corretorData.produtor.nome,
           numeroDocumento: corretorData.produtor.numeroDocumento,
+          codigoCorretora: corretorData.produtor.codigo
         });
       } else {
         nomeProdutores.push("Nome do produtor não encontrado");

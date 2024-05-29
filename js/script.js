@@ -194,6 +194,8 @@ document.addEventListener("DOMContentLoaded", function () {
           const numeroDocumentoInput =
             document.getElementById("numeroDocumento");
 
+          const codigoCorretora = document.getElementById('codigoCorretora');
+
           // Limpar opções existentes
           corretoraSelect.innerHTML = "";
           corretoraSelect.setAttribute("required", true);
@@ -212,6 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
               const option = document.createElement("option");
               option.text = produtor.nome;
               option.value = produtor.numeroDocumento;
+              option.dataset.codigoCorretora = produtor.codigoCorretora;
               corretoraSelect.add(option);
             });
 
@@ -219,7 +222,11 @@ document.addEventListener("DOMContentLoaded", function () {
             corretoraSelect.addEventListener("change", () => {
               const selectedOption =
                 corretoraSelect.options[corretoraSelect.selectedIndex];
-              numeroDocumentoInput.value = selectedOption.value;
+                const codigoCorretoraSelected = selectedOption.dataset.codigoCorretora;
+                console.log(codigoCorretora)
+                numeroDocumentoInput.value = selectedOption.value;
+                codigoCorretora.value = codigoCorretoraSelected; 
+
             });
           } else {
             // Adicionar uma opção padrão caso não haja produtores
