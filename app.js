@@ -775,6 +775,8 @@ app.post("/testeFormulario", async (req, res) => {
     var emailtitularfinanceiro = 
     dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular;
 
+    console.log(dados);
+
     const numeroProposta = await generateUniqueProposalNumber();
     const dadosImplantacao = [
       dados.nomecompleto,
@@ -849,12 +851,13 @@ app.post("/testeFormulario", async (req, res) => {
       Pagamento: 
         ${dados.formaPagamento === 1 ? "Boleto" : 
           dados.formaPagamento === 2? "Cartão de Crédito em 12x" : "Cartão de Crédito em 3x"} \n
+        Profissão selecionada: ${dados.profissaotitular}
       `;
 
     const jsonModeloDS = {
       "numeroProposta": `${numeroProposta}`,
       "dataAssinatura": "26/02/2024",
-      "diaVencimento": 1,
+      "diaVencimento": `${dados.dataVencimento}`,
       "cpfResponsavel": dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
       "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
       "observacao": `${observacoesDigitalSaude}`,

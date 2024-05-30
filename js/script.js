@@ -721,16 +721,37 @@ function removeErrorMessage() {
   }
 }
 
-/* $('input[name="formaPagamento"]').on('change', function() {
+const divEscolhaVencimento = `
+  <div class="form-group">
+  <label for="dataVencimento">Escolha a melhor data de vencimento para você</label>
+  <select class="form-control" id="dataVencimento" name="dataVencimento" required>
+      <option disabled selected value="">Selecione ...</option>
+      <option value="1">1</option>
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+      <option value="25">25</option>
+      <option value="30">30</option>
+  </select>
+  </div>
+`;
+
+const dataVencimentoEscolha = document.getElementById('dataVencimentoEscolha');
+
+$('input[name="formaPagamento"]').on('change', function() {
+  console.log('mudou')
   var formaPagamentoSelecionada = $(this).val();
+  console.log(formaPagamentoSelecionada)
+  console.log(dataVencimentoEscolha)
   if (formaPagamentoSelecionada === '2' || formaPagamentoSelecionada === '3') {
-    $('.confirmacaoBoleto').hide();
-    funcaoParaCartao();
+    dataVencimentoEscolha.innerHTML = divEscolhaVencimento;
+    //funcaoParaCartao();
   }
   if (formaPagamentoSelecionada === '1') {
-    $('.confirmacaoBoleto').show()
+    dataVencimentoEscolha.innerHTML = '';
   }
-}); */
+});
 
 function funcaoParaCartao() {
   $('#modalCartaoCredito').modal('show');
