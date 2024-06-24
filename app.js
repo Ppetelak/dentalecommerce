@@ -618,7 +618,6 @@ app.post("/testeFormularioDS", async (req, res) => {
         "orgaoEmissor": dados.orgaoexpedidor,
         "cpf": dados.cpftitular,
         "dnv": "string",
-        "cns": "string",
         "pis": "string",
         "nomeMae": dados.nomemaetitular,
         "endereco": dados.enderecoresidencial,
@@ -678,7 +677,6 @@ app.post("/testeFormularioDS", async (req, res) => {
         "orgaoEmissor": "null",
         "cpf": dependente.cpfdependente,
         "dnv": "string",
-        "cns": "string",
         "pis": "string",
         "nomeMae": dependente.nomemaedependente,
         "endereco": dados.enderecoresidencial,
@@ -887,7 +885,6 @@ app.post("/testeFormulario", async (req, res) => {
           "orgaoEmissor": dados.orgaoexpedidor,
           "cpf": dados.cpftitular,
           "dnv": "string",
-          "cns": "string",
           "pis": "string",
           "nomeMae": dados.nomemaetitular,
           "endereco": dados.enderecoresidencial,
@@ -963,7 +960,6 @@ app.post("/testeFormulario", async (req, res) => {
               "orgaoEmissor": "null",
               "cpf": dependente.cpfdependente,
               "dnv": "string",
-              "cns": "string",
               "pis": "string",
               "nomeMae": dependente.nomemaedependente,
               "endereco": dados.enderecoresidencial,
@@ -1101,12 +1097,13 @@ app.get("/buscar-corretor", async (req, res) => {
       headers: {
         "Content-Type": "text/plain;charset=UTF-8",
         token: `${token}`,
-        senhaApi: senhaApi,
+        senhaApi: senhaApi
       },
     };
 
     // Fazer a solicitação à API
-    const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`;
+    const apiUrl = `https://e997-2804-14c-87b7-d25a-f565-b1fa-b562-4653.ngrok-free.app/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`
+    /* const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`; */
     const response = await axios.get(apiUrl, configDS);
 
     // Verificar se a API retornou algum resultado

@@ -242,6 +242,81 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  /* btnBuscarCorretor.addEventListener("click", () => {
+    const cpfCorretor = cpfCorretorInput.value;
+    if (cpfCorretor) {
+      const token = "X43ADVSEXM";
+      const senhaApi = "kgt87pkxc2";
+
+      fetch(`https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "text/plain;charset=UTF-8",
+          "token": token,
+          "senhaApi": senhaApi,
+          "Access-Control-Allow-Origin": "https://digitalsaude.com.br"
+        }
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Corretor não encontrado");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Preencher os campos do formulário com as informações retornadas da API
+        document.getElementById("nomecorretor").value = data[0]?.nome || "";
+        document.getElementById("celularcorretor").value = data[0]?.telefone || "";
+        document.getElementById("idCorretor").value = data[0]?.codigo || "";
+
+        const corretoraSelect = document.getElementById("corretora");
+        const numeroDocumentoInput = document.getElementById("numeroDocumento");
+        const codigoCorretora = document.getElementById("codigoCorretora");
+
+        // Limpar opções existentes
+        corretoraSelect.innerHTML = "";
+        corretoraSelect.setAttribute("required", true);
+
+        if (data.length > 0) {
+          // Adicionar uma opção padrão
+          const defaultOption = document.createElement("option");
+          defaultOption.disabled = true;
+          defaultOption.selected = true;
+          defaultOption.required = true;
+          defaultOption.text = "Selecione um produtor";
+          corretoraSelect.add(defaultOption);
+
+          // Iterar sobre os nomes do array e adicionar opções ao select
+          data.forEach((corretor) => {
+            if (corretor.produtor && corretor.produtor.nome) {
+              const option = document.createElement("option");
+              option.text = corretor.produtor.nome;
+              option.value = corretor.produtor.numeroDocumento;
+              option.dataset.codigoCorretora = corretor.produtor.codigo;
+              corretoraSelect.add(option);
+            }
+          });
+
+          // Adicionar um ouvinte de evento change para atualizar o número do documento
+          corretoraSelect.addEventListener("change", () => {
+            const selectedOption = corretoraSelect.options[corretoraSelect.selectedIndex];
+            numeroDocumentoInput.value = selectedOption.value;
+            codigoCorretora.value = selectedOption.dataset.codigoCorretora;
+          });
+        } else {
+          // Adicionar uma opção padrão caso não haja produtores
+          const option = document.createElement("option");
+          option.text = "Nenhum produtor encontrado";
+          corretoraSelect.add(option);
+        }
+      })
+      .catch((error) => {
+        alert(error.message);
+        console.error("Erro na requisição:", error);
+      });
+    }
+  }); */
+
   const cepInput = document.getElementById("cep");
   const buscarCepBtn = document.getElementById("buscarCepBtn");
   const mensagemErroCep = document.getElementById("mensagemErroCep");
