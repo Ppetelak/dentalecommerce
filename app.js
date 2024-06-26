@@ -14,7 +14,20 @@ const session = require("express-session");
 const crypto = require("crypto");
 const cookie = require("cookie-parser");
 const multer = require("multer");
+const {
+  ServicePrincipalCredentials,
+  PDFServices,
+  MimeType,
+  DocumentMergeParams,
+  OutputFormat,
+  DocumentMergeJob,
+  DocumentMergeResult,
+  SDKError,
+  ServiceUsageError,
+  ServiceApiError
+} = require("@adobe/pdfservices-node-sdk");
 const fs = require("fs");
+const fsPromises = require("fs").promises;
 const axios = require("axios");
 const winston = require("winston");
 const uuid = require("uuid");
@@ -46,6 +59,7 @@ app.use("/img", express.static("img"));
 app.use("/arquivos", express.static("arquivos"));
 app.use("/uploads", express.static("uploads"));
 app.use("/formulario", express.static("formulario"));
+app.use('/arquivospdf', express.static('arquivospdf'));
 app.use("/bootstrap-icons", express.static("node_modules/bootstrap-icons"));
 app.set("view engine", "ejs");
 app.use(cookie());
@@ -126,6 +140,108 @@ function consultarEmailTitular(idImplantacao) {
         }
       }
     );
+  });
+}
+
+async function salvarPDFProposta(dadosProposta, idProposta) {
+  const db = await mysql.createPool(config);
+  return new Promise(async (resolve, reject) => {
+    let readStream;
+
+    try {
+        // Initial setup, create credentials instance
+        const credentials = new ServicePrincipalCredentials({
+            clientId: "2ccc988bc62c440fbee4c36db6464be0",
+            clientSecret: "p8e-o-Hdu0cUQRuIV43fr3_KdE0qswIOtmPF"
+        });
+
+        // Creates a PDF Services instance
+        const pdfServices = new PDFServices({
+            credentials
+        });
+
+        // Setup input data for the document merge process
+        const jsonDataForMerge = {
+            nome: dadosProposta.nome,
+            teste: dadosProposta.teste
+        };
+
+        // Creates an asset(s) from source file(s) and upload
+        const inputDocxPath = path.join(__dirname, 'arquivospdf', 'propostaModelo.pdf');
+        readStream = fs.createReadStream(inputDocxPath);
+        const inputAsset = await pdfServices.upload({
+            readStream,
+            mimeType: MimeType.PDF
+        });
+
+        // Create parameters for the job
+        const params = new DocumentMergeParams({
+            jsonDataForMerge,
+            outputFormat: OutputFormat.PDF
+        });
+
+        // Creates a new job instance
+        const job = new DocumentMergeJob({
+            inputAsset,
+            params
+        });
+
+        // Submit the job and get the job result
+        const pollingURL = await pdfServices.submit({
+            job
+        });
+        const pdfServicesResponse = await pdfServices.getJobResult({
+            pollingURL,
+            resultType: DocumentMergeResult
+        });
+
+        // Get content from the resulting asset(s)
+        const resultAsset = pdfServicesResponse.result.asset;
+        const streamAsset = await pdfServices.getContent({
+            asset: resultAsset
+        });
+
+        // Creates a write stream and copy stream asset's content to it
+        const outputFilePath = path.join(__dirname, 'arquivospdf', `Proposta Nº ${numeroProposta}.pdf`);
+        console.log(`Saving asset at ${outputFilePath}`);
+
+        const writeStream = fs.createWriteStream(outputFilePath);
+        streamAsset.readStream.pipe(writeStream);
+
+        writeStream.on('finish', async () => {
+            try {
+                // Conecte-se ao banco de dados
+                await db.query(
+                    'INSERT INTO Propostas (numeroProposta, caminhoArquivoPDF) VALUES (?, ?)',
+                    [numeroProposta, outputFilePath], (err, result)
+                );
+
+                console.log('Dados inseridos com sucesso:');
+                resolve();
+            } catch (err) {
+                console.error('Erro ao inserir dados no banco de dados:', err);
+                reject(err);
+            } finally {
+                if (db) {
+                    await db.end();
+                }
+            }
+        });
+
+        writeStream.on('error', (err) => {
+            reject(err);
+        });
+
+    } catch (err) {
+        if (err instanceof SDKError || err instanceof ServiceUsageError || err instanceof ServiceApiError) {
+            console.log("Exception encountered while executing operation", err);
+        } else {
+            console.log("Exception encountered while executing operation", err);
+        }
+        reject(err);
+    } finally {
+        readStream?.destroy();
+    }
   });
 }
 
@@ -1062,6 +1178,13 @@ app.post("/testeFormulario", async (req, res) => {
           await sendStatus(resultImplantacaoId, 4, "Erro ao enviar proposta para o digital");
           console.error("Erro inesperado ao enviar proposta:", error);
         }
+
+        try {
+          await salvarPDFProposta(dadosProposta, numeroProposta);
+      } catch (err) {
+          console.error('Erro ao gerar o PDF:', err);
+          res.status(500).send('Erro ao gerar o PDF');
+      }
         
 
         try {
@@ -1102,8 +1225,8 @@ app.get("/buscar-corretor", async (req, res) => {
     };
 
     // Fazer a solicitação à API
-    const apiUrl = `https://e997-2804-14c-87b7-d25a-f565-b1fa-b562-4653.ngrok-free.app/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`
-    /* const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`; */
+    /* const apiUrl = `https://e997-2804-14c-87b7-d25a-f565-b1fa-b562-4653.ngrok-free.app/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}` */
+    const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`;
     const response = await axios.get(apiUrl, configDS);
 
     // Verificar se a API retornou algum resultado
@@ -1926,6 +2049,94 @@ app.delete("/excluir-profissao/:id", verificaAutenticacao, async (req, res) => {
     }
   });
 });
+
+/* TESTES  */
+
+app.get('/gerarpdf', async (req, res) => {
+  let readStream;
+  try {
+      // Initial setup, create credentials instance
+      const credentials = new ServicePrincipalCredentials({
+          clientId: "2ccc988bc62c440fbee4c36db6464be0",
+          clientSecret: "p8e-o-Hdu0cUQRuIV43fr3_KdE0qswIOtmPF"
+      });
+
+      // Creates a PDF Services instance
+      const pdfServices = new PDFServices({
+          credentials
+      });
+
+      // Setup input data for the document merge process
+      const jsonDataForMerge = {
+          nome: "Kane Miller",
+          teste: 100
+      }
+
+      // Creates an asset(s) from source file(s) and upload
+      const inputDocxPath = path.join(__dirname, 'arquivospdf', 'documentMergeTemplate.docx');
+      readStream = fs.createReadStream(inputDocxPath);
+      const inputAsset = await pdfServices.upload({
+          readStream,
+          mimeType: MimeType.DOCX
+      });
+
+      // Create parameters for the job
+      const params = new DocumentMergeParams({
+          jsonDataForMerge,
+          outputFormat: OutputFormat.PDF
+      });
+
+      // Creates a new job instance
+      const job = new DocumentMergeJob({
+          inputAsset,
+          params
+      });
+
+      // Submit the job and get the job result
+      const pollingURL = await pdfServices.submit({
+          job
+      });
+      const pdfServicesResponse = await pdfServices.getJobResult({
+          pollingURL,
+          resultType: DocumentMergeResult
+      });
+
+      // Get content from the resulting asset(s)
+      const resultAsset = pdfServicesResponse.result.asset;
+      const streamAsset = await pdfServices.getContent({
+          asset: resultAsset
+      });
+
+      // Creates a write stream and copy stream asset's content to it
+      const outputFilePath = path.join(__dirname, 'arquivospdf', 'formulario_preenchido.pdf');
+      console.log(`Saving asset at ${outputFilePath}`);
+
+      const writeStream = fs.createWriteStream(outputFilePath);
+      streamAsset.readStream.pipe(writeStream);
+      writeStream.on('finish', () => {
+        res.sendFile(outputFilePath, err => {
+            if (err) {
+                console.error('Erro ao enviar o arquivo:', err);
+                res.status(500).send('Erro ao enviar o arquivo');
+            }
+        });
+    });
+
+    // Manter o streaming até o fim
+    streamAsset.readStream.on('end', () => {
+        console.log('PDF gerado e salvo com sucesso!');
+    });
+  } catch (err) {
+      if (err instanceof SDKError || err instanceof ServiceUsageError || err instanceof ServiceApiError) {
+          console.log("Exception encountered while executing operation", err);
+      } else {
+          console.log("Exception encountered while executing operation", err);
+      }
+  } finally {
+      readStream?.destroy();
+  }
+});
+
 
 app.get("/logout", (req, res) => {
   // Remover as informações de autenticação da sessão

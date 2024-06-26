@@ -123,3 +123,10 @@ CREATE TABLE anexos_implantacoes (
     caminho_arquivo VARCHAR(255),
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE Propostas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    numeroProposta INT NOT NULL,
+    caminhoArquivoPDF VARCHAR(255) NOT NULL,
+    dataCriacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
