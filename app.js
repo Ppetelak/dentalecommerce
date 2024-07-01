@@ -143,65 +143,67 @@ function consultarEmailTitular(idImplantacao) {
   });
 }
 
-async function salvarPDFProposta(dadosProposta, idProposta) {
+async function salvarPDFProposta(dadosProposta, dependentes, numeroProposta) {
   const db = await mysql.createPool(config);
   return new Promise(async (resolve, reject) => {
     let readStream;
 
     try {
-        // Initial setup, create credentials instance
         const credentials = new ServicePrincipalCredentials({
             clientId: "2ccc988bc62c440fbee4c36db6464be0",
             clientSecret: "p8e-o-Hdu0cUQRuIV43fr3_KdE0qswIOtmPF"
         });
 
-        // Creates a PDF Services instance
-        const pdfServices = new PDFServices({
-            credentials
-        });
+        const pdfServices = new PDFServices({ credentials });
 
-        // Setup input data for the document merge process
+        // Preparar dados para mesclagem, incluindo dependentes
         const jsonDataForMerge = {
-            nome: dadosProposta.nome,
-            teste: dadosProposta.teste
+            PropostaNumero: numeroProposta,
+            TitularNomeCompleto: dadosProposta.nomecompleto,
+            TitularNomeMae: dadosProposta.nomemaetitular,
+            TitularDataNascimento: dadosProposta.datadenascimento,
+            TitularSexo: dadosProposta.sexotitular,
+            TitularEstadoCivil: dadosProposta.estadociviltitular,
+            TitularCPF: dadosProposta.cpftitular,
+            TitularRG: dadosProposta.rgtitular,
+            TitularNumeroCNS: "",
+            TitularEmail: dadosProposta.emailtitular,
+            TitularDDDTelResidencial: dadosProposta.telefonetitular,
+            TitularDDDTelCelular: dadosProposta.celulartitular,
+            TitularDDDTelComercial: "",
+            TitularEndResidencialCompleto: dadosProposta.enderecoresidencial,
+            TitularEndumero: dadosProposta.numeroendereco,
+            TitularEndComplemento: dadosProposta.complementoendereco,
+            TitularEndBairro: dadosProposta.bairro,
+            TitularEndCEP: dadosProposta.cep,
+            TitularEndMunicipio: dadosProposta.cidade,
+            TitularEndUf: dadosProposta.estado,
+            Dependentes: dependentes.map(dep => ({
+                DependenteNome: dep.nomecompletodependente,
+                DependenteCPF: dep.cpfdependente,
+                DependenteNascimento: dep.nascimentodependente,
+                DependenteSexo: dep.sexodependente,
+                DependenteEstadoCivil: dep.estadocivildependente,
+                DependenteParentesco: dep.grauparentescodependente
+            }))
         };
 
-        // Creates an asset(s) from source file(s) and upload
-        const inputDocxPath = path.join(__dirname, 'arquivospdf', 'propostaModelo.pdf');
+        console.log(JSON.stringify(jsonDataForMerge, null, 2));  // Verifique se os dados estão corretos
+
+        const inputDocxPath = path.join(__dirname, 'arquivospdf', 'modeloProposta2.docx');
         readStream = fs.createReadStream(inputDocxPath);
-        const inputAsset = await pdfServices.upload({
-            readStream,
-            mimeType: MimeType.PDF
-        });
+        const inputAsset = await pdfServices.upload({ readStream, mimeType: MimeType.DOCX });
 
-        // Create parameters for the job
-        const params = new DocumentMergeParams({
-            jsonDataForMerge,
-            outputFormat: OutputFormat.PDF
-        });
+        const params = new DocumentMergeParams({ jsonDataForMerge, outputFormat: OutputFormat.PDF });
 
-        // Creates a new job instance
-        const job = new DocumentMergeJob({
-            inputAsset,
-            params
-        });
+        const job = new DocumentMergeJob({ inputAsset, params });
 
-        // Submit the job and get the job result
-        const pollingURL = await pdfServices.submit({
-            job
-        });
-        const pdfServicesResponse = await pdfServices.getJobResult({
-            pollingURL,
-            resultType: DocumentMergeResult
-        });
+        const pollingURL = await pdfServices.submit({ job });
+        const pdfServicesResponse = await pdfServices.getJobResult({ pollingURL, resultType: DocumentMergeResult });
 
-        // Get content from the resulting asset(s)
         const resultAsset = pdfServicesResponse.result.asset;
-        const streamAsset = await pdfServices.getContent({
-            asset: resultAsset
-        });
+        const streamAsset = await pdfServices.getContent({ asset: resultAsset });
 
-        // Creates a write stream and copy stream asset's content to it
         const outputFilePath = path.join(__dirname, 'arquivospdf', `Proposta Nº ${numeroProposta}.pdf`);
         console.log(`Saving asset at ${outputFilePath}`);
 
@@ -210,21 +212,12 @@ async function salvarPDFProposta(dadosProposta, idProposta) {
 
         writeStream.on('finish', async () => {
             try {
-                // Conecte-se ao banco de dados
-                await db.query(
-                    'INSERT INTO Propostas (numeroProposta, caminhoArquivoPDF) VALUES (?, ?)',
-                    [numeroProposta, outputFilePath], (err, result)
-                );
-
+                await db.query('INSERT INTO Propostas (numeroProposta, caminhoArquivoPDF) VALUES (?, ?)', [numeroProposta, outputFilePath]);
                 console.log('Dados inseridos com sucesso:');
                 resolve();
             } catch (err) {
                 console.error('Erro ao inserir dados no banco de dados:', err);
                 reject(err);
-            } finally {
-                if (db) {
-                    await db.end();
-                }
             }
         });
 
@@ -233,14 +226,12 @@ async function salvarPDFProposta(dadosProposta, idProposta) {
         });
 
     } catch (err) {
-        if (err instanceof SDKError || err instanceof ServiceUsageError || err instanceof ServiceApiError) {
-            console.log("Exception encountered while executing operation", err);
-        } else {
-            console.log("Exception encountered while executing operation", err);
-        }
+        console.error("Exception encountered while executing operation", err);
         reject(err);
     } finally {
-        readStream?.destroy();
+        if (readStream) {
+            readStream.destroy();
+        }
     }
   });
 }
@@ -1180,7 +1171,7 @@ app.post("/testeFormulario", async (req, res) => {
         }
 
         try {
-          await salvarPDFProposta(dadosProposta, numeroProposta);
+          await salvarPDFProposta(dados, dependentes, numeroProposta);
       } catch (err) {
           console.error('Erro ao gerar o PDF:', err);
           res.status(500).send('Erro ao gerar o PDF');
@@ -1225,8 +1216,8 @@ app.get("/buscar-corretor", async (req, res) => {
     };
 
     // Fazer a solicitação à API
-    /* const apiUrl = `https://e997-2804-14c-87b7-d25a-f565-b1fa-b562-4653.ngrok-free.app/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}` */
-    const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`;
+    const apiUrl = `https://75ec-2804-14c-87b7-d25a-4885-2143-e8a2-6d6b.ngrok-free.app/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`
+    /* const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`; */
     const response = await axios.get(apiUrl, configDS);
 
     // Verificar se a API retornou algum resultado
@@ -2068,12 +2059,12 @@ app.get('/gerarpdf', async (req, res) => {
 
       // Setup input data for the document merge process
       const jsonDataForMerge = {
-          nome: "Kane Miller",
-          teste: 100
+          TitularNomeCompleto: "Pablo Petelak",
+          TitularDataNascimento: "23/05/1992"
       }
 
       // Creates an asset(s) from source file(s) and upload
-      const inputDocxPath = path.join(__dirname, 'arquivospdf', 'documentMergeTemplate.docx');
+      const inputDocxPath = path.join(__dirname, 'arquivospdf', 'modeloProposta.docx');
       readStream = fs.createReadStream(inputDocxPath);
       const inputAsset = await pdfServices.upload({
           readStream,
@@ -2134,6 +2125,20 @@ app.get('/gerarpdf', async (req, res) => {
       }
   } finally {
       readStream?.destroy();
+  }
+});
+
+app.post('/gerarpdfteste', async (req, res) => {
+  try {
+    let dadosProposta = req.body.inputs;
+    let dadosDependente = req.body.dependentes;
+
+    await salvarPDFProposta(dadosProposta, dadosDependente, "2024099999991");
+    
+    res.send('requisição bem sucedida');
+  } catch (error) {
+    console.error('Erro ao processar a requisição:', error);
+    res.status(500).send('Erro interno do servidor');
   }
 });
 
