@@ -32,12 +32,13 @@ const axios = require("axios");
 const winston = require("winston");
 const uuid = require("uuid");
 const { format } = require("date-fns");
-const { ptBR } = require("date-fns/locale");
+const { ptBR, id } = require("date-fns/locale");
 const nodemailer = require("nodemailer");
+const puppeteer = require("puppeteer");
 const juice = require("juice");
 const { default: parseJSON } = require("date-fns/parseJSON");
 const port = process.env.PORT || 5586;
-const appUrl = process.env.APP_URL || "http://localhost:5586";
+const appUrl = process.env.APP_URL || "http://localhost";
 
 /* Verificar se usuário está logado */
 const verificaAutenticacao = (req, res, next) => {
@@ -126,6 +127,89 @@ const upload = multer({ storage: storage });
 
 
 /* --------------------------------------- FUNÇÕES ÚTEIS --------------------------------- */
+async function enviarAnexosParaDSContrato(numeroProposta) {
+  console.log('entrou na função de enviar os anexos')
+  const db = await mysql.createPool(config);
+  const query = "SELECT * FROM anexos_implantacoes WHERE id_implantacao = ?";
+  const token = "X43ADVSEXM";
+  const senhaApi = "kgt87pkxc2";
+  const apiUrl = "https://digitalsaude.com.br/api/v2/anexo/";
+
+  try {
+    const idImplantacao = await consultarIDProposta(numeroProposta);
+    const querySelectCodigoDS = "SELECT codigo_ds FROM propostas_codigods WHERE numeroProposta = ?"
+    const codigoDSResult = await db.query(querySelectCodigoDS, [idImplantacao]);
+
+    if (!codigoDSResult || codigoDSResult.length === 0) {
+      console.error('Não foi encontrado o código DS para a proposta:', numeroProposta);
+      return { success: false, message: 'Não foi encontrado o código DS para a proposta' };
+    }
+
+    const codigoDS = codigoDSResult[0].codigo_ds;
+
+    const rows = await db.query(query, [numeroProposta]);
+    const anexos = rows;
+
+    if (!anexos || anexos.length === 0) {
+      console.log('Nenhum anexo encontrado para a proposta:', numeroProposta);
+      return { success: true, message: 'Nenhum anexo para enviar' };
+    }
+
+    const configDS = {
+      headers: {
+        "Content-Type": "application/json",
+        "token": token,
+        "senhaApi": senhaApi
+      }
+    };
+
+    for (const anexo of anexos) {
+      const data = {
+        "codigoContrato": codigoDS,
+        "arquivo": anexo.nome_arquivo,
+        "linkAnexo": anexo.caminho_arquivo,
+      };
+      console.log('Enviando anexo:', data);
+
+      try {
+        const response = await axios.post(apiUrl, data, configDS);
+
+        if (response.status === 200) {
+          await sendStatus(numeroProposta, 4, `Anexo de nome "${data.nomeArquivo}" anexado ao contrato com sucesso`);
+          console.log("Anexo enviado com sucesso:", response.data);
+        } else {
+          await sendStatus(numeroProposta, 4, `ERRO ao anexar arquivo de nome "${data.nomeArquivo}" ao contrato`);
+          console.error(`Erro: Recebido status ${response.status}`);
+        }
+      } catch (error) {
+        await sendStatus(numeroProposta, 4, `ERRO ao anexar arquivo de nome "${data.nomeArquivo}" ao contrato`);
+
+        if (error.response) {
+          const status = error.response.status;
+          let message = "Erro desconhecido ao enviar anexo a proposta.";
+
+          if (status === 400) {
+            message = "Requisição inválida (400). Verifique os dados enviados.";
+          } else if (status === 401) {
+            message = "Acesso não autorizado (401). Verifique suas credenciais.";
+          } else if (status === 500) {
+            message = "Erro interno no servidor (500). Tente novamente mais tarde.";
+          }
+
+          console.error(message, error.response.data);
+        } else {
+          console.error("Erro ao enviar anexo:", error.message);
+        }
+      }
+    }
+    return { success: true };
+  } catch (err) {
+    console.error('Erro ao consultar o banco de dados:', err);
+    return { success: false, message: 'Erro ao consultar o banco de dados', error: err };
+  } finally {
+    await db.end();
+  }
+}
 
 function consultarEmailTitular(idImplantacao) {
   return new Promise((resolve, reject) => {
@@ -143,97 +227,128 @@ function consultarEmailTitular(idImplantacao) {
   });
 }
 
-async function salvarPDFProposta(dadosProposta, dependentes, numeroProposta) {
+function getBase64Image(filePath) {
+  // Lê o arquivo como um buffer
+  const buffer = fs.readFileSync(filePath);
+
+  // Converte o buffer para base64
+  return buffer.toString('base64');
+}
+
+async function gerarSalvarPDFProposta(link, numeroProposta, idImplantacao, planoLogoSrc, dataVigencia) {
   const db = await mysql.createPool(config);
-  return new Promise(async (resolve, reject) => {
-    let readStream;
-
+  const query = "INSERT INTO anexos_implantacoes (id_implantacao, nome_arquivo, caminho_arquivo) VALUES (?, ?, ?)";
+  return new Promise(async (resolve, reject) =>{
     try {
-        const credentials = new ServicePrincipalCredentials({
-            clientId: "2ccc988bc62c440fbee4c36db6464be0",
-            clientSecret: "p8e-o-Hdu0cUQRuIV43fr3_KdE0qswIOtmPF"
+      const browser = await puppeteer.launch({
+        headless: true, // Mude para true para produção
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+      });
+      const page = await browser.newPage();
+  
+      const url = link;
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 180000 });
+      await page.waitForSelector('body'); // Aguarde um elemento específico que garante que os estilos foram aplicados
+  
+      // Aguarde até que o conteúdo da página esteja completamente carregado
+      await page.evaluate(() => {
+        return new Promise((resolve) => {
+          if (document.readyState === 'complete') {
+            resolve();
+          } else {
+            window.addEventListener('load', resolve);
+          }
         });
+      });
+  
+      const urlAdmBase64 = getBase64Image(path.join(__dirname, 'img', 'logomounthermonoriginal.png'));
+      const urlPlanoBase64 = getBase64Image(path.join(__dirname, planoLogoSrc));
+  
+      const header = `
+        <header style="width: 100%; position: fixed; top: 0; left: 0; right: 0; padding-top: 10px;">
+          <div style="width: 100%; padding: 10px; display: flex; flex-direction: row; font-size: 12px;">
+            <div style="width: 60%; padding: 10px; display: flex; flex-direction: column;">
+              <div style="width: 100%; padding: 10px; display: flex; flex-direction: row;">
+                <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
+                <strong> Administradora de Benefícios: </strong>
+                  <img style="max-width: 50%;" src="data:image/png;base64,${urlAdmBase64}">
+                  <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content;-webkit-print-color-adjust: exact">
+                    <div style="border: 1px solid white">
+                      ANS 42167-7
+                    </div>
+                  </div>
+                </div>
+                <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
+                <strong> Operadora: </strong>
+                  <img style="max-width: 50%;" src="data:image/png;base64,${urlPlanoBase64}">
+                  <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content;-webkit-print-color-adjust: exact">
+                    <div style="border: 1px solid white">
+                      ANS 42167-7
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="width: 40%; padding: 10px; display: flex; flex-direction: column;">
+              <div style="width: 100%; padding: 10px; display: flex; flex-direction: row; background: #000080; color:#ffffff; -webkit-print-color-adjust: exact; border-radius: 11px 0px 0px 11px;">
+                <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
+                  Numero da Proposta <br>
+                  <span style="background: white; color: black; padding: 10px; border-radius: 5px;">${numeroProposta}</span>
+                </div>
+                <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
+                  Data Vigência <br>
+                  <span style="background: white; color: black; padding: 10px; border-radius: 5px;">${dataVigencia}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+      `;
+  
+      const footer = `
+        <footer style="font-size:10px; text-align:center; width: 100%; padding: 10px 0; background-color: #000080; color: #ffffff; -webkit-print-color-adjust: exact; position: fixed; bottom: 0; left: 0; right: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+            <span>Mount Hermon - Administradora de Beneficíos</span>
+            <span>0800 480 1000 - mounthermon.com.br</span>
+          </div>
+          <div style="margin-top: 5px;">
+            <span class="pageNumber"></span> / <span class="totalPages"></span>
+          </div>
+        </footer>
+      `;
+  
+      console.log('Generating PDF');
+      const pdf = await page.pdf({
+        format: 'A4',
+        displayHeaderFooter: true,
+        headerTemplate: header,
+        footerTemplate: footer,
+        printBackground: true
+      });
+  
+      await browser.close();
 
-        const pdfServices = new PDFServices({ credentials });
+      const nomeArquivo = `Proposta Nº ${numeroProposta}.pdf`;
+  
+      const filePath = path.join(__dirname, 'arquivospdf', `Proposta Nº ${numeroProposta}.pdf`);
+      fs.writeFileSync(filePath, pdf);
+      const fileUrl = `${appUrl}:${port}/uploads/${nomeArquivo}`;
 
-        // Preparar dados para mesclagem, incluindo dependentes
-        const jsonDataForMerge = {
-            PropostaNumero: numeroProposta,
-            TitularNomeCompleto: dadosProposta.nomecompleto,
-            TitularNomeMae: dadosProposta.nomemaetitular,
-            TitularDataNascimento: dadosProposta.datadenascimento,
-            TitularSexo: dadosProposta.sexotitular,
-            TitularEstadoCivil: dadosProposta.estadociviltitular,
-            TitularCPF: dadosProposta.cpftitular,
-            TitularRG: dadosProposta.rgtitular,
-            TitularNumeroCNS: "",
-            TitularEmail: dadosProposta.emailtitular,
-            TitularDDDTelResidencial: dadosProposta.telefonetitular,
-            TitularDDDTelCelular: dadosProposta.celulartitular,
-            TitularDDDTelComercial: "",
-            TitularEndResidencialCompleto: dadosProposta.enderecoresidencial,
-            TitularEndumero: dadosProposta.numeroendereco,
-            TitularEndComplemento: dadosProposta.complementoendereco,
-            TitularEndBairro: dadosProposta.bairro,
-            TitularEndCEP: dadosProposta.cep,
-            TitularEndMunicipio: dadosProposta.cidade,
-            TitularEndUf: dadosProposta.estado,
-            Dependentes: dependentes.map(dep => ({
-                DependenteNome: dep.nomecompletodependente,
-                DependenteCPF: dep.cpfdependente,
-                DependenteNascimento: dep.nascimentodependente,
-                DependenteSexo: dep.sexodependente,
-                DependenteEstadoCivil: dep.estadocivildependente,
-                DependenteParentesco: dep.grauparentescodependente
-            }))
-        };
-
-        console.log(JSON.stringify(jsonDataForMerge, null, 2));  // Verifique se os dados estão corretos
-
-        const inputDocxPath = path.join(__dirname, 'arquivospdf', 'modeloProposta2.docx');
-        readStream = fs.createReadStream(inputDocxPath);
-        const inputAsset = await pdfServices.upload({ readStream, mimeType: MimeType.DOCX });
-
-        const params = new DocumentMergeParams({ jsonDataForMerge, outputFormat: OutputFormat.PDF });
-
-        const job = new DocumentMergeJob({ inputAsset, params });
-
-        const pollingURL = await pdfServices.submit({ job });
-        const pdfServicesResponse = await pdfServices.getJobResult({ pollingURL, resultType: DocumentMergeResult });
-
-        const resultAsset = pdfServicesResponse.result.asset;
-        const streamAsset = await pdfServices.getContent({ asset: resultAsset });
-
-        const outputFilePath = path.join(__dirname, 'arquivospdf', `Proposta Nº ${numeroProposta}.pdf`);
-        console.log(`Saving asset at ${outputFilePath}`);
-
-        const writeStream = fs.createWriteStream(outputFilePath);
-        streamAsset.readStream.pipe(writeStream);
-
-        writeStream.on('finish', async () => {
-            try {
-                await db.query('INSERT INTO Propostas (numeroProposta, caminhoArquivoPDF) VALUES (?, ?)', [numeroProposta, outputFilePath]);
-                console.log('Dados inseridos com sucesso:');
-                resolve();
-            } catch (err) {
-                console.error('Erro ao inserir dados no banco de dados:', err);
-                reject(err);
-            }
-        });
-
-        writeStream.on('error', (err) => {
-            reject(err);
-        });
-
-    } catch (err) {
-        console.error("Exception encountered while executing operation", err);
-        reject(err);
-    } finally {
-        if (readStream) {
-            readStream.destroy();
+      db.query(query, [numeroProposta, nomeArquivo, fileUrl], (err, result) => {
+        if (err) {
+          reject(err);
+          enviarErroDiscord(`Erro ao salvar anexo do PDF gerado da proposta ao banco de dados, ERRO: ${err} -------- Proposta Nº ${numeroProposta}`)
+        } else {
+          sendStatus(idImplantacao, 2, "PDF do contrato após assinatura gerado com sucesso");
+          resolve(result);
         }
+      });
+    } catch (error) {
+      console.error('Error salvar PDF:', error);
+      enviarErroDiscord(`Erro geral na função de gerar PDF ERRO: ${error} ------ Proposta Nº ${numeroProposta}`)
+      reject(error);
     }
-  });
+  })
 }
 
 async function sendContractEmail(
@@ -292,7 +407,8 @@ async function sendContractEmail(
   });
 }
 
-function consultarNumeroProposta(idImplantacao) {
+async function consultarNumeroProposta(idImplantacao) {
+  const db = await mysql.createPool(config);
   return new Promise((resolve, reject) => {
     db.query(
       "SELECT numeroProposta FROM implantacoes WHERE id=?",
@@ -302,6 +418,23 @@ function consultarNumeroProposta(idImplantacao) {
           reject(err);
         } else {
           resolve(result[0].numeroProposta);
+        }
+      }
+    );
+  });
+}
+
+async function consultarIDProposta(numeroProposta) {
+  const db = await mysql.createPool(config);
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT id FROM implantacoes WHERE numeroProposta=?",
+      [numeroProposta],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result[0].id);
         }
       }
     );
@@ -339,26 +472,6 @@ async function salvarAnexos(idImplantacao, anexos) {
   }
 }
 
-/* async function insertData(query, values) {
-  return new Promise((resolve, reject) => {
-    db.query(query, values, (err, result) => {
-      if (err) {
-        logger.error({
-          message: `Erro ao inserir pela Query ${query}`,
-          error: err.message,
-          stack: err.stack,
-          timestamp: new Date().toISOString(),
-        });
-        reject(err);
-      } else {
-        resolve(result);
-      }
-    });
-  });
-} */
-
-
-
 function formatarDataDs(data) {
   var partesData = data.split('-');
   var dataFormatada = partesData[2] + '/' + partesData[1] + '/' + partesData[0];
@@ -366,6 +479,7 @@ function formatarDataDs(data) {
 }
 
 async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
+  const db = await mysql.createPool(config);
   const token = "X43ADVSEXM";
   const senhaApi = "kgt87pkxc2";
   const apiUrl = "https://digitalsaude.com.br/api/v2/contrato/";
@@ -384,10 +498,10 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
 
   try {
     const response = await axios.post(apiUrl, data, configDS);
-    
-    // Verificação dos códigos de status
+    const codigoImplantacaoDS = response.data.codigo
     if (response.status === 200) {
       await sendStatus(idImplantacao, 4, 'Implantação realizada com sucesso no digital saúde');
+      await db.query('INSERT INTO propostas_codigods (numeroProposta, codigo_ds) VALUES (?, ?)', [idImplantacao, codigoImplantacaoDS]);
       console.log("Proposta enviada com sucesso:", response.data);
       return { success: true, data: response.data };
     } else {
@@ -1141,7 +1255,7 @@ app.post("/testeFormulario", async (req, res) => {
         }));
 
         try {
-          await salvarAnexos(resultImplantacaoId, anexos);
+          await salvarAnexos(numeroProposta, anexos);
         } catch (error) {
           enviarErroDiscord(`Erro ao salvar Anexos ${error}`)
           console.error("Erro ao salvar anexos:", error);
@@ -1154,7 +1268,7 @@ app.post("/testeFormulario", async (req, res) => {
             numeroProposta,
             dados.cpffinanceiro,
             dados.nomefinanceiro,
-            dados.idEntidade
+            dados.identidade
           );
         } catch (error){
           enviarErroDiscord(`Erro ao enviar email para o titular do contrato ${error}`)
@@ -1169,14 +1283,6 @@ app.post("/testeFormulario", async (req, res) => {
           await sendStatus(resultImplantacaoId, 4, "Erro ao enviar proposta para o digital");
           console.error("Erro inesperado ao enviar proposta:", error);
         }
-
-        try {
-          await salvarPDFProposta(dados, dependentes, numeroProposta);
-      } catch (err) {
-          console.error('Erro ao gerar o PDF:', err);
-          res.status(500).send('Erro ao gerar o PDF');
-      }
-        
 
         try {
           await sendStatus(resultImplantacaoId, 2, "Implantação realizada com sucesso ao Ecommerce");
@@ -1523,6 +1629,10 @@ app.get(
 /* ROTA PARA SALVAR ASSINATURA DO CONTRATO */
 app.post("/salva-assinatura", async (req, res) => {
   const db = await mysql.createPool(config);
+  const numeroProposta = req.body.numeroProposta;
+  const planoLogo = req.body.planoLogo;
+  const dataVigencia = req.body.dataVigencia;
+  const urlContrato = req.body.urlContrato;
   const idImplantacao = req.body.idImplantacao;
   const assinatura = req.body.assinatura_base64;
   const sqlInsertAsign =
@@ -1544,10 +1654,15 @@ app.post("/salva-assinatura", async (req, res) => {
         .send("Erro ao enviar assinatura, solicite auxílio do suporte");
     }
     await sendStatus(idImplantacao, 2, "Proposta assinada pelo contratante");
+    await gerarSalvarPDFProposta(urlContrato, numeroProposta, idImplantacao, planoLogo, dataVigencia);
+    console.log('chegou aqui gerou o pdf')
+    await enviarAnexosParaDSContrato(numeroProposta);
+    console.log('chegou aqui enviou anexos')
+
     res.cookie("alertSuccess", "Assinatura feita com sucesso", {
       maxAge: 3000,
     });
-    res.status(200).send("Corretor cadastrado com sucesso.");
+    res.status(200).send("Assinado com sucesso.");
   });
 });
 
@@ -1886,22 +2001,6 @@ app.get("/entidades", verificaAutenticacao, async (req, res) => {
   });
 });
 
-/* app.get("/api/profissoes/:id", verificaAutenticacao, async (req, res) => {
-  const db = await mysql.createPool(config);
-  var idEntidade = req.params.id;
-  db.query(
-    "SELECT * FROM profissoes WHERE idEntidade = ?",
-    [idEntidade],
-    (error, resultsProfissoes) => {
-      if (error) {
-        res.status(500).json({ error: "Erro ao buscar profissões" });
-      } else {
-        res.json(resultsProfissoes);
-      }
-    }
-  );
-}); */
-
 app.post("/editar-entidade/:id", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   const idEntidade = req.params.id;
@@ -2041,106 +2140,122 @@ app.delete("/excluir-profissao/:id", verificaAutenticacao, async (req, res) => {
   });
 });
 
+app.get('/generate-pdf', async (req, res) => {
+  const link = req.query.url;
+  const numeroProposta = req.query.numeroProposta;
+  const planoLogoSrc= req.query.planoLogo;
+  const dataVigencia = req.query.dataVigencia;
+
+
+  try {
+    console.log('Launching browser');
+    const browser = await puppeteer.launch({
+      headless: true, // Mude para true para produção
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    const page = await browser.newPage();
+
+    const url = link;
+    console.log(`Navigating to URL: ${url}`);
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 180000 });
+
+    console.log('Waiting for CSS to load');
+    await page.waitForSelector('body'); // Aguarde um elemento específico que garante que os estilos foram aplicados
+
+    // Aguarde até que o conteúdo da página esteja completamente carregado
+    await page.evaluate(() => {
+      return new Promise((resolve) => {
+        if (document.readyState === 'complete') {
+          resolve();
+        } else {
+          window.addEventListener('load', resolve);
+        }
+      });
+    });
+
+    const urlAdmBase64 = getBase64Image(path.join(__dirname, 'img', 'logomounthermonoriginal.png'));
+    const urlPlanoBase64 = getBase64Image(path.join(__dirname, planoLogoSrc));
+
+    const header = `
+      <header style="width: 100%; position: fixed; top: 0; left: 0; right: 0; padding-top: 10px;">
+        <div style="width: 100%; padding: 10px; display: flex; flex-direction: row; font-size: 12px;">
+          <div style="width: 60%; padding: 10px; display: flex; flex-direction: column;">
+            <div style="width: 100%; padding: 10px; display: flex; flex-direction: row;">
+              <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
+              <strong> Administradora de Benefícios: </strong>
+                <img style="max-width: 50%;" src="data:image/png;base64,${urlAdmBase64}">
+                <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content;-webkit-print-color-adjust: exact">
+                  <div style="border: 1px solid white">
+                    ANS 42167-7
+                  </div>
+                </div>
+              </div>
+              <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
+              <strong> Operadora: </strong>
+                <img style="max-width: 50%;" src="data:image/png;base64,${urlPlanoBase64}">
+                <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content;-webkit-print-color-adjust: exact">
+                  <div style="border: 1px solid white">
+                    ANS 42167-7
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="width: 40%; padding: 10px; display: flex; flex-direction: column;">
+            <div style="width: 100%; padding: 10px; display: flex; flex-direction: row; background: #000080; color:#ffffff; -webkit-print-color-adjust: exact; border-radius: 11px 0px 0px 11px;">
+              <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
+                Numero da Proposta <br>
+                <span style="background: white; color: black; padding: 10px; border-radius: 5px;">${numeroProposta}</span>
+              </div>
+              <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
+                Data Vigência <br>
+                <span style="background: white; color: black; padding: 10px; border-radius: 5px;">${dataVigencia}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+    `;
+
+    const footer = `
+      <footer style="font-size:10px; text-align:center; width: 100%; padding: 10px 0; background-color: #000080; color: #ffffff; -webkit-print-color-adjust: exact; position: fixed; bottom: 0; left: 0; right: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+          <span>Mount Hermon - Administradora de Beneficíos</span>
+          <span>0800 480 1000 - mounthermon.com.br</span>
+        </div>
+        <div style="margin-top: 5px;">
+          <span class="pageNumber"></span> / <span class="totalPages"></span>
+        </div>
+      </footer>
+    `;
+
+    console.log('Generating PDF');
+    const pdf = await page.pdf({
+      format: 'A4',
+      displayHeaderFooter: true,
+      headerTemplate: header,
+      footerTemplate: footer,
+      printBackground: true
+    });
+
+    await browser.close();
+    console.log('PDF generated');
+
+    const filePath = path.join(__dirname, 'arquivospdf', 'modeloProposta2.pdf');
+    fs.writeFileSync(filePath, pdf);
+    console.log(`PDF saved to ${filePath}`);
+
+    res.contentType('application/pdf');
+    res.send(pdf);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).send('Erro ao gerar PDF');
+  }
+});
+
 /* TESTES  */
 
-app.get('/gerarpdf', async (req, res) => {
-  let readStream;
-  try {
-      // Initial setup, create credentials instance
-      const credentials = new ServicePrincipalCredentials({
-          clientId: "2ccc988bc62c440fbee4c36db6464be0",
-          clientSecret: "p8e-o-Hdu0cUQRuIV43fr3_KdE0qswIOtmPF"
-      });
-
-      // Creates a PDF Services instance
-      const pdfServices = new PDFServices({
-          credentials
-      });
-
-      // Setup input data for the document merge process
-      const jsonDataForMerge = {
-          TitularNomeCompleto: "Pablo Petelak",
-          TitularDataNascimento: "23/05/1992"
-      }
-
-      // Creates an asset(s) from source file(s) and upload
-      const inputDocxPath = path.join(__dirname, 'arquivospdf', 'modeloProposta.docx');
-      readStream = fs.createReadStream(inputDocxPath);
-      const inputAsset = await pdfServices.upload({
-          readStream,
-          mimeType: MimeType.DOCX
-      });
-
-      // Create parameters for the job
-      const params = new DocumentMergeParams({
-          jsonDataForMerge,
-          outputFormat: OutputFormat.PDF
-      });
-
-      // Creates a new job instance
-      const job = new DocumentMergeJob({
-          inputAsset,
-          params
-      });
-
-      // Submit the job and get the job result
-      const pollingURL = await pdfServices.submit({
-          job
-      });
-      const pdfServicesResponse = await pdfServices.getJobResult({
-          pollingURL,
-          resultType: DocumentMergeResult
-      });
-
-      // Get content from the resulting asset(s)
-      const resultAsset = pdfServicesResponse.result.asset;
-      const streamAsset = await pdfServices.getContent({
-          asset: resultAsset
-      });
-
-      // Creates a write stream and copy stream asset's content to it
-      const outputFilePath = path.join(__dirname, 'arquivospdf', 'formulario_preenchido.pdf');
-      console.log(`Saving asset at ${outputFilePath}`);
-
-      const writeStream = fs.createWriteStream(outputFilePath);
-      streamAsset.readStream.pipe(writeStream);
-      writeStream.on('finish', () => {
-        res.sendFile(outputFilePath, err => {
-            if (err) {
-                console.error('Erro ao enviar o arquivo:', err);
-                res.status(500).send('Erro ao enviar o arquivo');
-            }
-        });
-    });
-
-    // Manter o streaming até o fim
-    streamAsset.readStream.on('end', () => {
-        console.log('PDF gerado e salvo com sucesso!');
-    });
-  } catch (err) {
-      if (err instanceof SDKError || err instanceof ServiceUsageError || err instanceof ServiceApiError) {
-          console.log("Exception encountered while executing operation", err);
-      } else {
-          console.log("Exception encountered while executing operation", err);
-      }
-  } finally {
-      readStream?.destroy();
-  }
-});
-
-app.post('/gerarpdfteste', async (req, res) => {
-  try {
-    let dadosProposta = req.body.inputs;
-    let dadosDependente = req.body.dependentes;
-
-    await salvarPDFProposta(dadosProposta, dadosDependente, "2024099999991");
-    
-    res.send('requisição bem sucedida');
-  } catch (error) {
-    console.error('Erro ao processar a requisição:', error);
-    res.status(500).send('Erro interno do servidor');
-  }
-});
+/* FIM TESTES */
 
 
 app.get("/logout", (req, res) => {

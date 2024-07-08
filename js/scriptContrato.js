@@ -1,6 +1,21 @@
 function saveAsPDF() {
-    window.print();
+    const currentUrl = window.location.href;
+
+            // Obter os valores dos inputs ocultos
+    const numeroProposta = document.getElementById("numeroProposta").value;
+    const planoLogo = document.getElementById("planoLogo").value;
+    const dataVigencia = document.getElementById("dataVigencia").value;
+
+    // Construir a URL com os parâmetros
+    const newHref = `/generate-pdf/?url=${encodeURIComponent(currentUrl)}&numeroProposta=${numeroProposta}&planoLogo=${planoLogo}&dataVigencia=${dataVigencia}`;
+
+    // Atualizar o href do link
+    const pdfLink = document.getElementById("pdfLink");
+    pdfLink.setAttribute("href", newHref);
+    // Redireciona para o link
+    pdfLink.click();
 }
+
 document.getElementById('btnSave').addEventListener('click', saveAsPDF);
 
 const container = document.getElementById('signature-container');
@@ -34,7 +49,11 @@ document.getElementById('save-btn').addEventListener('click', function () {
     // Construa o objeto a ser enviado no corpo da requisição
     const dataToSend = {
         idImplantacao: idImplantacao,
-        assinatura_base64: signatureData
+        assinatura_base64: signatureData,
+        urlContrato: window.location.href,
+        numeroProposta: document.getElementById("numeroProposta").value,
+        planoLogo: document.getElementById("planoLogo").value,
+        dataVigencia: document.getElementById("dataVigencia").value
     };
 
     console.log(dataToSend);

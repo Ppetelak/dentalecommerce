@@ -130,3 +130,12 @@ CREATE TABLE Propostas (
     caminhoArquivoPDF VARCHAR(255) NOT NULL,
     dataCriacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE propostas_codigods (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    numeroProposta INT NOT NULL,
+    codigo_ds VARCHAR(255) NOT NULL,
+    dataCriacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
+ALTER TABLE anexos_implantacoes MODIFY COLUMN id_implantacao VARCHAR(255);
