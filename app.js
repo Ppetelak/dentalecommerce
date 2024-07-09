@@ -2249,6 +2249,12 @@ app.get('/generate-pdf', async (req, res) => {
     res.contentType('application/pdf');
     res.send(pdf);
   } catch (error) {
+    logger.error({
+      message: "Erro geração de pdf da proposta",
+      error: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString(),
+    });
     console.error('Error generating PDF:', error);
     res.status(500).send('Erro ao gerar PDF');
   }
