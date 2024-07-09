@@ -156,6 +156,10 @@ h3 {
     font-weight: normal;
 }
 
+.manualOrientacao, .guiaLeitura {
+    text-align: justify;
+}
+
 .table-contrato tr td:nth-child(1), .table-contrato tr th:nth-child(1) {
     background: #000;
     color: #fff;
@@ -248,6 +252,13 @@ h3 {
     background: #E0E0DF;
     padding-top: 5px;
     padding-bottom: 5px;
+}
+
+.table-glc tr td:nth-child(3), .table-glc tr th:nth-child(3){
+    background: #E0E0DF;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight: bold;
 }
 
 .propostaAssociativa {

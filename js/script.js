@@ -507,13 +507,20 @@ function handlePossuiDependentesChange() {
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label for="cpfdependente">CPF:</label>
                     <input type="text" class="form-control required dependente-input" name="cpfdependente"
                         id="cpfdependente" rows="3" placeholder="CPF do dependente" onblur="validarCPF(this)" required>
                     <span class="valid-feedback"></span>
                     <span class="invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="rgdependente">RG: </label>
+                    <input type="text" class="form-control required dependente-input" name="rgdependente"
+                        id="rgdependente" rows="3" placeholder="RG do dependente" required>
                 </div>
             </div>
             <div class="col-md-6">

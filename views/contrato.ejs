@@ -151,11 +151,6 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-6">
-                            <p>Entidade de Classe: <span> entidade de classe </span></p>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -202,16 +197,16 @@
             <div class="row dados financeiroTitular">
                 <% if(implantacao.titularresponsavelfinanceiro === 'Sim') { %>
                     <div class="col-12">
-                        <h6>Titular Financeiro</h6>
+                        <h6>Representante Legal</h6>
                         <div class="row">
                             <div class="col-12">
-                                <p> Titular do Plano é o mesmo responsável financeiro</p>
+                                <p> Titular do Plano é o mesmo Representante Legal</p>
                             </div>
                         </div>
                     </div>
                 <% } else if(implantacao.titularresponsavelfinanceiro === 'Não') { %> 
                     <div class="col-12">
-                        <h6>Titular Financeiro</h6>
+                        <h6>Representante Legal</h6>
                         <div class="row">
                             <div class="col-6">
                                 <p>CPF: <span>
@@ -291,6 +286,9 @@
                                     <div class="col-6">
                                         <p>Grau de parentesco: <span> <%= dependente.grauparentescodependente %> </span></p>
                                     </div>
+                                    <div class="col-6">
+                                        <p>RG: <span> <%= dependente.rgdependente %></span></p>
+                                    </div>
                                 </div>
                             </div>
                         <% }) %>
@@ -326,7 +324,6 @@
                                          </span>
                                          <% } %>        
                             </p>
-                            <p>Valor do taxa associativa: <span> R$ <%= entidade.taxa %></span></p>
                             <p>Valor da taxa de cadastro:</p>
                             <p>Total da cobrança:</p>
                             <p> Mês de reajuste: <span> <%= plano.reajuste %> </span></p>
@@ -346,10 +343,10 @@
                         </p>
                         <ol>
                             <li>
-                                Este instrumento é a <strong>Proposta</strong> de Adesão, doravante denominada simplesmente “Proposta”, ao plano odontológico coletivo por adesão, doravante denominado simplesmente “benefício”, esti pulado pela Mount Hermon Administradora de Benefícios Ltda., doravante denominada simplesmente “Administradora de Benefícios”, com a Dental Uni - Cooperativa Odontológica, doravante denominada simplesmente “Operadora”, e destinada à população que mantenha vínculo com a minha entidade de classe, doravante denominada simplesmente “Entidade”, indicada na página 1 desta <strong>Proposta</strong>.
+                                Este instrumento é a <strong>Proposta de Adesão </strong>, doravante denominada simplesmente <strong> "Proposta" </strong>, ao plano odontológico coletivo por adesão, doravante denominado simplesmente “benefício”, estipulado pela Mount Hermon <strong> Administradora de Benefícios </strong> Ltda., doravante denominada simplesmente “<strong> Administradora de Benefícios </strong>”, com a Dental Uni - Cooperativa Odontológica, doravante denominada simplesmente <strong> "Operadora" </strong>, e destinada à população que mantenha vínculo com a minha entidade de classe, doravante denominada simplesmente <strong> "Entidade" </strong>, indicada na página 1 desta <strong>Proposta</strong>.
                             </li>
                             <li>
-                                Mantenho vínculo com a Entidade indicada na página 1 desta <strong>Proposta</strong>, sendo que a documentação comprobatória desse vínculo está sendo entregue por mim ao angariador, no ato da assinatura desta, para que seja conferida pela <strong>Administradora de Benefícios</strong>, podendo ser recusada em razão da falta de minha elegibilidade. Em caso de recusa da adesão, a taxa de angariação será devolvida a mim pelo angariador que a recebeu. A Administradora de Benefícios e/ou a <strong>Operadora</strong> poderão, a qualquer tempo, requerer a atualização da documentação comprobatória do meu vínculo com a Entidade.
+                                Mantenho vínculo com a Entidade indicada na página 1 desta <strong>Proposta</strong>, sendo que a documentação comprobatória desse vínculo está sendo entregue por mim ao angariador, no ato da assinatura desta, para que seja conferida pela <strong><strong> Administradora de Benefícios </strong></strong>, podendo ser recusada em razão da falta de minha elegibilidade. Em caso de recusa da adesão, a taxa de angariação será devolvida a mim pelo angariador que a recebeu. A <strong> Administradora de Benefícios </strong> e/ou a <strong>Operadora</strong> poderão, a qualquer tempo, requerer a atualização da documentação comprobatória do meu vínculo com a Entidade.
                             </li>
                             <li>
                                 Serão aceitos como meus dependentes o (a) cônjuge; o (a) companheiro(a) que comprove união estável conforme Lei Civil; os (as) fi lhos (as); o (as) enteado (as); os (as) netos. De qualquer idade, desde que ainda sejam dependentes. Agregados que possuem grau de parentesco com o Titular até o 3° grau: pai; bisavôs (ós); ti os (as); mãe; bisnetos (as); sobrinhos (as); avôs (ós); irmão (ãs); sogro (a); cunhados (as). 
@@ -358,16 +355,16 @@
                                 A responsabilidade pelos documentos e informações fornecidos por mim e por meu(s) dependente(s) sobre toda e qualquer circunstância que possa influir na aceitação desta <strong>Proposta</strong>, na permanência e/ou no valor mensal do <strong>benefício</strong> é única e exclusivamente minha; Omissões ou dados errôneos acarretarão na perda de todos os meus direitos, bem como os do(s) meu(s) dependente(s), decorrentes do <strong>benefício</strong>.
                             </li>
                             <li>
-                                Efetivada a análise dos documentos e das informações prestadas nesta <strong>Proposta</strong>, de acordo com a legislação vigente, será implantada pela <strong>Operadora</strong> e o <strong>benefício</strong> terá início na data indicada no campo “Início da vigência”, na página 1 da presente; tanto eu quanto meu(s) dependente(s) passaremos a ser denominados “beneficiários”.
+                                Efetivada a análise dos documentos e das informações prestadas nesta <strong>Proposta</strong>, de acordo com a legislação vigente, será implantada pela <strong>Operadora</strong> e o <strong>benefício</strong> terá início na data indicada no campo “Início da vigência”, na página 1 da presente; tanto eu quanto meu(s) dependente(s) passaremos a ser denominados <strong> "beneficiários" </strong>.
                             </li>
                             <li>
-                                Assim que eu assumir a condição de <strong>Beneficiário</strong> titular, fi cam outorgados à <strong>Administradora de Benefícios</strong> amplos poderes para me representar, perante a <strong>Operadora</strong> e outros órgãos, em especial a ANS, no cumprimento e/ou nas alterações deste <strong>benefício</strong>, bem como na negociação dos reajustes dos valores mensais.
+                                Assim que eu assumir a condição de <strong>Beneficiário</strong> titular, ficam outorgados à <strong><strong> Administradora de Benefícios </strong></strong> amplos poderes para me representar, perante a <strong>Operadora</strong> e outros órgãos, em especial a ANS, no cumprimento e/ou nas alterações deste <strong>benefício</strong>, bem como na negociação dos reajustes dos valores mensais.
                             </li>
                             <li>
-                                O contrato do plano odontológico coletivo por adesão firmado entre a <strong>Administradora de Benefícios</strong> e a <strong>Operadora</strong>, no qual passarei a integrar, vigorará pelo prazo mínimo de 12 (doze) meses, podendo ser renovado automaticamente, por prazo indeterminado, desde que não ocorra denúncia, por escrito, no prazo de 60 (sessenta) dias, de qualquer das partes, seja pela <strong>Administradora de Benefícios</strong> ou pela <strong>Operadora</strong>. A vigência do <strong>benefício</strong> indicada na página 1 desta <strong>Proposta</strong> não se confunde com a vigência do contrato do plano odontológico coletivo por adesão. Em caso de rescisão desse contrato do plano odontológico coletivo por adesão, a <strong>Administradora de Benefícios</strong> me fará a comunicação desse fato em prazo não inferior a 30 (trinta) dias.
+                                O contrato do plano odontológico coletivo por adesão firmado entre a <strong><strong> Administradora de Benefícios </strong></strong> e a <strong>Operadora</strong>, no qual passarei a integrar, vigorará pelo prazo mínimo de 12 (doze) meses, podendo ser renovado automaticamente, por prazo indeterminado, desde que não ocorra denúncia, por escrito, no prazo de 60 (sessenta) dias, de qualquer das partes, seja pela <strong><strong> Administradora de Benefícios </strong></strong> ou pela <strong>Operadora</strong>. A vigência do <strong>benefício</strong> indicada na página 1 desta <strong>Proposta</strong> não se confunde com a vigência do contrato do plano odontológico coletivo por adesão. Em caso de rescisão desse contrato do plano odontológico coletivo por adesão, a <strong><strong> Administradora de Benefícios </strong></strong> me fará a comunicação desse fato em prazo não inferior a 30 (trinta) dias.
                             </li>
                             <li>
-                                Com antecedência mínima de 60 (sessenta) dias para o vencimento do período de cada 12 meses contratados, contados da primeira vigência, deverei denunciar à <strong>Administradora de Benefícios</strong>, por escrito, minha intenção em dar continuidade ou não no meu plano odontológico para o novo período anual. Não havendo minha manifestação de cancelamento, a <strong>Administradora de Benefícios</strong> procederá com renovação automática do meu plano odontológico e de meus dependentes, se houver. Receberei da <strong>Administradora de Benefícios</strong> informativo para quitação das mensalidades na mesma forma de pagamento em que foi aderido o contrato. Este será enviado em até 5 dias antes da renovação do mesmo produto com os valores atualizados, visto que o contrato prevê reajuste das mensalidades.
+                                Com antecedência mínima de 60 (sessenta) dias para o vencimento do período de cada 12 meses contratados, contados da primeira vigência, deverei denunciar à <strong><strong> Administradora de Benefícios </strong></strong>, por escrito, minha intenção em dar continuidade ou não no meu plano odontológico para o novo período anual. Não havendo minha manifestação de cancelamento, a <strong><strong> Administradora de Benefícios </strong></strong> procederá com renovação automática do meu plano odontológico e de meus dependentes, se houver. Receberei da <strong><strong> Administradora de Benefícios </strong></strong> informativo para quitação das mensalidades na mesma forma de pagamento em que foi aderido o contrato. Este será enviado em até 5 dias antes da renovação do mesmo produto com os valores atualizados, visto que o contrato prevê reajuste das mensalidades.
                             </li>
                             <li>
                                 Alguns planos coletivos por adesão, podem possuir entre os seus mecanismos de regulação a coparticipação, que é a participação na despesa assistencial a ser paga pelo <strong>Beneficiário</strong> sempre que houver a realização de consultas, exames, procedimentos, respeitadas as resoluções e instruções normativas da ANS vigentes à época da estipulação do contrato do plano odontológico coletivo por adesão e conforme o quadro a seguir:
@@ -492,28 +489,28 @@
                                 </tbody>
                             </table>
                             <li>
-                                O pagamento do <strong>benefício</strong>, será no mesmo dia [XX] e sua forma será aquela indicada na página 3 desta <strong>Proposta</strong>, sendo que a falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao mês (0,033% ao dia) e à multa de 2% sobre o valor do débito em atraso, calculados proporcionalmente ao tempo de inadimplência e ainda, se for o caso, honorários advocatícios e reembolso de custas judiciais e outras despesas de cobrança. No período de inadimplência, poderá ocorrer a suspensão automática do <strong>benefício</strong>, cuja utilização somente será restabelecida a parti r da quitação do(s) valor(es) pendente(s), acrescido(s) dos encargos supracitados, observada a possibilidade de cancelamento, conforme disposto no item 17 desta <strong>Proposta</strong>. No caso de inadimplência, a contar da data de seu vencimento, a <strong>Administradora de Benefícios</strong> adotará medidas para a cobrança dos valores em atraso, acarretando, inclusive, o envio das informações do <strong>Beneficiário</strong> titular, ou de seu responsável legal, aos órgãos de serviço de proteção ao crédito, mediante prévia comunicação, conforme determina o Código de Defesa do Consumidor
+                                O pagamento do <strong>benefício</strong>, será no mesmo dia <%= implantacao.dataVencimento %> e sua forma será aquela indicada na página 1 desta <strong>Proposta</strong>, sendo que a falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao mês (0,033% ao dia) e à multa de 2% sobre o valor do débito em atraso, calculados proporcionalmente ao tempo de inadimplência e ainda, se for o caso, honorários advocatícios e reembolso de custas judiciais e outras despesas de cobrança. No período de inadimplência, poderá ocorrer a suspensão automática do <strong>benefício</strong>, cuja utilização somente será restabelecida a partir da quitação do(s) valor(es) pendente(s), acrescido(s) dos encargos supracitados, observada a possibilidade de cancelamento, conforme disposto no item 18 desta <strong>Proposta</strong>. No caso de inadimplência, a contar da data de seu vencimento, a <strong><strong> Administradora de Benefícios </strong></strong> adotará medidas para a cobrança dos valores em atraso, acarretando, inclusive, o envio das informações do <strong>Beneficiário</strong> titular, ou de seu responsável legal, aos órgãos de serviço de proteção ao crédito, mediante prévia comunicação, conforme determina o Código de Defesa do Consumidor
                             </li>
                             <li>
                                 Independentemente da data da minha <strong>Proposta</strong>, o valor mensal do <strong>benefício</strong> poderá sofrer os seguintes reajustes:
                                 <br>
                                 <ul>
                                     <li>
-                                        (I) reajuste anual (financeiro e/ou por índice de sinistralidade), que ocorre quando há alteração de custos, utilização dos serviços médicos e uso de novas tecnologias, cuja periodicidade será anual, sempre no mês de aniversário do contrato celebrado entre a <strong>Operadora</strong> e a Administradora, independente da data de inclusão dos beneficiários no plano odontológico, nunca ocorrendo, porém, em periodicidade inferior a 12 (doze) meses, da última aplicação do reajuste anual; 
+                                        (I) reajuste anual (financeiro e/ou por índice de sinistralidade), que ocorre quando há alteração de custos, utilização dos serviços médicos e uso de novas tecnologias, cuja periodicidade será <strong>anual </strong>, sempre no mês de aniversário do contrato celebrado entre a <strong>Operadora</strong> e a <strong>Administradora de Benefícios </strong>, independente da data de inclusão dos beneficiários no plano odontológico, nunca ocorrendo, porém, em periodicidade inferior a 12 (doze) meses, da última aplicação do reajuste anual; 
                                     </li>
                                     <li>
-                                        (II) reajuste(s) em outra(s) hipótese(s), que venha(m) a ser autorizado(s) pela ANS, contratado(s) entre a <strong>Administradora de Benefícios</strong> e a <strong>Operadora</strong>, além de previamente comunicado(s) ao <strong>Beneficiário</strong>
+                                        (II) reajuste(s) em outra(s) hipótese(s), que venha(m) a ser autorizado(s) pela <strong>ANS</strong>, contratado(s) entre a <strong><strong> Administradora de Benefícios </strong></strong> e a <strong>Operadora</strong>, além de previamente comunicado(s) ao <strong>Beneficiário</strong>
                                     </li>
                                 </ul>
                             </li>
                             <li>
-                                Devo solicitar e informar expressamente à <strong>Administradora de Benefícios</strong> toda e qualquer alteração cadastral, tal como a eventual perda de elegibilidade.
+                                Devo solicitar e informar expressamente à <strong><strong> Administradora de Benefícios </strong></strong> toda e qualquer alteração cadastral, tal como a eventual perda de elegibilidade.
                             </li>
                             <li>
-                                Poderei solicitar o cancelamento do <strong>benefício</strong> à <strong>Administradora de Benefícios</strong>, de acordo com os normativos da legislação em vigor. O <strong>benefício</strong> poderá ser cancelado unilateralmente, conforme as regras e prazos previstos em contrato, nas seguintes situações (i) por uma das pessoas jurídicas contratantes (<strong>Operadora</strong>, <strong>Administradora de Benefícios</strong> ou Entidade); (ii) em caso de perda da elegibilidade, se constatada fraude no uso do plano ou nas informações prestadas na contratação; (iii) pela falta de pagamento do parcelamento contratado ou pela falta de pagamento da renovação anual, mediante comunicado prévio. No caso de cancelamento do <strong>benefício</strong>, haverá minha exclusão e a de meu(s) <strong>Beneficiário</strong>(s) dependente(s), sem prejuízo da cobrança do(s) valor(es) não pago(s), incluídos juros e multa.
+                                Poderei solicitar o cancelamento do <strong>benefício</strong> à <strong><strong> Administradora de Benefícios </strong></strong>, de acordo com os normativos da legislação em vigor. O <strong>benefício</strong> poderá ser cancelado unilateralmente, conforme as regras e prazos previstos em contrato, nas seguintes situações (i) por uma das pessoas jurídicas contratantes (<strong>Operadora</strong>, <strong><strong> Administradora de Benefícios </strong></strong> ou <strong>Entidade</strong>); (ii) em caso de perda da elegibilidade, se constatada fraude no uso do plano ou nas informações prestadas na contratação; (iii) pela falta de pagamento do parcelamento contratado ou pela falta de pagamento da renovação anual, mediante comunicado prévio. No caso de cancelamento do <strong>benefício</strong>, haverá minha exclusão e a de meu(s) <strong>Beneficiário</strong>(s) dependente(s), sem prejuízo da cobrança do(s) valor(es) não pago(s), incluídos juros e multa.
                             </li>
                             <li>
-                                No caso de cancelamento do <strong>benefício</strong>, devolverei imediatamente à <strong>Administradora de Benefícios</strong> os cartões de identificação do(s) <strong>Beneficiário</strong>(s), assumindo todas as responsabilidades civis, criminais e financeiras por toda e qualquer utilização indevida do <strong>benefício</strong>, incluindo a utilização por terceiros, com ou sem o meu conhecimento.
+                                No caso de cancelamento do <strong>benefício</strong>, devolverei imediatamente à <strong><strong> Administradora de Benefícios </strong></strong> os cartões de identificação do(s) <strong>Beneficiário</strong>(s), assumindo todas as responsabilidades civis, criminais e financeiras por toda e qualquer utilização indevida do <strong>benefício</strong>, incluindo a utilização por terceiros, com ou sem o meu conhecimento.
                             </li>
                             <li>
                                 Não haverá nenhuma continuidade deste <strong>benefício</strong> nas hipóteses previstas nos artigos 30 e 31 da Lei nº 9.656/98, que cuidam da continuidade assistencial em casos de demissão e aposentadoria em contratos coletivos empresariais, hipóteses essas totalmente diversas das que se aplicam a este <strong>benefício</strong>.
@@ -522,13 +519,13 @@
                                 Poderei postular nova adesão ao <strong>benefício</strong>, após ser feita nova análise e aceitação das condições de minha elegibilidade e após ter quitado eventuais débitos anteriores. A nova adesão estará sujeita ao cumprimento de novos prazos de carências parciais ou totais, de acordo com os normativos da legislação em vigor.
                             </li>
                             <li>
-                                Poderei desistir desta <strong>Proposta</strong>, sem nenhum ônus, desde que tal decisão seja comunicada por escrito à <strong>Administradora de Benefícios</strong> no prazo máximo de 7 (sete) dias, contados a parti r da data de minha assinatura neste instrumento, autorizando a cobrança do valor do <strong>benefício</strong>, caso esse prazo não seja observado
+                                Poderei desistir desta <strong>Proposta</strong>, sem nenhum ônus, desde que tal decisão seja comunicada por escrito à <strong><strong> Administradora de Benefícios </strong></strong> no prazo máximo de 7 (sete) dias, contados a partir da data de minha assinatura neste instrumento, autorizando a cobrança do valor do <strong>benefício</strong>, caso esse prazo não seja observado
                             </li>
                             <li>
-                                A minha manifestação de vontade, ao aceitar esta <strong>Proposta</strong>, não poderá ser questionada pelo mero fato de ter sido assinada por meio eletrônico e, para todos os fi ns de direito, esta <strong>Proposta</strong> equivale a um documento particular. Declaro, ainda, aceitar como válido o meio tecnológico adotado pela <strong>Administradora de Benefícios</strong> para a celebração desta <strong>Proposta</strong>, uma vez que garanti das a autoria e integridade do documento em forma eletrônica, nos termos da legislação em vigor.
+                                A minha manifestação de vontade, ao aceitar esta <strong>Proposta</strong>, não poderá ser questionada pelo mero fato de ter sido assinada por meio eletrônico e, para todos os fins de direito, esta <strong>Proposta</strong> equivale a um documento particular. Declaro, ainda, aceitar como válido o meio tecnológico adotado pela <strong><strong> Administradora de Benefícios </strong></strong> para a celebração desta <strong>Proposta</strong>, uma vez que garanti das a autoria e integridade do documento em forma eletrônica, nos termos da legislação em vigor.
                             </li>
                             <li>
-                                O tratamento de meus dados pessoais e dados pessoais sensíveis do(s) <strong>Beneficiário</strong>(s) dependente(s) pela <strong>Administradora de Benefícios</strong> e <strong>Operadora</strong>, para os fi ns do preenchimento da <strong>Proposta</strong> e regular prestação dos serviços de assistência à saúde contratados, visa atender as exigências de garanti a assistencial obrigatória estabelecidas na Instrução Normativa - IN Nº 8, de 30 de março de 2022 da Agência Nacional de Saúde Suplementar - ANS, e será realizado independentemente do meu consenti mento e do(s) <strong>Beneficiário</strong>(s) dependente(s) de dados manifestado no ato da contratação, sempre de modo a resguardar os direitos fundamentais de liberdade, privacidade e livre desenvolvimento da pessoa natural, em observância à Lei Federal nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD)” 
+                                O tratamento de meus dados pessoais e dados pessoais sensíveis do(s) <strong>Beneficiário</strong>(s) dependente(s) pela <strong><strong> Administradora de Benefícios </strong></strong> e <strong>Operadora</strong>, para os fins do preenchimento da <strong>Proposta</strong> e regular prestação dos serviços de assistência à saúde contratados, visa atender as exigências de garantia assistencial obrigatória estabelecidas na Instrução Normativa - IN Nº 8, de 30 de março de 2022 da Agência Nacional de Saúde Suplementar - ANS, e será realizado independentemente do meu consentimento e do(s) <strong>Beneficiário</strong>(s) dependente(s) de dados manifestado no ato da contratação, sempre de modo a resguardar os direitos fundamentais de liberdade, privacidade e livre desenvolvimento da pessoa natural, em observância à Lei Federal nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD)” 
                             </li>
                             <li>
                                 O Foro para dirimir quaisquer questões oriundas da presente <strong>Proposta</strong> é o do meu domicílio.
@@ -546,15 +543,12 @@
                         <p>
                             Os planos com contratação individual ou familiar são aqueles contratados diretamente da
                             operadora de plano de saúde: é o próprio <strong>Beneficiário</strong> quem escolhe as características do
-                            plano a ser contratado.
-                        </p>
-
-                        <p>
+                            plano a ser contratado. <br>
                             Os planos com contratação coletiva são aqueles em que o <strong>Beneficiário</strong> ingressa no plano de
                             saúde contratado por uma empresa ou órgão público (coletivo empresarial); associação
                             profissional, sindicato ou entidade assemelhada (coletivo por adesão). Nos planos coletivos
                             é um representante dessas pessoas jurídicas contratantes, com a participação ou não de uma
-                            <strong>Administradora de Benefícios</strong>, que negocia e define as características do plano a ser
+                            <strong><strong> Administradora de Benefícios </strong></strong>, que negocia e define as características do plano a ser
                             contratado. Assim, é importante que o <strong>Beneficiário</strong> antes de vincular-se a um plano coletivo,
                             em especial o por adesão, avalie a compatibilidade entre os seus interesses e os interesses
                             da pessoa jurídica contratante.
@@ -572,7 +566,7 @@
                                 <td> CARÊNCIA </td>
                                 <td>
                                     É permitida a exigência de cumprimento de período de carência nos prazos máximos
-                                    estabelecidos pela Lei nº 9.656/1998:24h para urgência/emergência, até300 dias para
+                                    estabelecidos pela Lei nº 9.656/1998:24h para urgência/emergência, até 300 dias para
                                     parto a termo e até 180 dias para demais procedimentos.
                                 </td>
                                 <td>
@@ -619,7 +613,7 @@
                                     cobertura total, desde que cumpridas as eventuais carências. A operadora de planos
                                     de saúde não pode negar a cobertura de procedimentos relacionados a DLP não
                                     declaradas pelo <strong>Beneficiário</strong> antes do julgamento de processo administrativo na forma
-                                    prevista pela RN 162/2007
+                                    prevista pela RN 558/2022
                                 </td>
                                 <td>
                                     <div class="interna">
@@ -664,7 +658,7 @@
                                     que devem ter cláusula clara elegendo um índice de preços divulgado por instituição
                                     externa. A variação da mensalidade por mudança de faixa etária é o aumento
                                     decorrente de alteração de idade do <strong>Beneficiário</strong>, segundo faixas e percentuais de
-                                    variação dispostos em contrato e atendendo a RN 63/2003.
+                                    variação dispostos em contrato e atendendo a RN 563/2022.
                                 </td>
                                 <td>
                                     Os planos coletivos não precisam de autorização prévia da ANS para aplicação de
@@ -678,7 +672,7 @@
                                     autorização da ANS, esta faz um monitoramento dos reajustes aplicados nos contratos
                                     coletivos. A variação da mensalidade por mudança de faixa etária é o aumento
                                     decorrente da alteração de idade do <strong>Beneficiário</strong>, segundo faixas e percentuais de
-                                    variação dispostos em contrato e atendendo a RN nº 63/2003.
+                                    variação dispostos em contrato e atendendo a RN nº 563/2022.
                                 </td>
                             </tr>
                             <tr>
@@ -748,17 +742,13 @@
                             pagamento da mensalidade, regular é não vinculada à coparticipação em eventos, é assegurado
                             ao mesmo o direito de permanência neste plano coletivo no caso de demissão sem justa causa
                             ou aposentadoria. No caso de morte do titular demitido ou aposentado em gozo de <strong>benefício</strong>
-                            decorrente dos artigos 30 e 31, é assegurada a permanência do grupo familiar.
-                        </p>
-                        <p>
+                            decorrente dos artigos 30 e 31, é assegurada a permanência do grupo familiar. <br>
                             O <strong>Beneficiário</strong> tem um prazo máximo de 30 dias, após seu desligamento, para se manifestar
                             junto à empresa/órgão público, com a qual mantinha vínculo empregatício ou estatutário,
                             sobre a sua vontade de permanecer no plano de saúde. O <strong>Beneficiário</strong> assume integralmente o
                             pagamento da mensalidade quando opta pela permanência. O período de manutenção da condição
                             de <strong>Beneficiário</strong> do plano é de 6 meses no mínimo, e proporcional ao período em que o mesmo
-                            permaneceu vinculado e contribuindo para o plano de saúde como empregado ou servidor
-                        </p>
-                        <p>
+                            permaneceu vinculado e contribuindo para o plano de saúde como empregado ou servidor <br>
                             Salientamos que o <strong>Beneficiário</strong> perde o direito de permanência no plano de saúde do seu
                             ex-empregador ou órgão público quando da sua admissão em um novo emprego ou cargo
                         </p>
@@ -771,17 +761,11 @@
                             Os beneficiários de planos coletivos empresariais que tiverem o <strong>benefício</strong> de plano de saúde
                             extinto, terão o direito de se vincular a um plano da mesma operadora com contratação
                             individual ou familiar, sem a necessidade de cumprimento de novos prazos de carência. Essa
-                            prerrogativa não se aplica aos planos de autogestões.
-                        </p>
-                        <p>
+                            prerrogativa não se aplica aos planos de autogestões. <br>
                             A condição para exercer esse direito é que a operadora comercialize plano individual ou
-                            familiar.
-                        </p>
-                        <p>
+                            familiar. <br>
                             O <strong>Beneficiário</strong> tem um prazo máximo de 30 dias, após a extinção do <strong>benefício</strong>, para contratar,
-                            junto à operadora, o plano individual ou familiar.
-                        </p>
-                        <p>
+                            junto à operadora, o plano individual ou familiar. <br>
                             Este direito não existe caso tenha havido apenas a troca de operadora por parte do
                             contratante (órgão público ou empresa)
                         </p>
@@ -796,9 +780,7 @@
                             pelo <strong>Beneficiário</strong>. A Lei nº 9.656/1998 definiu como referência o plano com assistência
                             ambulatorial, hospitalar, obstétrica e urgência/emergência integral após 24h, em acomodação
                             padrão enfermaria. O contrato pode prever coberturas mais amplas do que as exigidas pela
-                            legislação, mas as exclusões devem estar limitadas às previstas na Lei nº 9.656/1998.
-                        </p>
-                        <p>
+                            legislação, mas as exclusões devem estar limitadas às previstas na Lei nº 9.656/1998. <br>
                             A cobertura para acidente do trabalho ou doença profissional em planos coletivos
                             empresariais é adicional e depende de contratação específica.
                         </p>
@@ -817,26 +799,20 @@
                         </h1>
                         <p>
                             É a especificação nominal do(s) estado(s) ou município(s) que compõem as áreas de
-                            abrangência estadual, grupo de estados, grupo de municípios ou municipal
-                        </p>
-                        <p>
-                            É importante que o <strong>Beneficiário</strong> fique atento a estas informações, uma vez que as
-                            especificações da área de abrangência e da área de atuação do plano, obrigatoriamente, devem
-                            constar no contrato de forma clara.
+                            abrangência estadual, grupo de estados, grupo de municípios ou municipal. <br>
+                            É importante que o <strong>Beneficiário</strong> fique atento a estas informações, uma vez que as especificações da área de abrangência e da área de atuação do plano, obrigatoriamente, devem constar no contrato de forma clara.
                         </p>
 
                         <h1>
-                            <strong>Administradora de Benefícios</strong>
+                            <strong><strong> Administradora de Benefícios </strong></strong>
                         </h1>
                         <p>
-                            Quando houver participação <strong>Administradora de Benefícios</strong> na contratação de plano coletivo
+                            Quando houver participação <strong><strong> Administradora de Benefícios </strong></strong> na contratação de plano coletivo
                             empresarial, a verificação do número de participantes para fins de carência ou CPT
-                            considerará a totalidade de participantes eventualmente já vinculados ao plano estipulado.
-                        </p>
-                        <p>
+                            considerará a totalidade de participantes eventualmente já vinculados ao plano estipulado. <br>
                             Se a contratação for de plano coletivo por adesão, para fins de carência considerar-se-á
                             como data de celebração do contrato coletivo a data do ingresso da pessoa jurídica
-                            contratante ao contrato estipulado pela <strong>Administradora de Benefícios</strong>
+                            contratante ao contrato estipulado pela <strong><strong> Administradora de Benefícios </strong></strong>
                         </p>
                         <div class="rodape">
                             <div class="rodapeManual">
@@ -889,9 +865,12 @@
                                 <td>
                                     CONTRATAÇÃO
                                 </td>
-                                <td colspan="2">
+                                <td>
                                     Determina se o plano destina-se à pessoa física ou jurídica. A contratação pode ser
                                     Individual/ Familiar, Coletivo por Adesão ou Coletivo Empresarial.
+                                </td>
+                                <td>
+                                    3
                                 </td>
                             </tr>
                             <tr>
@@ -903,6 +882,9 @@
                                     assistencial é categorizada em: referência, hospitalar com obstetrícia, hospitalar
                                     sem obstetrícia, ambulatorial, odontológica e suas combinações.
                                 </td>
+                                <td>
+                                    1
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -911,6 +893,9 @@
                                 <td>
                                     Define o padrão de acomodação para o leito de internação nos planos hospitalares:
                                     pode ser coletiva ou individual.
+                                </td>
+                                <td>
+                                    1
                                 </td>
                             </tr>
                             <tr>
@@ -922,6 +907,9 @@
                                     coberturas de assistência à saúde contratadas. A exceção da nacional, é obrigatória
                                     a especificação nominal do(s) estado(s) ou município(s) que compõem as áreas de
                                     abrangência estadual, grupo de estados, grupo de municípios ou municipal
+                                </td>
+                                <td>
+                                    4
                                 </td>
                             </tr>
                             <tr>
@@ -935,6 +923,9 @@
                                     firmado com a operadora, conforme a segmentação assistencial do plano contratado. O
                                     <strong>Beneficiário</strong> deve analisar detalhadamente as coberturas a que tem direito.
                                 </td>
+                                <td>
+                                    3
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -945,6 +936,9 @@
                                     legislação de saúde suplementar, conforme a segmentação assistencial do plano
                                     contratado.
                                 </td>
+                                <td>
+                                    3
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -953,6 +947,9 @@
                                 <td>
                                     Doenças e lesões preexistentes - DLP - são aquelas existentes antes da contratação
                                     do plano de saúde, e que o <strong>Beneficiário</strong> ou seu responsável saiba ser portador
+                                </td>
+                                <td>
+                                    3
                                 </td>
                             </tr>
                             <tr>
@@ -967,6 +964,9 @@
                                     em seu contrato e na legislação, exceto eventual cobertura parcial temporária por
                                     DLP.
                                 </td>
+                                <td>
+                                    3
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -978,6 +978,9 @@
                                     que a operadora utiliza para gerenciar a demanda e/ou utilização dos serviços de
                                     saúde.
                                 </td>
+                                <td>
+                                    3
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -985,6 +988,9 @@
                                 </td>
                                 <td>
                                     Define o período em que vigorará o contrato.
+                                </td>
+                                <td>
+                                    3
                                 </td>
                             </tr>
                             <tr>
@@ -994,6 +1000,9 @@
                                 <td>
                                     A rescisão põe fim definitivamente à vigência do contrato. A suspensão descontinua a
                                     vigência do contrato.
+                                </td>
+                                <td>
+                                    4
                                 </td>
                             </tr>
                             <tr>
@@ -1007,6 +1016,9 @@
                                     mudança de faixa etária é o aumento decorrente da alteração de idade do
                                     <strong>Beneficiário</strong>.
                                 </td>
+                                <td>
+                                    4
+                                </td>
                             </tr>
                             <tr>
                                 <td>
@@ -1018,6 +1030,9 @@
                                     de continuar vinculado por determinados períodos ao plano coletivo empresarial, nos
                                     casos de demissão sem justa causa ou aposentadoria, observadas as regras para
                                     oferecimento, opção e gozo, previstas na Lei e sua regulamentação.
+                                </td>
+                                <td>
+                                    4
                                 </td>
                             </tr>
                         </table>
@@ -1068,14 +1083,14 @@
                     <h6> ADITIVO DE REDUÇÃO DE CARÊNCIA </h6>
                     <div class="row">
                         <p>
-                            Este Aditivo de Redução de Carências é parte integrante da Proposta acima referida e visa conceder prazos de carência reduzidos, contados a parti r do início de vigência do benefício, aos proponentes elegíveis a essa redução.
+                            Este Aditivo de Redução de Carências é parte integrante da Proposta acima referida e visa conceder prazos de carência reduzidos, contados a partir do início de vigência do benefício, aos proponentes elegíveis a essa redução.
                         </p>
 
                         <table class="table table-contratoGerais">
                             <thead>
                                 <th> DESCRIÇÃO </th>
                                 <th> CARÊNCIA CONTRATUAL * </th>
-                                <th> CARÊNCIA CONTRATUAL * </th>
+                                <th> CARÊNCIA REDUZIDA* </th>
                             </thead>
                             <tbody>
                                 <tr>

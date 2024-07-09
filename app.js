@@ -1036,7 +1036,8 @@ app.post("/testeFormulario", async (req, res) => {
       dados.aceitoPrestacaoServicos,
       dados.planoSelecionado,
       numeroProposta,
-      dados.idEntidade
+      dados.idEntidade,
+      dados.dataVencimento
     ];
 
     async function obsDigitalSaude () {
@@ -1169,7 +1170,8 @@ app.post("/testeFormulario", async (req, res) => {
             dependente.nascimentodependente,
             dependente.sexodependente,
             dependente.estadocivildependente,
-            dependente.grauparentescodependente,  
+            dependente.grauparentescodependente,
+            dependente.rgdependente,
             resultImplantacaoId
           ]
         )
@@ -1177,7 +1179,7 @@ app.post("/testeFormulario", async (req, res) => {
             const dependenteObj = {
               "nome": dependente.nomecompletodependente,
               "dataNascimento": formatarDataDs(dependente.nascimentodependente),
-              "rg": "null",
+              "rg": dependente.rgdependente,
               "orgaoEmissor": "null",
               "cpf": dependente.cpfdependente,
               "dnv": "string",
@@ -1322,8 +1324,7 @@ app.get("/buscar-corretor", async (req, res) => {
     };
 
     // Fazer a solicitação à API
-    const apiUrl = `https://75ec-2804-14c-87b7-d25a-4885-2143-e8a2-6d6b.ngrok-free.app/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`
-    /* const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`; */
+    const apiUrl = `https://digitalsaude.com.br/api/v2/produtor/procurarPorNumeroDocumento?numeroDocumento=${cpfCorretor}`;
     const response = await axios.get(apiUrl, configDS);
 
     // Verificar se a API retornou algum resultado
