@@ -219,8 +219,14 @@ $('#addPlano').click(function () {
           <select class="form-control" name="abrangencia" id="abrangencia">
             <option disabled selected value="">Selecione</option>
             <option value="Nacional">Nacional</option>
-            <option value="Regional">Regional</option>
+            <option value="Grupo de Estados">Grupo de Estados</option>
+            <option value="Grupo de Municípios">Grupo de Municípios</option>
+            <option value="Municipal">Municipal</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label for="areaatuacao">Abrangência</label>
+          <input type="text" name="areaatuacao" class="form-control">
         </div>
       </div>
     </div>
@@ -239,6 +245,39 @@ $('#addPlano').click(function () {
         </div>
       </div>
     </div>
+    <div class="row">
+    <h1>Informações da Operadora</h1>
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="ansOperadora"> Nº ANS Operadora</label>
+        <input name="ansOperadora" id="ansOperadora" class="ansOperadora form-control">
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="siteOperadora"> Site Operadora</label>
+        <input name="siteOperadora" id="siteOperadora" class="siteOperadora form-control">
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="telefoneOperadora"> Telefone Operadora</label>
+        <input name="telefoneOperadora" id="telefoneOperadora" class="telefoneOperadora form-control">
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="cnpjOperadora"> CNPJ Operadora</label>
+        <input name="cnpjOperadora" id="cnpjOperadora" class="cnpjOperadora form-control">
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="razaoSocialOperadora"> Razão Social Operadora</label>
+        <input name="razaoSocialOperadora" id="razaoSocialOperadora" class="razaoSocialOperadora form-control">
+      </div>
+    </div>
+  </div>
     <div class="form-group">
       <button class="btn btn-primary btn-salvar" data-id="${novoId}">Salvar Plano</button>
       <button class="btn btn-secondary btn-cancelar" >Cancelar</button>
@@ -325,7 +364,13 @@ function salvarPlano(trElement) {
     pgtoAnualCartao3x: trElement.find("input[name=pgtoAnualCartao3x]").val(),
     reajuste: trElement.find("select[name=reajuste]").val(),
     numeroConvenio: trElement.find("input[name='numeroConvenio']").val(),
-    codigoPlanoDS: trElement.find("input[name='codigoPlanoDS']").val()
+    codigoPlanoDS: trElement.find("input[name='codigoPlanoDS']").val(),
+    areaatuacao: trElement.find("input[name='areaatuacao']").val(),
+    ansOperadora: trElement.find("input[name='ansOperadora']").val(),
+    siteOperadora: trElement.find("input[name='siteOperadora']").val(),
+    telefoneOperadora: trElement.find("input[name='telefoneOperadora']").val(),
+    cnpjOperadora: trElement.find("input[name='cnpjOperadora']").val(),
+    razaoSocialOperadora: trElement.find("input[name='razaoSocialOperadora']").val()
   }
 
   console.log(plano)

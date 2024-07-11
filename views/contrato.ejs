@@ -34,7 +34,7 @@
                 <input type="hidden" id="numeroProposta" value="<%= implantacao.numeroProposta %>">
                 <input type="hidden" id="planoLogo" value="<%= plano.logo %>">
                 <input type="hidden" id="dataVigencia" value="<%= dataFormatada %>">
-                <a id="pdfLink">
+                <a id="pdfLink" target="_blank">
                     <button type="button" class="btn btn-primary salvar" id="btnSave">IMPRIMIR/ SALVAR PDF</button>
                 </a>
             </div>
@@ -78,6 +78,14 @@
             </div>
         </header>
         <div class="content">
+            <div class="row">
+                <div class="col-6">
+
+                </div>
+                <div class="col-6">
+                    <strong>Movimentação: </strong> Inclusão
+                </div>
+            </div>
             <div class="row dados titular">
                 <div class="col-12">
                     <h6>Contratante (Titular Plano)</h6>
@@ -101,7 +109,7 @@
                         </div>
                         <div class="col-6">
                             <p>Data de Nascimento: <span>
-                                    <%= implantacao.datanascimento %>
+                                    <%= implantacao.datadenascimento %>
                                 </span></p>
                         </div>
                     </div>
@@ -146,8 +154,18 @@
                         </div>
                         <div class="col-6">
                             <p>Profissão: <span>
-                                    <!-- <%= implantacao.profissaotitular %> -->
+                                    <%= implantacao.profissaotitular %>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <p>Entidade: <span>
+                                    <%= entidade.nome %>
                                 </span></p>
+                        </div>
+                        <div class="col-6">
                         </div>
                     </div>
 
@@ -199,10 +217,75 @@
                     <div class="col-12">
                         <h6>Representante Legal</h6>
                         <div class="row">
-                            <div class="col-12">
-                                <p> Titular do Plano é o mesmo Representante Legal</p>
+                            <div class="col-6">
+                                <p>CPF: <span>
+                                        <%= implantacao.cpftitular %>
+                                    </span></p>
+                            </div>
+                            <div class="col-6">
+                                <p>RG: <span>
+                                        <%= implantacao.rgtitular %>
+                                    </span></p>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <p>Nome completo: <span>
+                                        <%= implantacao.nomecompleto %>
+                                    </span></p>
+                            </div>
+                            <div class="col-6">
+                                <p>Data de Nascimento: <span>
+                                        <%= implantacao.datanascimento %>
+                                    </span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <p>Endereço Completo: <span>
+                                        <%= implantacao.enderecoresidencial %>, <%= implantacao.numeroendereco %>, <%=
+                                                    implantacao.bairro %>, <%= implantacao.cidade %> - <%=
+                                                            implantacao.estados %>, CEP: <%= implantacao.cep %>
+                                    </span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <p>Nome da Mãe: <span>
+                                        <%= implantacao.nomemaetitular %>
+                                    </span></p>
+                            </div>
+                            <div class="col-6">
+                                <p>Sexo: <span>
+                                        <%= implantacao.sexotitular %>
+                                    </span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <p>Email: <span>
+                                        <%= implantacao.emailtitular %>
+                                    </span></p>
+                            </div>
+                            <div class="col-6">
+                                <p>Telefone Contato: <span>
+                                        <%= implantacao.telefonetitular %> / <%= implantacao.celulartitular %>
+                                    </span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <p>Estado Civil: <span>
+                                        <%= implantacao.estadociviltitular %>
+                                    </span></p>
+                            </div>
+                            <div class="col-6">
+                                <p>Profissão: <span>
+                                        <%= implantacao.profissaotitular %>
+                                    </span></p>
+                            </div>
+                        </div>
+    
                     </div>
                 <% } else if(implantacao.titularresponsavelfinanceiro === 'Não') { %> 
                     <div class="col-12">
@@ -324,8 +407,6 @@
                                          </span>
                                          <% } %>        
                             </p>
-                            <p>Valor da taxa de cadastro:</p>
-                            <p>Total da cobrança:</p>
                             <p> Mês de reajuste: <span> <%= plano.reajuste %> </span></p>
                         </div>
                     </div>
@@ -392,7 +473,11 @@
                                             -
                                         </td>
                                         <td>
-                                            <%= plano.coparticipacao %>
+                                            <% if (plano.coparticipacao === 'Sim') { %>
+                                                Com coparticipação
+                                            <% } else { %>
+                                                Sem coparticipação
+                                            <% } %>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -483,7 +568,7 @@
                                             ODONTOLÓGICO
                                         </td>
                                         <td>
-                                            <%= plano.abrangencia %>
+                                            <%= plano.areaatuacao %>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -539,7 +624,39 @@
                 <div class="col-12">
                     <h6> Manual de Orientação para Contratação de Planos de Saúde</h6>
                     <div class="row manual">
-                        <h1> Diferenças entre planos individuais e coletivos </h1>
+                        <div style="
+                            width: 100%;
+                            display: flex;
+                            flex-direction: row;">
+                            <div style="
+                                width: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;">
+                                <img 
+                                    class="mw-100" 
+                                    src="<%= plano.logo %>" 
+                                    style="
+                                        width: 50%;"
+                                />
+                            </div>
+                            <div style="
+                                width: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                color: #0E3178;
+                                font-weight: 900;
+                                align-items: center;
+                                text-align: end;"
+                                >
+                                <%= plano.razaoSocialOperadora %> <br>
+                                CPNJ: <%= plano.cnpjOperadora %> <br>
+                                Registro na ANS: <%= plano.ansOperadora %> <br>
+                                <%= plano.siteOperadora %> | Tel: <%= plano.telefoneOperadora %>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <h1> Diferenças entre planos individuais e coletivos </h1>
                         <p>
                             Os planos com contratação individual ou familiar são aqueles contratados diretamente da
                             operadora de plano de saúde: é o próprio <strong>Beneficiário</strong> quem escolhe as características do
@@ -852,6 +969,35 @@
                                 </div>
                             </div>
                         </div>
+                        <div style="
+                            width: 100%;
+                            display: flex;
+                            flex-direction: row;">
+                            <div style="
+                                width: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                ">
+                                <%= plano.siteOperadora %> | Tel: <%= plano.telefoneOperadora %>
+                            </div>
+                            <div style="
+                                width: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                color: #0E3178;
+                                font-weight: 900;
+                                font-size: 12px;
+                                text-align: end;"
+                                >
+                                <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content">
+                                    <div style="border: 1px solid white">
+                                      ANS Nº <%= plano.ansOperadora %>
+                                    </div>
+                                  </div>
+                            </div>
+                        </div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -859,6 +1005,38 @@
             <div class="row dados guiaLeitura page-break">
                 <div class="col-12">
                     <h6> Guia de Leitura Contratual (GLC)</h6>
+                    <div style="
+                            width: 100%;
+                            display: flex;
+                            flex-direction: row;">
+                            <div style="
+                                width: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;">
+                                <img 
+                                    class="mw-100" 
+                                    src="<%= plano.logo %>" 
+                                    style="
+                                        width: 50%;"
+                                />
+                            </div>
+                            <div style="
+                                width: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                color: #0E3178;
+                                font-weight: 900;
+                                align-items: center;
+                                text-align: end;
+                                font-size: 12px;"
+                                >
+                                <%= plano.razaoSocialOperadora %> <br>
+                                CPNJ: <%= plano.cnpjOperadora %> <br>
+                                Registro na ANS: <%= plano.ansOperadora %> <br>
+                                <%= plano.siteOperadora %> | Tel: <%= plano.telefoneOperadora %>
+                            </div>
+                        </div>
                     <div class="row manual">
                         <table class="table table-glc">
                             <tr>
@@ -1074,103 +1252,145 @@
                                 </div>
                             </div>
                         </div>
+                        <div style="
+                            width: 100%;
+                            display: flex;
+                            flex-direction: row;">
+                            <div style="
+                                width: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                ">
+                                <%= plano.siteOperadora %> | Tel: <%= plano.telefoneOperadora %>
+                            </div>
+                            <div style="
+                                width: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                color: #0E3178;
+                                font-weight: 900;
+                                font-size: 12px;
+                                text-align: end;"
+                                >
+                                <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content">
+                                    <div style="border: 1px solid white">
+                                      ANS Nº <%= plano.ansOperadora %>
+                                    </div>
+                                  </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row dados aditivoReducaoCarencia page-break">
-                <div class="col-12">
-                    <h6> ADITIVO DE REDUÇÃO DE CARÊNCIA </h6>
-                    <div class="row">
-                        <p>
-                            Este Aditivo de Redução de Carências é parte integrante da Proposta acima referida e visa conceder prazos de carência reduzidos, contados a partir do início de vigência do benefício, aos proponentes elegíveis a essa redução.
-                        </p>
 
-                        <table class="table table-contratoGerais">
-                            <thead>
-                                <th> DESCRIÇÃO </th>
-                                <th> CARÊNCIA CONTRATUAL * </th>
-                                <th> CARÊNCIA REDUZIDA* </th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        Urgência
-                                    </td>
-                                    <td>
-                                        24 horas
-                                    </td>
-                                    <td>
-                                        Zero
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Diagnóstico e Ortodontia
-                                    </td>
-                                    <td>
-                                        30 dias
-                                    </td>
-                                    <td>
-                                        Zero
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Dentística, Prevenção, Radiologia, Cirurgia e Odontopediatria
-                                    </td>
-                                    <td>
-                                        60 dias
-                                    </td>
-                                    <td>
-                                        Zero
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Periodontia e Endodontia
-                                    </td>
-                                    <td>
-                                        90 Dias
-                                    </td>
-                                    <td>
-                                        Zero
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Prótese
-                                    </td>
-                                    <td>
-                                        180 Dias
-                                    </td>
-                                    <td>
-                                        Zero
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <p>
-                            *Carência Contratual válida para pagamento em boleto parcelado.  
-                        </p>
-                        <p> 
-                            **Carência Reduzida válida para pagamento em cartão de crédito, débito, pix ou em boleto único. 
-                        </p> 
-
-                        <p>
-                            Declaro ter recebido cópia deste Aditivo de Redução de Carências e estou de acordo com os seus termos. Estou ciente de que a possibilidade de redução de carências será analisada de forma individual, para cada proponente, e que essa possibilidade está subordinada à análise e aprovação de documentos por parte da Operadora. Estou ciente também de que os proponentes que não se enquadrarem nas condições descritas neste aditivo e não forem elegíveis à redução de carências deverão cumprir integralmente as carências descritas no Manual do Beneficiário.
-                        </p>
+            <% if (implantacao.formaPagamento === '1') { %>
+                <div class="row dados aditivoReducaoCarencia page-break">
+                    <div class="col-12">
+                        <h6> ADITIVO DE REDUÇÃO DE CARÊNCIA </h6>
+                        <div class="row">
+                            <p>
+                                Este Aditivo de Redução de Carências é parte integrante da Proposta acima referida e visa conceder prazos de carência reduzidos, contados a partir do início de vigência do benefício, aos proponentes elegíveis a essa redução.
+                            </p>
+    
+                            <table class="table table-contratoGerais">
+                                <thead>
+                                    <th> DESCRIÇÃO </th>
+                                    <th> CARÊNCIA CONTRATUAL * </th>
+                                    <th> CARÊNCIA REDUZIDA* </th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            Urgência
+                                        </td>
+                                        <td>
+                                            24 horas
+                                        </td>
+                                        <td>
+                                            Zero
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Diagnóstico e Ortodontia
+                                        </td>
+                                        <td>
+                                            30 dias
+                                        </td>
+                                        <td>
+                                            Zero
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Dentística, Prevenção, Radiologia, Cirurgia e Odontopediatria
+                                        </td>
+                                        <td>
+                                            60 dias
+                                        </td>
+                                        <td>
+                                            Zero
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Periodontia e Endodontia
+                                        </td>
+                                        <td>
+                                            90 Dias
+                                        </td>
+                                        <td>
+                                            Zero
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Prótese
+                                        </td>
+                                        <td>
+                                            180 Dias
+                                        </td>
+                                        <td>
+                                            Zero
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+    
+                            <p>
+                                *Carência Contratual válida para pagamento em boleto parcelado.  
+                            </p>
+                            <p> 
+                                **Carência Reduzida válida para pagamento em cartão de crédito, débito, pix ou em boleto único. 
+                            </p> 
+    
+                            <p>
+                                Declaro ter recebido cópia deste Aditivo de Redução de Carências e estou de acordo com os seus termos. Estou ciente de que a possibilidade de redução de carências será analisada de forma individual, para cada proponente, e que essa possibilidade está subordinada à análise e aprovação de documentos por parte da Operadora. Estou ciente também de que os proponentes que não se enquadrarem nas condições descritas neste aditivo e não forem elegíveis à redução de carências deverão cumprir integralmente as carências descritas no Manual do Beneficiário.
+                            </p>
+                        </div>
+    
                     </div>
-
                 </div>
-            </div>
+            <% } %>
+            
 
             <div class="row assinatura page-break" id="assinar">
                 <div class="col-12">
                     <h6> Assinatura da <strong>Proposta</strong></h6>
                     <% if (assinaturaBase64) { %>
                         <img src="<%= assinaturaBase64 %>" alt="Assinatura do Usuário">
+                        <div style="
+                            width: 100%;
+                            text-align: left;">
+                            <p> <strong> Dados de Assinatura </strong> </p>
+                            <p> 
+                                <strong>Data e horário: </strong> <%= dadosAssinatura.timestamp %> </br>
+                                <strong>Localização: </strong>  <%= dadosAssinatura.location %> </br>
+                                <strong>IP computador:  </strong> <%= dadosAssinatura.ip_address %> </br>
+                            </p>
+                            
+                        </div>
                     <% } else { %>
                         <!-- Se não existir assinatura, renderize o canvas -->
                         <canvas id="signature-pad" width="400" height="200"></canvas>

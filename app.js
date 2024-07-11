@@ -32,7 +32,7 @@ const axios = require("axios");
 const winston = require("winston");
 const uuid = require("uuid");
 const { format } = require("date-fns");
-const { ptBR, id } = require("date-fns/locale");
+const { ptBR } = require("date-fns/locale");
 const nodemailer = require("nodemailer");
 const puppeteer = require("puppeteer");
 const juice = require("juice");
@@ -472,6 +472,23 @@ async function salvarAnexos(idImplantacao, anexos) {
   }
 }
 
+async function formatarData(data) {
+  try {
+      if (typeof data !== 'string') return '';
+
+      const dataObj = new Date(data);
+      if (isNaN(dataObj)) {
+          console.error('Data inválida:', data);
+          return '';
+      }
+
+      return format(dataObj, 'dd/MM/yyyy');
+  } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return '';
+  }
+}
+
 function formatarDataDs(data) {
   var partesData = data.split('-');
   var dataFormatada = partesData[2] + '/' + partesData[1] + '/' + partesData[0];
@@ -600,8 +617,8 @@ async function sendStatus(idImplantacao, idStatus, mensagem) {
   }
 }
 
-function rollbackAndRespond(res, message) {
-  // Finalize a transação com rollback
+async function rollbackAndRespond(res, message) {
+  const db = await mysql.createPool(config);
   db.query("ROLLBACK;", [], (err) => {
     if (err) {
       console.error("Erro ao realizar rollback:", err);
@@ -1037,7 +1054,8 @@ app.post("/testeFormulario", async (req, res) => {
       dados.planoSelecionado,
       numeroProposta,
       dados.idEntidade,
-      dados.dataVencimento
+      dados.dataVencimento,
+      dados.numerocns
     ];
 
     async function obsDigitalSaude () {
@@ -1606,14 +1624,25 @@ app.get(
                           ? resultAssinatura[0].assinatura_base64
                           : null;
 
+                      const dependentes = resultDependentes
+
+                      dependentes.forEach(dependente => {
+                        dependente.nascimentodependente = format(new Date(dependente.nascimentodependente), "dd/MM/yyyy");
+                      })
+
+                      const implantacao = resultImplantacoes[0]
+                      implantacao.datadenascimento = format(new Date(implantacao.datadenascimento), "dd/MM/yyyy");
+
+
                       res.render("contrato", {
-                        implantacao: resultImplantacoes[0],
+                        implantacao: implantacao,
                         plano: resultPlano[0],
                         dataFormatada: dataFormatada,
                         entidade: resultEntidade[0],
-                        dependentes: resultDependentes,
+                        dependentes: dependentes,
                         documentos: resultDocumentos,
                         assinaturaBase64: assinaturaBase64,
+                        dadosAssinatura: resultAssinatura[0]
                       });
                     }
                   );
@@ -1636,10 +1665,20 @@ app.post("/salva-assinatura", async (req, res) => {
   const urlContrato = req.body.urlContrato;
   const idImplantacao = req.body.idImplantacao;
   const assinatura = req.body.assinatura_base64;
-  const sqlInsertAsign =
-    "INSERT INTO assinatura_implantacao( id_implantacao, assinatura_base64) VALUES (?,?)";
+  
+  // Capturar o IP do solicitante
+  const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  
+  // Capturar a data e horário em UTC-3
+  const timestamp = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
 
-  db.query(sqlInsertAsign, [idImplantacao, assinatura], async (err, result) => {
+  // Pegar localização se estiver disponível
+  const location = req.body.location;
+
+  const sqlInsertAssign =
+    "INSERT INTO assinatura_implantacao(id_implantacao, assinatura_base64, ip_address, timestamp, location) VALUES (?,?,?,?,?)";
+
+  db.query(sqlInsertAssign, [idImplantacao, assinatura, ipAddress, timestamp, location], async (err, result) => {
     if (err) {
       logger.error({
         message: "ROTA: ASSINAR | ERRO: ao salvar assinatura do beneficiário",
@@ -1653,12 +1692,12 @@ app.post("/salva-assinatura", async (req, res) => {
       res
         .status(500)
         .send("Erro ao enviar assinatura, solicite auxílio do suporte");
+      return;
     }
+
     await sendStatus(idImplantacao, 2, "Proposta assinada pelo contratante");
     await gerarSalvarPDFProposta(urlContrato, numeroProposta, idImplantacao, planoLogo, dataVigencia);
-    console.log('chegou aqui gerou o pdf')
     await enviarAnexosParaDSContrato(numeroProposta);
-    console.log('chegou aqui enviou anexos')
 
     res.cookie("alertSuccess", "Assinatura feita com sucesso", {
       maxAge: 3000,
@@ -1666,6 +1705,7 @@ app.post("/salva-assinatura", async (req, res) => {
     res.status(200).send("Assinado com sucesso.");
   });
 });
+
 
 app.post("/login-verifica", async (req, res) => {
   const db = await mysql.createPool(config);
@@ -1902,7 +1942,7 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
     if (result.length > 0) {
       // O plano existe, atualize-o
       const updateQuery =
-        "UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ?, pgtoAnualAvista = ?, pgtoAnualCartao =? , pgtoAnualCartao3x = ? , reajuste = ? , numeroConvenio = ?, codigoPlanoDS = ? WHERE id = ?";
+        "UPDATE planos SET nome_do_plano = ?, ans = ?, descricao = ?, observacoes = ?, logo = ?, banner = ? , contratacao= ?, coparticipacao = ?, abrangencia = ?, pgtoAnualAvista = ?, pgtoAnualCartao =? , pgtoAnualCartao3x = ? , reajuste = ? , numeroConvenio = ?, codigoPlanoDS = ?, areaatuacao = ?, ansOperadora = ?, siteOperadora = ?, telefoneOperadora = ?, cnpjOperadora = ?, razaoSocialOperadora = ? WHERE id = ?";
       db.query(
         updateQuery,
         [
@@ -1921,6 +1961,12 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
           plano.reajuste,
           plano.numeroConvenio,
           plano.codigoPlanoDS,
+          plano.areaatuacao,
+          plano.ansOperadora,
+          plano.siteOperadora,
+          plano.telefoneOperadora,
+          plano.cnpjOperadora,
+          plano.razaoSocialOperadora,
           plano.id,
         ],
         (err, result) => {
@@ -1937,7 +1983,7 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
     } else {
       // O plano não existe, crie-o
       const createQuery =
-        "INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia, pgtoAnualAvista, pgtoAnualCartao, pgtoAnualCartao3x, reajuste, numeroConvenio, codigoPlanoDS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO planos (nome_do_plano, ans, descricao, observacoes, logo, banner, contratacao, coparticipacao, abrangencia, pgtoAnualAvista, pgtoAnualCartao, pgtoAnualCartao3x, reajuste, numeroConvenio, codigoPlanoDS, areaatuacao, ansOperadora, siteOperadora, telefoneOperadora, cnpjOperadora, razaoSocialOperadora) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       db.query(
         createQuery,
         [
@@ -1955,7 +2001,13 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
           plano.pgtoAnualCartao3x,
           plano.reajuste,
           plano.numeroConvenio,
-          plano.codigoPlanoDS
+          plano.codigoPlanoDS,
+          plano.areaatuacao,
+          plano.ansOperadora,
+          plano.siteOperadora,
+          plano.telefoneOperadora,
+          plano.cnpjOperadora,
+          plano.razaoSocialOperadora,
         ],
         (err, result) => {
           if (err) {

@@ -53,24 +53,45 @@ document.getElementById('save-btn').addEventListener('click', function () {
         urlContrato: window.location.href,
         numeroProposta: document.getElementById("numeroProposta").value,
         planoLogo: document.getElementById("planoLogo").value,
-        dataVigencia: document.getElementById("dataVigencia").value
+        dataVigencia: document.getElementById("dataVigencia").value,
+        location: null // Inicializa com null
     };
 
-    console.log(dataToSend);
-    $.ajax({
-        url: "/salva-assinatura",
-        type: "POST",
-        data: dataToSend,
-        success: function () {
-            signaturePad.clear();
-            location.reload();
-        },
-        error: function () {
-            console.error('Erro ao salvar assinatura:', error);
-            window.reload();
-        }
-    });
+    // Função para enviar dados
+    function sendData() {
+        console.log(dataToSend);
+        $.ajax({
+            url: "/salva-assinatura",
+            type: "POST",
+            data: dataToSend,
+            success: function () {
+                signaturePad.clear();
+                location.reload();
+            },
+            error: function (error) {
+                console.error('Erro ao salvar assinatura:', error);
+                window.reload();
+            }
+        });
+    }
+
+    // Tentar obter a localização do usuário
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                dataToSend.location = `Lat: ${position.coords.latitude}, Long: ${position.coords.longitude}`;
+                sendData();
+            },
+            function (error) {
+                console.warn('Erro ao obter localização:', error);
+                sendData();
+            }
+        );
+    } else {
+        sendData();
+    }
 });
+
 
 document.getElementById('reset-btn').addEventListener('click', function () {
     // Limpe o canvas ao clicar no botão de reset

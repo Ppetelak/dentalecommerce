@@ -139,3 +139,5 @@ CREATE TABLE propostas_codigods (
 )
 
 ALTER TABLE anexos_implantacoes MODIFY COLUMN id_implantacao VARCHAR(255);
+ALTER TABLE implantacoes ADD numerocns VARCHAR(200)
+ALTER TABLE planos MODIFY COLUMN abrangencia ENUM('Nacional', 'Grupo de Estados', 'Grupo de Municípios', 'Municipal');
