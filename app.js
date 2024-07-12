@@ -1441,7 +1441,7 @@ app.get("/preview-success", (req, res) => {
   res.render("sucesso", dados);
 });
 
-app.get("/enviar-email/:id", async (req, res) => {
+app.get("/enviar-email/:id", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   const idImplantacao = req.params.id;
   const queryImplantacoes = "SELECT * FROM implantacoes WHERE id=?";
