@@ -1472,6 +1472,12 @@ app.get("/enviar-email/:id", async (req, res) => {
       );
       res.status(200).send("Envio de email feito com sucesso.");
     } catch (error) {
+      logger.error({
+        message: "Erro no envio do email ao beneficiário para assinatura",
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+      });
       console.error(error);
       res.status(500).send("Erro ao enviar o e-mail");
     }
