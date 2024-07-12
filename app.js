@@ -14,18 +14,6 @@ const session = require("express-session");
 const crypto = require("crypto");
 const cookie = require("cookie-parser");
 const multer = require("multer");
-const {
-  ServicePrincipalCredentials,
-  PDFServices,
-  MimeType,
-  DocumentMergeParams,
-  OutputFormat,
-  DocumentMergeJob,
-  DocumentMergeResult,
-  SDKError,
-  ServiceUsageError,
-  ServiceApiError
-} = require("@adobe/pdfservices-node-sdk");
 const fs = require("fs");
 const fsPromises = require("fs").promises;
 const axios = require("axios");
