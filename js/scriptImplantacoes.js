@@ -15,9 +15,12 @@ $(document).ready(function() {
         type: "GET",
         url: `/enviar-email/${idImplantacao}`,
         success: function(data) {
+            alert("Disparo de email realizado");
             location.reload();
         },
         error: function(error) {
+            alert("Erro ao disparar email consulte o log");
+            console.log(error);
             location.reload();
         }
         });

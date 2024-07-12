@@ -1462,14 +1462,15 @@ app.get("/enviar-email/:id", async (req, res) => {
         idImplantacao,
         implantacao.numeroProposta,
         implantacao.cpffinanceiro,
-        implantacao.nomefinanceiro
+        implantacao.nomefinanceiro,
+        implantacao.identidade
       );
       res.cookie(
         "alertSuccess",
         "Disparo de email feito com sucesso, aguarde até 5 minutos para verificar se usuário recebe o email",
         { maxAge: 3000 }
       );
-      res.status(200).send("Corretor cadastrado com sucesso.");
+      res.status(200).send("Envio de email feito com sucesso.");
     } catch (error) {
       console.error(error);
       res.status(500).send("Erro ao enviar o e-mail");
