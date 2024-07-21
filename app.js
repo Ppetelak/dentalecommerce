@@ -617,8 +617,9 @@ async function rollbackAndRespond(res, message) {
 
 async function enviarErroDiscord(mensagem) {
   try {
-    await axios.post('https://bot.midiaideal.com/mensagem-erros-ecommerce', { mensagem });
-    console.log('Mensagem enviada com sucesso');
+    console.log(`Mensagem para discord: ${mensagem}`)
+    /* await axios.post('https://bot.midiaideal.com/mensagem-erros-ecommerce', { mensagem });
+    console.log('Mensagem enviada com sucesso'); */
   } catch (error) {
       console.error('Erro ao enviar mensagem erro:', error);
   }
@@ -1258,6 +1259,12 @@ app.post("/testeFormulario", async (req, res) => {
             };
             jsonModeloDS.beneficiarioList.push(dependenteObj);
           } catch (error) {
+            logger.error({
+              message: "Erro ao dar push do dependente no objeto dependentes rota envio de dados da proposta",
+              error: error.message,
+              stack: error.stack,
+              timestamp: new Date().toISOString(),
+            });
             console.error('Erro ao dar push do dependente no objeto dependentes', error)
           }   
         }));
@@ -1266,6 +1273,12 @@ app.post("/testeFormulario", async (req, res) => {
           await salvarAnexos(numeroProposta, anexos);
         } catch (error) {
           enviarErroDiscord(`Erro ao salvar Anexos ${error}`)
+          logger.error({
+            message: "Erro ao salvar anexos rota envio de dados da proposta",
+            error: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString(),
+          });
           console.error("Erro ao salvar anexos:", error);
         }
 
@@ -1274,13 +1287,20 @@ app.post("/testeFormulario", async (req, res) => {
             dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular,
             resultImplantacaoId,
             numeroProposta,
-            dados.cpffinanceiro,
-            dados.nomefinanceiro,
-            dados.identidade
+            cpffinanceiro,
+            nomefinanceiro,
+            dados.idEntidade
           );
         } catch (error){
           enviarErroDiscord(`Erro ao enviar email para o titular do contrato ${error}`)
+          logger.error({
+            message: "Erro ao enviar email para o titular do contrato rota envio de dados da proposta",
+            error: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString(),
+          });
           console.error('Erro ao enviar email com contrato', error)
+
         }
 
         try {
@@ -1288,6 +1308,12 @@ app.post("/testeFormulario", async (req, res) => {
         } catch (error) {
           // Tratamento de erro adicional, se necessário
           enviarErroDiscord(`Erro ao enviar dados para o DS da proposta ${error}`)
+          logger.error({
+            message: "Erro ao enviar proposta para o Digital Saúde rota envio de dados da proposta",
+            error: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString(),
+          });
           await sendStatus(resultImplantacaoId, 4, "Erro ao enviar proposta para o digital");
           console.error("Erro inesperado ao enviar proposta:", error);
         }
@@ -1296,6 +1322,12 @@ app.post("/testeFormulario", async (req, res) => {
           await sendStatus(resultImplantacaoId, 2, "Implantação realizada com sucesso ao Ecommerce");
         } catch (error) {
           enviarErroDiscord(`Erro ao mudar status da proposta para realizada com sucesso ${error}`)
+          logger.error({
+            message: "Erro ao enviar atualização de status da proposta para o Ecommerce rota envio de dados da proposta",
+            error: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString(),
+          });
           console.error('Erro ao mudar status da proposta', error)
         }
         res.status(200).json({ numeroPropostaGerado: numeroProposta });
@@ -1304,11 +1336,23 @@ app.post("/testeFormulario", async (req, res) => {
       })
       .catch((error) => {
         enviarErroDiscord(`Erro durante a implantação ${error}`)
+        logger.error({
+          message: "Erro geral durante a implantação rota envio de dados da proposta",
+          error: error.message,
+          stack: error.stack,
+          timestamp: new Date().toISOString(),
+        });
         console.error("Erro durante a implantação:", error);
         res.status(500).send({ error: error.message });
       });
     } catch (error) {
       enviarErroDiscord(`Erro geral ${error}`)
+      logger.error({
+        message: "Erro2 geral durante a implantação rota envio de dados da proposta",
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+      });
       console.error("Erro geral:", error);
       res.status(500).send({ error: error.message });
     }
