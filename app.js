@@ -1,9 +1,9 @@
-const { 
+const {
   mysql,
-  qInsImplantacao, 
+  qInsImplantacao,
   qInsDependentes,
   config,
-  qInsEntidade
+  qInsEntidade,
 } = require("./database");
 const express = require("express");
 const app = new express();
@@ -26,7 +26,7 @@ const puppeteer = require("puppeteer");
 const juice = require("juice");
 const { default: parseJSON } = require("date-fns/parseJSON");
 const port = process.env.PORT || 5586;
-const appUrl = process.env.APP_URL || "http://localhost";
+const appUrl = process.env.APP_URL || "http://localhost:5586";
 
 /* Verificar se usuário está logado */
 const verificaAutenticacao = (req, res, next) => {
@@ -48,13 +48,11 @@ app.use("/img", express.static("img"));
 app.use("/arquivos", express.static("arquivos"));
 app.use("/uploads", express.static("uploads"));
 app.use("/formulario", express.static("formulario"));
-app.use('/arquivospdf', express.static('arquivospdf'));
+app.use("/arquivospdf", express.static("arquivospdf"));
 app.use("/bootstrap-icons", express.static("node_modules/bootstrap-icons"));
 app.set("view engine", "ejs");
 app.use(cookie());
 app.use(express.json());
-
-
 
 /* FUNÇÃO DE INSERÇÃO AO BANCO DE DADOS */
 
@@ -113,10 +111,10 @@ const uploadForm = multer({ storage: storageForm });
 
 const upload = multer({ storage: storage });
 
-
 /* --------------------------------------- FUNÇÕES ÚTEIS --------------------------------- */
+
 async function enviarAnexosParaDSContrato(numeroProposta) {
-  console.log('entrou na função de enviar os anexos')
+  console.log("entrou na função de enviar os anexos");
   const db = await mysql.createPool(config);
   const query = "SELECT * FROM anexos_implantacoes WHERE id_implantacao = ?";
   const token = "X43ADVSEXM";
@@ -125,52 +123,78 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
 
   try {
     const idImplantacao = await consultarIDProposta(numeroProposta);
-    const querySelectCodigoDS = "SELECT codigo_ds FROM propostas_codigods WHERE numeroProposta = ?"
+    const querySelectCodigoDS =
+      "SELECT codigo_ds FROM propostas_codigods WHERE numeroProposta = ?";
     const codigoDSResult = await db.query(querySelectCodigoDS, [idImplantacao]);
 
     if (!codigoDSResult || codigoDSResult.length === 0) {
-      console.error('Não foi encontrado o código DS para a proposta:', numeroProposta);
-      return { success: false, message: 'Não foi encontrado o código DS para a proposta' };
+      console.error(
+        "Não foi encontrado o código DS para a proposta:",
+        numeroProposta
+      );
+      logger.info("ERRO: Não foi encontrado o código DS para a proposta");
+      return {
+        success: false,
+        message: "Não foi encontrado o código DS para a proposta",
+      };
     }
 
     const codigoDS = codigoDSResult[0].codigo_ds;
 
     const rows = await db.query(query, [numeroProposta]);
     const anexos = rows;
+    var quantidadeAnexos = anexos.length;
+
+    logger.info(`Quantidade de anexos encontrados para a proposta de id ${idImplantacao}: ${quantidadeAnexos}`)
 
     if (!anexos || anexos.length === 0) {
-      console.log('Nenhum anexo encontrado para a proposta:', numeroProposta);
-      return { success: true, message: 'Nenhum anexo para enviar' };
+      console.log("Nenhum anexo encontrado para a proposta:", numeroProposta);
+      logger.info("ERRO: Nenhum anexo encontrado para a proposta");
+      return { success: true, message: "Nenhum anexo para enviar" };
     }
 
     const configDS = {
       headers: {
         "Content-Type": "application/json",
-        "token": token,
-        "senhaApi": senhaApi
-      }
+        token: token,
+        senhaApi: senhaApi,
+      },
     };
 
     for (const anexo of anexos) {
       const data = {
-        "codigoContrato": codigoDS,
-        "arquivo": anexo.nome_arquivo,
-        "linkAnexo": anexo.caminho_arquivo,
+        codigoContrato: codigoDS,
+        arquivo: anexo.nome_arquivo,
+        linkAnexo: anexo.caminho_arquivo,
       };
-      console.log('Enviando anexo:', data);
+      console.log("Enviando anexo:", data);
 
       try {
         const response = await axios.post(apiUrl, data, configDS);
 
         if (response.status === 200) {
-          await sendStatus(numeroProposta, 4, `Anexo de nome "${data.nomeArquivo}" anexado ao contrato com sucesso`);
+          await sendStatus(
+            numeroProposta,
+            4,
+            `Anexo de nome "${data.nomeArquivo}" anexado ao contrato com sucesso`
+          );
           console.log("Anexo enviado com sucesso:", response.data);
+          logger.info("SUCESS: Anexo enviado com sucesso");
         } else {
-          await sendStatus(numeroProposta, 4, `ERRO ao anexar arquivo de nome "${data.nomeArquivo}" ao contrato`);
+          await sendStatus(
+            numeroProposta,
+            4,
+            `ERRO ao anexar arquivo de nome "${data.nomeArquivo}" ao contrato`
+          );
           console.error(`Erro: Recebido status ${response.status}`);
         }
       } catch (error) {
-        await sendStatus(numeroProposta, 4, `ERRO ao anexar arquivo de nome "${data.nomeArquivo}" ao contrato`);
+        logger.info("ERRO: Erro ao enviar anexo ao digital saúde", error.message);
+        await sendStatus(
+          numeroProposta,
+          4,
+          `ERRO ao anexar arquivo de nome "${data.nomeArquivo}" ao contrato`
+        );
 
         if (error.response) {
           const status = error.response.status;
@@ -179,9 +203,11 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
           if (status === 400) {
             message = "Requisição inválida (400). Verifique os dados enviados.";
           } else if (status === 401) {
-            message = "Acesso não autorizado (401). Verifique suas credenciais.";
+            message =
+              "Acesso não autorizado (401). Verifique suas credenciais.";
           } else if (status === 500) {
-            message = "Erro interno no servidor (500). Tente novamente mais tarde.";
+            message =
+              "Erro interno no servidor (500). Tente novamente mais tarde.";
           }
 
           console.error(message, error.response.data);
@@ -192,8 +218,13 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
     }
     return { success: true };
   } catch (err) {
-    console.error('Erro ao consultar o banco de dados:', err);
-    return { success: false, message: 'Erro ao consultar o banco de dados', error: err };
+    logger.info("erro: Erro ao enviar anexo ao digital saúde", err.message);
+    console.error("Erro ao consultar o banco de dados:", err);
+    return {
+      success: false,
+      message: "Erro ao consultar o banco de dados",
+      error: err,
+    };
   } finally {
     await db.end();
   }
@@ -220,38 +251,47 @@ function getBase64Image(filePath) {
   const buffer = fs.readFileSync(filePath);
 
   // Converte o buffer para base64
-  return buffer.toString('base64');
+  return buffer.toString("base64");
 }
 
-async function gerarSalvarPDFProposta(link, numeroProposta, idImplantacao, planoLogoSrc, dataVigencia) {
+async function gerarSalvarPDFProposta(
+  link,
+  numeroProposta,
+  idImplantacao,
+  planoLogoSrc,
+  dataVigencia
+) {
   const db = await mysql.createPool(config);
-  const query = "INSERT INTO anexos_implantacoes (id_implantacao, nome_arquivo, caminho_arquivo) VALUES (?, ?, ?)";
-  return new Promise(async (resolve, reject) =>{
+  const query =
+    "INSERT INTO anexos_implantacoes (id_implantacao, nome_arquivo, caminho_arquivo) VALUES (?, ?, ?)";
+  return new Promise(async (resolve, reject) => {
     try {
       const browser = await puppeteer.launch({
         headless: true, // Mude para true para produção
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
       const page = await browser.newPage();
-  
+
       const url = link;
-      await page.goto(url, { waitUntil: 'networkidle2', timeout: 180000 });
-      await page.waitForSelector('body'); // Aguarde um elemento específico que garante que os estilos foram aplicados
-  
+      await page.goto(url, { waitUntil: "networkidle2", timeout: 180000 });
+      await page.waitForSelector("body"); // Aguarde um elemento específico que garante que os estilos foram aplicados
+
       // Aguarde até que o conteúdo da página esteja completamente carregado
       await page.evaluate(() => {
         return new Promise((resolve) => {
-          if (document.readyState === 'complete') {
+          if (document.readyState === "complete") {
             resolve();
           } else {
-            window.addEventListener('load', resolve);
+            window.addEventListener("load", resolve);
           }
         });
       });
-  
-      const urlAdmBase64 = getBase64Image(path.join(__dirname, 'img', 'logomounthermonoriginal.png'));
+
+      const urlAdmBase64 = getBase64Image(
+        path.join(__dirname, "img", "logomounthermonoriginal.png")
+      );
       const urlPlanoBase64 = getBase64Image(path.join(__dirname, planoLogoSrc));
-  
+
       const header = `
         <header style="width: 100%; position: fixed; top: 0; left: 0; right: 0; padding-top: 10px;">
           <div style="width: 100%; padding: 10px; display: flex; flex-direction: row; font-size: 12px;">
@@ -292,7 +332,7 @@ async function gerarSalvarPDFProposta(link, numeroProposta, idImplantacao, plano
           </div>
         </header>
       `;
-  
+
       const footer = `
         <footer style="font-size:10px; text-align:center; width: 100%; padding: 10px 0; background-color: #000080; color: #ffffff; -webkit-print-color-adjust: exact; position: fixed; bottom: 0; left: 0; right: 0;">
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
@@ -304,96 +344,120 @@ async function gerarSalvarPDFProposta(link, numeroProposta, idImplantacao, plano
           </div>
         </footer>
       `;
-  
-      console.log('Generating PDF');
+
+      console.log("Generating PDF");
       const pdf = await page.pdf({
-        format: 'A4',
+        format: "A4",
         displayHeaderFooter: true,
         headerTemplate: header,
         footerTemplate: footer,
-        printBackground: true
+        printBackground: true,
       });
-  
+
       await browser.close();
 
       const nomeArquivo = `Proposta Nº ${numeroProposta}.pdf`;
-  
-      const filePath = path.join(__dirname, 'arquivospdf', `Proposta Nº ${numeroProposta}.pdf`);
+
+      const filePath = path.join(
+        __dirname,
+        "arquivospdf",
+        `Proposta Nº ${numeroProposta}.pdf`
+      );
       fs.writeFileSync(filePath, pdf);
-      const fileUrl = `${appUrl}:${port}/uploads/${nomeArquivo}`;
+      const fileUrl = `${appUrl}/arquivospdf/${nomeArquivo}`;
 
       db.query(query, [numeroProposta, nomeArquivo, fileUrl], (err, result) => {
         if (err) {
           reject(err);
-          enviarErroDiscord(`Erro ao salvar anexo do PDF gerado da proposta ao banco de dados, ERRO: ${err} -------- Proposta Nº ${numeroProposta}`)
+          enviarErroDiscord(
+            `Erro ao salvar anexo do PDF gerado da proposta ao banco de dados, ERRO: ${err} -------- Proposta Nº ${numeroProposta}`
+          );
         } else {
-          sendStatus(idImplantacao, 2, "PDF do contrato após assinatura gerado com sucesso");
+          sendStatus(
+            idImplantacao,
+            2,
+            "PDF do contrato após assinatura gerado com sucesso"
+          );
           resolve(result);
         }
       });
     } catch (error) {
-      console.error('Error salvar PDF:', error);
-      enviarErroDiscord(`Erro geral na função de gerar PDF ERRO: ${error} ------ Proposta Nº ${numeroProposta}`)
+      console.error("Error salvar PDF:", error);
+      enviarErroDiscord(
+        `Erro geral na função de gerar PDF ERRO: ${error} ------ Proposta Nº ${numeroProposta}`
+      );
       reject(error);
-    }
-  })
-}
-
-async function sendContractEmail(
-  email,
-  idImplantacao,
-  numeroProposta,
-  cpfTitularFinanceiro,
-  nomeTitularFinanceiro,
-  idEntidade
-) {
-  return new Promise(async (resolve, reject) => {
-    const transporter = nodemailer.createTransport({
-      host: "mail.mounthermon.com.br",
-      port: 587,
-      secure: false,
-      auth: {
-        user: "naoresponda@mounthermon.com.br",
-        pass: "5w55t5$Ev",
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
-    const linkAleatorio = `${appUrl}/assinar/${idImplantacao}/${numeroProposta}/${cpfTitularFinanceiro}/${idEntidade}`;
-
-    const html = await ejs.renderFile(
-      path.join(__dirname, "../DentalEcommerce/views/emailTemplate.ejs"),
-      {
-        nomeTitularFinanceiro,
-        linkAleatorio,
-      }
-    );
-
-    const htmlWithInlineStyles = juice(html);
-
-    const mailOptions = {
-      from: "naoresponda@mounthermon.com.br",
-      to: email,
-      subject: `MOUNT HERMON - Assinatura Proposta Nº ${numeroProposta}`,
-      html: htmlWithInlineStyles,
-    };
-
-    try {
-      await transporter.sendMail(mailOptions);
-      resolve(); // Resolva a promessa se o e-mail for enviado com sucesso
-    } catch (err) {
-      logger.error({
-        message: "Erro no envio do email ao beneficiário para assinatura",
-        error: err.message,
-        stack: err.stack,
-        timestamp: new Date().toISOString(),
-      });
-      reject(err); // Rejeite a promessa se houver um erro no envio do e-mail
     }
   });
 }
+
+async function sendContractEmail(
+    email,
+    idImplantacao,
+    numeroProposta,
+    cpfTitularFinanceiro,
+    nomeTitularFinanceiro,
+    idEntidade
+  ) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        logger.info("Iniciando a configuração do transporter");
+        const transporter = nodemailer.createTransport({
+          host: "mail.mounthermon.com.br",
+          port: 587,
+          secure: false,
+          auth: {
+            user: "naoresponda@mounthermon.com.br",
+            pass: "5w55t5$Ev",
+          },
+          tls: {
+            rejectUnauthorized: false,
+          },
+        });
+  
+        logger.info("Transporter configurado com sucesso");
+  
+        const linkAleatorio = `${appUrl}/assinar/${idImplantacao}/${numeroProposta}/${cpfTitularFinanceiro}/${idEntidade}`;
+        logger.info(`Link aleatório gerado: ${linkAleatorio}`);
+  
+        logger.info("Renderizando o template do email");
+        const html = await ejs.renderFile(
+          path.join(__dirname, "../httpdocs/views/emailTemplate.ejs"),
+          {
+            nomeTitularFinanceiro,
+            linkAleatorio,
+          }
+        );
+        logger.info("Template renderizado com sucesso");
+  
+        const htmlWithInlineStyles = juice(html);
+  
+        const mailOptions = {
+          from: "naoresponda@mounthermon.com.br",
+          to: email,
+          subject: `MOUNT HERMON - Assinatura Proposta Nº ${numeroProposta}`,
+          html: htmlWithInlineStyles,
+        };
+  
+        logger.info("Enviando email");
+        await transporter.sendMail(mailOptions);
+        logger.info("Email enviado com sucesso");
+        resolve(); // Resolva a promessa se o e-mail for enviado com sucesso
+      } catch (err) {
+        logger.error({
+          message: "Erro no envio do email ao beneficiário para assinatura",
+          error: err.message,
+          stack: err.stack,
+          timestamp: new Date().toISOString(),
+        });
+        enviarErroDiscord(
+          `Erro ao enviar email para o titular do contrato ${err}`
+        );
+        reject(err); // Rejeite a promessa se houver um erro no envio do e-mail
+      }
+    });
+  }
+  
 
 async function consultarNumeroProposta(idImplantacao) {
   const db = await mysql.createPool(config);
@@ -431,7 +495,8 @@ async function consultarIDProposta(numeroProposta) {
 
 async function salvarAnexos(idImplantacao, anexos) {
   const db = await mysql.createPool(config);
-  const query = "INSERT INTO anexos_implantacoes (id_implantacao, nome_arquivo, caminho_arquivo) VALUES (?, ?, ?)";
+  const query =
+    "INSERT INTO anexos_implantacoes (id_implantacao, nome_arquivo, caminho_arquivo) VALUES (?, ?, ?)";
   const promises = []; // Array para armazenar todas as promessas de inserção
 
   // Iterar sobre cada anexo e criar uma promessa para inseri-lo no banco de dados
@@ -439,13 +504,17 @@ async function salvarAnexos(idImplantacao, anexos) {
     // Adicionar a promessa de inserção ao array de promessas
     promises.push(
       new Promise((resolve, reject) => {
-        db.query(query, [idImplantacao, nomeArquivo, caminhoArquivo], (err, result) => {
-          if (err) {
-            reject(err); // Rejeitar a promessa em caso de erro
-          } else {
-            resolve(result); // Resolver a promessa se a inserção for bem-sucedida
+        db.query(
+          query,
+          [idImplantacao, nomeArquivo, caminhoArquivo],
+          (err, result) => {
+            if (err) {
+              reject(err); // Rejeitar a promessa em caso de erro
+            } else {
+              resolve(result); // Resolver a promessa se a inserção for bem-sucedida
+            }
           }
-        });
+        );
       })
     );
   }
@@ -462,24 +531,24 @@ async function salvarAnexos(idImplantacao, anexos) {
 
 async function formatarData(data) {
   try {
-      if (typeof data !== 'string') return '';
+    if (typeof data !== "string") return "";
 
-      const dataObj = new Date(data);
-      if (isNaN(dataObj)) {
-          console.error('Data inválida:', data);
-          return '';
-      }
+    const dataObj = new Date(data);
+    if (isNaN(dataObj)) {
+      console.error("Data inválida:", data);
+      return "";
+    }
 
-      return format(dataObj, 'dd/MM/yyyy');
+    return format(dataObj, "dd/MM/yyyy");
   } catch (error) {
-      console.error('Erro ao formatar data:', error);
-      return '';
+    console.error("Erro ao formatar data:", error);
+    return "";
   }
 }
 
 function formatarDataDs(data) {
-  var partesData = data.split('-');
-  var dataFormatada = partesData[2] + '/' + partesData[1] + '/' + partesData[0];
+  var partesData = data.split("-");
+  var dataFormatada = partesData[2] + "/" + partesData[1] + "/" + partesData[0];
   return dataFormatada;
 }
 
@@ -494,33 +563,51 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
   const configDS = {
     headers: {
       "Content-Type": "application/json",
-      "token": token,
-      "senhaApi": senhaApi
-    }
+      token: token,
+      senhaApi: senhaApi,
+    },
   };
 
   console.log(data);
 
   try {
     const response = await axios.post(apiUrl, data, configDS);
-    const codigoImplantacaoDS = response.data.codigo
+    const codigoImplantacaoDS = response.data.codigo;
     if (response.status === 200) {
-      await sendStatus(idImplantacao, 4, 'Implantação realizada com sucesso no digital saúde');
-      await db.query('INSERT INTO propostas_codigods (numeroProposta, codigo_ds) VALUES (?, ?)', [idImplantacao, codigoImplantacaoDS]);
+      await sendStatus(
+        idImplantacao,
+        4,
+        "Implantação realizada com sucesso no digital saúde"
+      );
+      await db.query(
+        "INSERT INTO propostas_codigods (numeroProposta, codigo_ds) VALUES (?, ?)",
+        [idImplantacao, codigoImplantacaoDS]
+      );
       console.log("Proposta enviada com sucesso:", response.data);
       return { success: true, data: response.data };
     } else {
-      await sendStatus(idImplantacao, 4, "Erro ao enviar proposta para o digital");
+      await sendStatus(
+        idImplantacao,
+        4,
+        "Erro ao enviar proposta para o digital"
+      );
       console.error(`Erro: Recebido status ${response.status}`);
-      return { success: false, message: `Erro: Recebido status ${response.status}` };
+      return {
+        success: false,
+        message: `Erro: Recebido status ${response.status}`,
+      };
     }
   } catch (error) {
-    await sendStatus(idImplantacao, 4, "Erro ao enviar proposta para o digital");
+    await sendStatus(
+      idImplantacao,
+      4,
+      "Erro ao enviar proposta para o digital"
+    );
     if (error.response) {
       // A resposta foi recebida e o servidor respondeu com um código de status diferente de 2xx
       const status = error.response.status;
       let message = "Erro desconhecido ao enviar a proposta.";
-      
+
       if (status === 400) {
         message = "Requisição inválida (400). Verifique os dados enviados.";
       } else if (status === 401) {
@@ -528,17 +615,20 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
       } else if (status === 500) {
         message = "Erro interno no servidor (500). Tente novamente mais tarde.";
       }
-      
+
       console.error(message, error.response.data);
       return { success: false, message: message, data: error.response.data };
     } else {
       // Ocorreu um erro ao configurar a solicitação ou algo similar
       console.error("Erro ao enviar a proposta:", error.message);
-      return { success: false, message: "Erro ao enviar a proposta.", data: error.message };
+      return {
+        success: false,
+        message: "Erro ao enviar a proposta.",
+        data: error.message,
+      };
     }
   }
 }
-
 
 function generateRandomDigits(length) {
   let result = "";
@@ -588,8 +678,9 @@ const pool = mysql.createPool(config);
 
 async function sendStatus(idImplantacao, idStatus, mensagem) {
   const db = await mysql.createPool(config);
-  const query = "INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)";
-  
+  const query =
+    "INSERT INTO status_implantacao (idstatus, idimplantacao, mensagem) VALUES (?, ?, ?)";
+
   try {
     const result = await db.query(query, [idStatus, idImplantacao, mensagem]);
     return result;
@@ -617,11 +708,11 @@ async function rollbackAndRespond(res, message) {
 
 async function enviarErroDiscord(mensagem) {
   try {
-    console.log(`Mensagem para discord: ${mensagem}`)
+    console.log(`Mensagem para discord: ${mensagem}`);
     /* await axios.post('https://bot.midiaideal.com/mensagem-erros-ecommerce', { mensagem });
     console.log('Mensagem enviada com sucesso'); */
   } catch (error) {
-      console.error('Erro ao enviar mensagem erro:', error);
+    console.error("Erro ao enviar mensagem erro:", error);
   }
 }
 
@@ -632,11 +723,11 @@ app.get("/files", verificaAutenticacao, (req, res) => {
   res.render("uploads", { files: files, rotaAtual: "files" });
 });
 
-app.get('/mandarMensagemRobo/:mensagem', (req,res) => {
+app.get("/mandarMensagemRobo/:mensagem", (req, res) => {
   const mensagem = req.params.mensagem;
   enviarErroDiscord(mensagem);
-  res.send('mensagem enviada com sucesso')
-})
+  res.send("mensagem enviada com sucesso");
+});
 
 //Rotas para upload
 app.post("/upload", upload.array("file"), (req, res) => {
@@ -783,16 +874,13 @@ app.post("/testeFormularioDS", async (req, res) => {
     emailtitular: dados.emailtitular,
     profissaotitular: dados.profissaotitular,
     titularresponsavelfinanceiro: dados.titularresponsavelfinanceiro,
-    cpffinanceiro:
-      dados.cpffinanceiro || dados.cpftitular,
-    nomefinanceiro:
-      dados.nomefinanceiro || dados.nomecompleto,
+    cpffinanceiro: dados.cpffinanceiro || dados.cpftitular,
+    nomefinanceiro: dados.nomefinanceiro || dados.nomecompleto,
     datadenascimentofinanceiro:
       dados.datadenascimentofinanceiro || dados.datadenascimento,
     telefonetitularfinanceiro:
       dados.telefonetitularfinanceiro || dados.telefonetitular,
-    emailtitularfinanceiro:
-      dados.emailtitularfinanceiro || dados.emailtitular,
+    emailtitularfinanceiro: dados.emailtitularfinanceiro || dados.emailtitular,
     cep: dados.cep,
     enderecoresidencial: dados.enderecoresidencial,
     numeroendereco: dados.numeroendereco,
@@ -810,177 +898,221 @@ app.post("/testeFormularioDS", async (req, res) => {
     planoSelecionado: dados.planoSelecionado,
   };
 
-  console.log(dadosImplantacao)
+  console.log(dadosImplantacao);
 
   const jsonModeloDS = {
-    "numeroProposta": `${numeroProposta}`,
-    "dataAssinatura": "26/02/2024",
-    "diaVencimento": 1,
-    "cpfResponsavel": dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
-    "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
-    "observacao": `teste`,
-    "plano": {
-      "codigo": "VMR5GRUEPJ"
+    numeroProposta: `${numeroProposta}`,
+    dataAssinatura: "26/02/2024",
+    diaVencimento: 1,
+    cpfResponsavel: dados.cpffinanceiro
+      ? dados.cpffinanceiro
+      : dados.cpftitular,
+    nomeResponsavel: dados.nomefinanceiro
+      ? dados.nomefinanceiro
+      : dados.nomecompleto,
+    observacao: `teste`,
+    plano: {
+      codigo: "VMR5GRUEPJ",
     },
-    "convenio": {
-      "codigo": "LRYT12JW8T"
+    convenio: {
+      codigo: "LRYT12JW8T",
     },
-    "produtor": {
-      "codigo": "E17NJPUZM2"
+    produtor: {
+      codigo: "E17NJPUZM2",
     },
-    "corretora": {
-      "codigo": "S62MXENV8X"
+    corretora: {
+      codigo: "S62MXENV8X",
     },
-    "grupo": {
-      "codigo": "V2CAVAD6U2"
+    grupo: {
+      codigo: "V2CAVAD6U2",
     },
-    "filial": {
-      "codigo": "BETRHPTL2K"
+    filial: {
+      codigo: "BETRHPTL2K",
     },
-    "beneficiarioList": [
+    beneficiarioList: [
       {
-        "nome": dados.nomecompleto,
-        "dataNascimento": formatarDataDs(dados.datadenascimento),
-        "rg": dados.rgtitular,
-        "orgaoEmissor": dados.orgaoexpedidor,
-        "cpf": dados.cpftitular,
-        "dnv": "string",
-        "pis": "string",
-        "nomeMae": dados.nomemaetitular,
-        "endereco": dados.enderecoresidencial,
-        "numero": dados.numeroendereco,
-        "complemento": dados.complementoendereco,
-        "bairro": dados.bairro,
-        "municipio": dados.cidade,
-        "uf": dados.estado,
-        "cep": dados.cep,
-        "dddTelefone": "41",
-        "telefone": "992414553",
-        "dddCelular": "41",
-        "celular": "999665588",
-        "email": dados.emailtitular,
-        "altura": 0,
-        "peso": 0,
-        "imc": 0,
-        "dataVigencia": "26/02/2024",
-        "mensalidade": 0,
-        "estadoCivil": {
-            "id": dados.estadociviltitular === "Casado" ? 1 :
-                  dados.estadociviltitular === "Divorciado" ? 2 :
-                  dados.estadociviltitular === "Separado" ? 3 :
-                  dados.estadociviltitular === "Solteiro" ? 4 :
-                  dados.estadociviltitular === "Viúvo" ? 5: '',
-            "nome": dados.estadociviltitular
+        nome: dados.nomecompleto,
+        dataNascimento: formatarDataDs(dados.datadenascimento),
+        rg: dados.rgtitular,
+        orgaoEmissor: dados.orgaoexpedidor,
+        cpf: dados.cpftitular,
+        dnv: "string",
+        pis: "string",
+        nomeMae: dados.nomemaetitular,
+        endereco: dados.enderecoresidencial,
+        numero: dados.numeroendereco,
+        complemento: dados.complementoendereco,
+        bairro: dados.bairro,
+        municipio: dados.cidade,
+        uf: dados.estado,
+        cep: dados.cep,
+        dddTelefone: "41",
+        telefone: "992414553",
+        dddCelular: "41",
+        celular: "999665588",
+        email: dados.emailtitular,
+        altura: 0,
+        peso: 0,
+        imc: 0,
+        dataVigencia: "26/02/2024",
+        mensalidade: 0,
+        estadoCivil: {
+          id:
+            dados.estadociviltitular === "Casado"
+              ? 1
+              : dados.estadociviltitular === "Divorciado"
+              ? 2
+              : dados.estadociviltitular === "Separado"
+              ? 3
+              : dados.estadociviltitular === "Solteiro"
+              ? 4
+              : dados.estadociviltitular === "Viúvo"
+              ? 5
+              : "",
+          nome: dados.estadociviltitular,
         },
-        "tipoBeneficiario": {
-          "id": 1,
-          "nome": "Titular"
+        tipoBeneficiario: {
+          id: 1,
+          nome: "Titular",
         },
-        "sexo": {
-          "id": dados.sexotitular === "Masculino" ? 1 : 2,
-          "nome": dados.sexotitular
+        sexo: {
+          id: dados.sexotitular === "Masculino" ? 1 : 2,
+          nome: dados.sexotitular,
         },
-        "parentesco": {
-          "id": 1,
-          "nome": "Titular"
+        parentesco: {
+          id: 1,
+          nome: "Titular",
         },
-        "statusBeneficiario": {
-          "id": 2,
-          "nome": "Ativo"
-        }
-      }
-    ]
-  }
+        statusBeneficiario: {
+          id: 2,
+          nome: "Ativo",
+        },
+      },
+    ],
+  };
 
-  adicionarDependentes()
+  adicionarDependentes();
 
-  async function adicionarDependentes () {
+  async function adicionarDependentes() {
     dependentes.forEach((dependente) => {
       //insertData(qInsDependentes, [resultImplantacao.insertId, dependente]);
       const dependenteObj = {
-        "nome": dependente.nomecompletodependente,
-        "dataNascimento": formatarDataDs(dependente.nascimentodependente),
-        "rg": "null",
-        "orgaoEmissor": "null",
-        "cpf": dependente.cpfdependente,
-        "dnv": "string",
-        "pis": "string",
-        "nomeMae": dependente.nomemaedependente,
-        "endereco": dados.enderecoresidencial,
-        "numero": dados.numeroendereco,
-        "complemento": dados.complementoendereco,
-        "bairro": dados.bairro,
-        "municipio": dados.cidade,
-        "uf": dados.estado,
-        "cep": dados.cep,
-        "dddTelefone": "41",
-        "telefone": "999998888",
-        "dddCelular": "41",
-        "celular": "999998888",
-        "email": "dependente@dependente.com.br",
-        "altura": 0,
-        "peso": 0,
-        "imc": 0,
-        "dataVigencia": "26/02/2024",
-        "mensalidade": 0,
-        "estadoCivil": {
-            "id": dependente.estadocivildependente === "Casado" ? 1 :
-                  dependente.estadocivildependente === "Divorciado" ? 2 :
-                  dependente.estadocivildependente === "Separado" ? 3 :
-                  dependente.estadocivildependente === "Solteiro" ? 4 :
-                  dependente.estadocivildependente === "Viúvo" ? 5: '',
-            "nome": dependente.estadocivildependente
+        nome: dependente.nomecompletodependente,
+        dataNascimento: formatarDataDs(dependente.nascimentodependente),
+        rg: "null",
+        orgaoEmissor: "null",
+        cpf: dependente.cpfdependente,
+        dnv: "string",
+        pis: "string",
+        nomeMae: dependente.nomemaedependente,
+        endereco: dados.enderecoresidencial,
+        numero: dados.numeroendereco,
+        complemento: dados.complementoendereco,
+        bairro: dados.bairro,
+        municipio: dados.cidade,
+        uf: dados.estado,
+        cep: dados.cep,
+        dddTelefone: "41",
+        telefone: "999998888",
+        dddCelular: "41",
+        celular: "999998888",
+        email: "dependente@dependente.com.br",
+        altura: 0,
+        peso: 0,
+        imc: 0,
+        dataVigencia: "26/02/2024",
+        mensalidade: 0,
+        estadoCivil: {
+          id:
+            dependente.estadocivildependente === "Casado"
+              ? 1
+              : dependente.estadocivildependente === "Divorciado"
+              ? 2
+              : dependente.estadocivildependente === "Separado"
+              ? 3
+              : dependente.estadocivildependente === "Solteiro"
+              ? 4
+              : dependente.estadocivildependente === "Viúvo"
+              ? 5
+              : "",
+          nome: dependente.estadocivildependente,
         },
-        "tipoBeneficiario": {
-          "id": 2,
-          "nome": "Dependente"
+        tipoBeneficiario: {
+          id: 2,
+          nome: "Dependente",
         },
-        "sexo": {
-          "id": dependente.sexodependente === "Masculino" ? 1 : 2,
-          "nome": dependente.sexodependente
+        sexo: {
+          id: dependente.sexodependente === "Masculino" ? 1 : 2,
+          nome: dependente.sexodependente,
         },
-        "parentesco": {
-          "id": dependente.grauparentescodependente === "Agregado" ? 2 :
-                dependente.grauparentescodependente === "Companheiro" ? 3 :
-                dependente.grauparentescodependente === "Cônjuge" ? 4 :
-                dependente.grauparentescodependente === "Filho(a)" ? 5 :
-                dependente.grauparentescodependente === "Filho Adotivo" ? 6 :
-                dependente.grauparentescodependente === "Irmão(a)" ? 7 :
-                dependente.grauparentescodependente === "Mãe" ? 8 :
-                dependente.grauparentescodependente === "Pai" ? 9 :
-                dependente.grauparentescodependente === "Neto(a)" ? 10 :
-                dependente.grauparentescodependente === "Sobrinho(a)" ? 11 :
-                dependente.grauparentescodependente === "Sogro" ? 12 :
-                dependente.grauparentescodependente === "Enteado" ? 13 :
-                dependente.grauparentescodependente === "Tutelado" ? 14 :
-                dependente.grauparentescodependente === "Sogra" ? 15 :
-                dependente.grauparentescodependente === "Genro" ? 16 :
-                dependente.grauparentescodependente === "Nora" ? 17 :
-                dependente.grauparentescodependente === "Cunhado(a)" ? 18 :
-                dependente.grauparentescodependente === "Primo(a)" ? 19 :
-                dependente.grauparentescodependente === "Avô" ? 20 :
-                dependente.grauparentescodependente === "Avó" ? 21 :
-                dependente.grauparentescodependente === "Tio" ? 22 :
-                dependente.grauparentescodependente === "Tia" ? 23 :
-                dependente.grauparentescodependente === "Bisneto" ? 24 :
-                dependente.grauparentescodependente === "Madrasta" ? 25 : 26,
-          "nome": dependente.grauparentescodependente
+        parentesco: {
+          id:
+            dependente.grauparentescodependente === "Agregado"
+              ? 2
+              : dependente.grauparentescodependente === "Companheiro"
+              ? 3
+              : dependente.grauparentescodependente === "Cônjuge"
+              ? 4
+              : dependente.grauparentescodependente === "Filho(a)"
+              ? 5
+              : dependente.grauparentescodependente === "Filho Adotivo"
+              ? 6
+              : dependente.grauparentescodependente === "Irmão(a)"
+              ? 7
+              : dependente.grauparentescodependente === "Mãe"
+              ? 8
+              : dependente.grauparentescodependente === "Pai"
+              ? 9
+              : dependente.grauparentescodependente === "Neto(a)"
+              ? 10
+              : dependente.grauparentescodependente === "Sobrinho(a)"
+              ? 11
+              : dependente.grauparentescodependente === "Sogro"
+              ? 12
+              : dependente.grauparentescodependente === "Enteado"
+              ? 13
+              : dependente.grauparentescodependente === "Tutelado"
+              ? 14
+              : dependente.grauparentescodependente === "Sogra"
+              ? 15
+              : dependente.grauparentescodependente === "Genro"
+              ? 16
+              : dependente.grauparentescodependente === "Nora"
+              ? 17
+              : dependente.grauparentescodependente === "Cunhado(a)"
+              ? 18
+              : dependente.grauparentescodependente === "Primo(a)"
+              ? 19
+              : dependente.grauparentescodependente === "Avô"
+              ? 20
+              : dependente.grauparentescodependente === "Avó"
+              ? 21
+              : dependente.grauparentescodependente === "Tio"
+              ? 22
+              : dependente.grauparentescodependente === "Tia"
+              ? 23
+              : dependente.grauparentescodependente === "Bisneto"
+              ? 24
+              : dependente.grauparentescodependente === "Madrasta"
+              ? 25
+              : 26,
+          nome: dependente.grauparentescodependente,
         },
-        "statusBeneficiario": {
-          "id": 2,
-          "nome": "Ativo"
-        }
+        statusBeneficiario: {
+          id: 2,
+          nome: "Ativo",
+        },
       };
       jsonModeloDS.beneficiarioList.push(dependenteObj);
     });
-  };
+  }
 
   await enviarPropostaDigitalSaude(jsonModeloDS);
 
-  console.log(jsonModeloDS)
+  console.log(jsonModeloDS);
 
-  console.log('Foi')
-  res.send('Sucesso na rota, se páh na implantação também')
+  console.log("Foi");
+  res.send("Sucesso na rota, se páh na implantação também");
 });
 
 app.post("/testeFormulario", async (req, res) => {
@@ -990,15 +1122,27 @@ app.post("/testeFormulario", async (req, res) => {
     const dependentes = req.body.dependentes;
     const anexos = req.body.anexos;
 
-    var cpffinanceiro = dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular
-    var nomefinanceiro = dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto;
-    var datadenascimentofinanceiro = dados.datadenascimentofinanceiro ? dados.datadenascimentofinanceiro : dados.datadenascimento;
-    var sexotitularfinanceiro = dados.sexotitularfinanceiro ? dados.sexotitularfinanceiro : dados.sexotitular;
-    var estadociviltitularfinanceiro = dados.estadociviltitularfinanceiro ? dados.estadociviltitularfinanceiro : dados.estadociviltitular;
-    var telefonetitularfinanceiro = 
-    dados.telefonetitularfinanceiro ? dados.telefonetitularfinanceiro : dados.telefonetitular;
-    var emailtitularfinanceiro = 
-    dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular;
+    var cpffinanceiro = dados.cpffinanceiro
+      ? dados.cpffinanceiro
+      : dados.cpftitular;
+    var nomefinanceiro = dados.nomefinanceiro
+      ? dados.nomefinanceiro
+      : dados.nomecompleto;
+    var datadenascimentofinanceiro = dados.datadenascimentofinanceiro
+      ? dados.datadenascimentofinanceiro
+      : dados.datadenascimento;
+    var sexotitularfinanceiro = dados.sexotitularfinanceiro
+      ? dados.sexotitularfinanceiro
+      : dados.sexotitular;
+    var estadociviltitularfinanceiro = dados.estadociviltitularfinanceiro
+      ? dados.estadociviltitularfinanceiro
+      : dados.estadociviltitular;
+    var telefonetitularfinanceiro = dados.telefonetitularfinanceiro
+      ? dados.telefonetitularfinanceiro
+      : dados.telefonetitular;
+    var emailtitularfinanceiro = dados.emailtitularfinanceiro
+      ? dados.emailtitularfinanceiro
+      : dados.emailtitular;
 
     console.log(dados);
 
@@ -1044,16 +1188,14 @@ app.post("/testeFormulario", async (req, res) => {
       numeroProposta,
       dados.idEntidade,
       dados.dataVencimento,
-      dados.numerocns
+      dados.numerocns,
     ];
 
-    async function obsDigitalSaude () {
-
-      if(dados.titularresponsavelfinanceiro === "Sim") {
+    async function obsDigitalSaude() {
+      if (dados.titularresponsavelfinanceiro === "Sim") {
         return `O TITULAR É O MESMO TITULAR FINANCEIRO`;
       } else {
-        return ( 
-          `
+        return `
           O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
           ----> Dados responsável Financeiro <---- \n
           CPF: ${dados.cpffinanceiro} \n
@@ -1064,215 +1206,264 @@ app.post("/testeFormulario", async (req, res) => {
           Sexo: ${dados.sexotitularfinanceiro} \n
           Estado Civil: ${dados.estadociviltitularfinanceiro} \n
           Grau de Parentesco: ${dados.grauparentesco} \n
-          `
-        ) ;
+          `;
       }
-
     }
 
-    let observacoesDigitalSaude = await obsDigitalSaude ();
+    let observacoesDigitalSaude = await obsDigitalSaude();
 
-    observacoesDigitalSaude += 
-      `
+    observacoesDigitalSaude += `
       \n
       Pagamento: 
-        ${dados.formaPagamento === 1 ? "Boleto" : 
-          dados.formaPagamento === 2? "Cartão de Crédito em 12x" : "Cartão de Crédito em 3x"} \n
+        ${
+          dados.formaPagamento === 1
+            ? "Boleto"
+            : dados.formaPagamento === 2
+            ? "Cartão de Crédito em 12x"
+            : "Cartão de Crédito em 3x"
+        } \n
         Profissão selecionada: ${dados.profissaotitular}
       `;
 
     const jsonModeloDS = {
-      "numeroProposta": `${numeroProposta}`,
-      "dataAssinatura": "26/02/2024",
-      "diaVencimento": `${dados.dataVencimento}`,
-      "cpfResponsavel": dados.cpffinanceiro ? dados.cpffinanceiro : dados.cpftitular,
-      "nomeResponsavel": dados.nomefinanceiro ? dados.nomefinanceiro : dados.nomecompleto,
-      "observacao": `${observacoesDigitalSaude}`,
-      "plano": {
-        "codigo": `${dados.codigoPlanoDS}`
+      numeroProposta: `${numeroProposta}`,
+      dataAssinatura: "26/02/2024",
+      diaVencimento: `${dados.dataVencimento}`,
+      cpfResponsavel: dados.cpffinanceiro
+        ? dados.cpffinanceiro
+        : dados.cpftitular,
+      nomeResponsavel: dados.nomefinanceiro
+        ? dados.nomefinanceiro
+        : dados.nomecompleto,
+      observacao: `${observacoesDigitalSaude}`,
+      plano: {
+        codigo: `${dados.codigoPlanoDS}`,
       },
-      "convenio": {
-        "codigo": `${dados.numeroConvenio}`
+      convenio: {
+        codigo: `${dados.numeroConvenio}`,
       },
-      "produtor": {
-        "codigo": `${dados.idCorretor}`
+      produtor: {
+        codigo: `${dados.idCorretor}`,
       },
-      "corretora": {
-        "codigo": `${dados.codigoCorretora}`
+      corretora: {
+        codigo: `${dados.codigoCorretora}`,
       },
-      "grupo": {
-        "codigo": "V2CAVAD6U2"
+      grupo: {
+        codigo: "V2CAVAD6U2",
       },
-      "filial": {
-        "codigo": "BETRHPTL2K"
+      filial: {
+        codigo: "BETRHPTL2K",
       },
-      "beneficiarioList": [
+      beneficiarioList: [
         {
-          "nome": dados.nomecompleto,
-          "dataNascimento": formatarDataDs(dados.datadenascimento),
-          "rg": dados.rgtitular,
-          "orgaoEmissor": dados.orgaoexpedidor,
-          "cpf": dados.cpftitular,
-          "dnv": "string",
-          "pis": "string",
-          "nomeMae": dados.nomemaetitular,
-          "endereco": dados.enderecoresidencial,
-          "numero": dados.numeroendereco,
-          "complemento": dados.complementoendereco,
-          "bairro": dados.bairro,
-          "municipio": dados.cidade,
-          "uf": dados.estado,
-          "cep": dados.cep,
-          "dddTelefone": "41",
-          "telefone": "992414553",
-          "dddCelular": "41",
-          "celular": "999665588",
-          "email": dados.emailtitular,
-          "altura": 0,
-          "peso": 0,
-          "imc": 0,
-          "dataVigencia": "26/02/2024",
-          "mensalidade": 0,
-          "estadoCivil": {
-              "id": dados.estadociviltitular === "Casado" ? 1 :
-                    dados.estadociviltitular === "Divorciado" ? 2 :
-                    dados.estadociviltitular === "Separado" ? 3 :
-                    dados.estadociviltitular === "Solteiro" ? 4 :
-                    dados.estadociviltitular === "Viúvo" ? 5: '',
-              "nome": dados.estadociviltitular
+          nome: dados.nomecompleto,
+          dataNascimento: formatarDataDs(dados.datadenascimento),
+          rg: dados.rgtitular,
+          orgaoEmissor: dados.orgaoexpedidor,
+          cpf: dados.cpftitular,
+          dnv: "string",
+          pis: "string",
+          nomeMae: dados.nomemaetitular,
+          endereco: dados.enderecoresidencial,
+          numero: dados.numeroendereco,
+          complemento: dados.complementoendereco,
+          bairro: dados.bairro,
+          municipio: dados.cidade,
+          uf: dados.estado,
+          cep: dados.cep,
+          dddTelefone: "41",
+          telefone: "992414553",
+          dddCelular: "41",
+          celular: "999665588",
+          email: dados.emailtitular,
+          altura: 0,
+          peso: 0,
+          imc: 0,
+          dataVigencia: "26/02/2024",
+          mensalidade: 0,
+          estadoCivil: {
+            id:
+              dados.estadociviltitular === "Casado"
+                ? 1
+                : dados.estadociviltitular === "Divorciado"
+                ? 2
+                : dados.estadociviltitular === "Separado"
+                ? 3
+                : dados.estadociviltitular === "Solteiro"
+                ? 4
+                : dados.estadociviltitular === "Viúvo"
+                ? 5
+                : "",
+            nome: dados.estadociviltitular,
           },
-          "tipoBeneficiario": {
-            "id": 1,
-            "nome": "Titular"
+          tipoBeneficiario: {
+            id: 1,
+            nome: "Titular",
           },
-          "sexo": {
-            "id": dados.sexotitular === "Masculino" ? 1 : 2,
-            "nome": dados.sexotitular
+          sexo: {
+            id: dados.sexotitular === "Masculino" ? 1 : 2,
+            nome: dados.sexotitular,
           },
-          "parentesco": {
-            "id": 1,
-            "nome": "Titular"
+          parentesco: {
+            id: 1,
+            nome: "Titular",
           },
-          "statusBeneficiario": {
-            "id": 2,
-            "nome": "Ativo"
-          }
-        }
-      ]
-    }
+          statusBeneficiario: {
+            id: 2,
+            nome: "Ativo",
+          },
+        },
+      ],
+    };
 
-    
-    
     /* INSERÇÃO DE DADOS AO BANCO DE DADOS DAS INFORMAÇÕES SOBRE A IMPLANTAÇÃO */
 
-    await db.query(qInsImplantacao, dadosImplantacao)
+    await db
+      .query(qInsImplantacao, dadosImplantacao)
       .then(async (resultImplantacao) => {
-        const resultImplantacaoId = resultImplantacao.insertId
-        await Promise.all(dependentes.map(async (dependente) => {
-          await db.query(qInsDependentes, 
-          [
-            dependente.cpfdependente,
-            dependente.nomecompletodependente,
-            dependente.nomemaedependente,
-            dependente.nascimentodependente,
-            dependente.sexodependente,
-            dependente.estadocivildependente,
-            dependente.grauparentescodependente,
-            dependente.rgdependente,
-            resultImplantacaoId
-          ]
-        )
-          try {
-            const dependenteObj = {
-              "nome": dependente.nomecompletodependente,
-              "dataNascimento": formatarDataDs(dependente.nascimentodependente),
-              "rg": dependente.rgdependente,
-              "orgaoEmissor": "null",
-              "cpf": dependente.cpfdependente,
-              "dnv": "string",
-              "pis": "string",
-              "nomeMae": dependente.nomemaedependente,
-              "endereco": dados.enderecoresidencial,
-              "numero": dados.numeroendereco,
-              "complemento": dados.complementoendereco,
-              "bairro": dados.bairro,
-              "municipio": dados.cidade,
-              "uf": dados.estado,
-              "cep": dados.cep,
-              "dddTelefone": "41",
-              "telefone": "999998888",
-              "dddCelular": "41",
-              "celular": "999998888",
-              "email": "dependente@dependente.com.br",
-              "altura": 0,
-              "peso": 0,
-              "imc": 0,
-              "dataVigencia": "26/02/2024",
-              "mensalidade": 0,
-              "estadoCivil": {
-                  "id": dependente.estadocivildependente === "Casado" ? 1 :
-                        dependente.estadocivildependente === "Divorciado" ? 2 :
-                        dependente.estadocivildependente === "Separado" ? 3 :
-                        dependente.estadocivildependente === "Solteiro" ? 4 :
-                        dependente.estadocivildependente === "Viúvo" ? 5: '',
-                  "nome": dependente.estadocivildependente
-              },
-              "tipoBeneficiario": {
-                "id": 2,
-                "nome": "Dependente"
-              },
-              "sexo": {
-                "id": dependente.sexodependente === "Masculino" ? 1 : 2,
-                "nome": dependente.sexodependente
-              },
-              "parentesco": {
-                "id": dependente.grauparentescodependente === "Agregado" ? 2 :
-                      dependente.grauparentescodependente === "Companheiro" ? 3 :
-                      dependente.grauparentescodependente === "Cônjuge" ? 4 :
-                      dependente.grauparentescodependente === "Filho(a)" ? 5 :
-                      dependente.grauparentescodependente === "Filho Adotivo" ? 6 :
-                      dependente.grauparentescodependente === "Irmão(a)" ? 7 :
-                      dependente.grauparentescodependente === "Mãe" ? 8 :
-                      dependente.grauparentescodependente === "Pai" ? 9 :
-                      dependente.grauparentescodependente === "Neto(a)" ? 10 :
-                      dependente.grauparentescodependente === "Sobrinho(a)" ? 11 :
-                      dependente.grauparentescodependente === "Sogro" ? 12 :
-                      dependente.grauparentescodependente === "Enteado" ? 13 :
-                      dependente.grauparentescodependente === "Tutelado" ? 14 :
-                      dependente.grauparentescodependente === "Sogra" ? 15 :
-                      dependente.grauparentescodependente === "Genro" ? 16 :
-                      dependente.grauparentescodependente === "Nora" ? 17 :
-                      dependente.grauparentescodependente === "Cunhado(a)" ? 18 :
-                      dependente.grauparentescodependente === "Primo(a)" ? 19 :
-                      dependente.grauparentescodependente === "Avô" ? 20 :
-                      dependente.grauparentescodependente === "Avó" ? 21 :
-                      dependente.grauparentescodependente === "Tio" ? 22 :
-                      dependente.grauparentescodependente === "Tia" ? 23 :
-                      dependente.grauparentescodependente === "Bisneto" ? 24 :
-                      dependente.grauparentescodependente === "Madrasta" ? 25 : 26,
-                "nome": dependente.grauparentescodependente
-              },
-              "statusBeneficiario": {
-                "id": 0,
-                "nome": "Ativo"
-              }
-            };
-            jsonModeloDS.beneficiarioList.push(dependenteObj);
-          } catch (error) {
-            logger.error({
-              message: "Erro ao dar push do dependente no objeto dependentes rota envio de dados da proposta",
-              error: error.message,
-              stack: error.stack,
-              timestamp: new Date().toISOString(),
-            });
-            console.error('Erro ao dar push do dependente no objeto dependentes', error)
-          }   
-        }));
+        const resultImplantacaoId = resultImplantacao.insertId;
+        await Promise.all(
+          dependentes.map(async (dependente) => {
+            await db.query(qInsDependentes, [
+              dependente.cpfdependente,
+              dependente.nomecompletodependente,
+              dependente.nomemaedependente,
+              dependente.nascimentodependente,
+              dependente.sexodependente,
+              dependente.estadocivildependente,
+              dependente.grauparentescodependente,
+              dependente.rgdependente,
+              resultImplantacaoId,
+            ]);
+            try {
+              const dependenteObj = {
+                nome: dependente.nomecompletodependente,
+                dataNascimento: formatarDataDs(dependente.nascimentodependente),
+                rg: dependente.rgdependente,
+                orgaoEmissor: "null",
+                cpf: dependente.cpfdependente,
+                dnv: "string",
+                pis: "string",
+                nomeMae: dependente.nomemaedependente,
+                endereco: dados.enderecoresidencial,
+                numero: dados.numeroendereco,
+                complemento: dados.complementoendereco,
+                bairro: dados.bairro,
+                municipio: dados.cidade,
+                uf: dados.estado,
+                cep: dados.cep,
+                dddTelefone: "41",
+                telefone: "999998888",
+                dddCelular: "41",
+                celular: "999998888",
+                email: "dependente@dependente.com.br",
+                altura: 0,
+                peso: 0,
+                imc: 0,
+                dataVigencia: "26/02/2024",
+                mensalidade: 0,
+                estadoCivil: {
+                  id:
+                    dependente.estadocivildependente === "Casado"
+                      ? 1
+                      : dependente.estadocivildependente === "Divorciado"
+                      ? 2
+                      : dependente.estadocivildependente === "Separado"
+                      ? 3
+                      : dependente.estadocivildependente === "Solteiro"
+                      ? 4
+                      : dependente.estadocivildependente === "Viúvo"
+                      ? 5
+                      : "",
+                  nome: dependente.estadocivildependente,
+                },
+                tipoBeneficiario: {
+                  id: 2,
+                  nome: "Dependente",
+                },
+                sexo: {
+                  id: dependente.sexodependente === "Masculino" ? 1 : 2,
+                  nome: dependente.sexodependente,
+                },
+                parentesco: {
+                  id:
+                    dependente.grauparentescodependente === "Agregado"
+                      ? 2
+                      : dependente.grauparentescodependente === "Companheiro"
+                      ? 3
+                      : dependente.grauparentescodependente === "Cônjuge"
+                      ? 4
+                      : dependente.grauparentescodependente === "Filho(a)"
+                      ? 5
+                      : dependente.grauparentescodependente === "Filho Adotivo"
+                      ? 6
+                      : dependente.grauparentescodependente === "Irmão(a)"
+                      ? 7
+                      : dependente.grauparentescodependente === "Mãe"
+                      ? 8
+                      : dependente.grauparentescodependente === "Pai"
+                      ? 9
+                      : dependente.grauparentescodependente === "Neto(a)"
+                      ? 10
+                      : dependente.grauparentescodependente === "Sobrinho(a)"
+                      ? 11
+                      : dependente.grauparentescodependente === "Sogro"
+                      ? 12
+                      : dependente.grauparentescodependente === "Enteado"
+                      ? 13
+                      : dependente.grauparentescodependente === "Tutelado"
+                      ? 14
+                      : dependente.grauparentescodependente === "Sogra"
+                      ? 15
+                      : dependente.grauparentescodependente === "Genro"
+                      ? 16
+                      : dependente.grauparentescodependente === "Nora"
+                      ? 17
+                      : dependente.grauparentescodependente === "Cunhado(a)"
+                      ? 18
+                      : dependente.grauparentescodependente === "Primo(a)"
+                      ? 19
+                      : dependente.grauparentescodependente === "Avô"
+                      ? 20
+                      : dependente.grauparentescodependente === "Avó"
+                      ? 21
+                      : dependente.grauparentescodependente === "Tio"
+                      ? 22
+                      : dependente.grauparentescodependente === "Tia"
+                      ? 23
+                      : dependente.grauparentescodependente === "Bisneto"
+                      ? 24
+                      : dependente.grauparentescodependente === "Madrasta"
+                      ? 25
+                      : 26,
+                  nome: dependente.grauparentescodependente,
+                },
+                statusBeneficiario: {
+                  id: 0,
+                  nome: "Ativo",
+                },
+              };
+              jsonModeloDS.beneficiarioList.push(dependenteObj);
+            } catch (error) {
+              logger.error({
+                message:
+                  "Erro ao dar push do dependente no objeto dependentes rota envio de dados da proposta",
+                error: error.message,
+                stack: error.stack,
+                timestamp: new Date().toISOString(),
+              });
+              console.error(
+                "Erro ao dar push do dependente no objeto dependentes",
+                error
+              );
+            }
+          })
+        );
 
         try {
           await salvarAnexos(numeroProposta, anexos);
         } catch (error) {
-          enviarErroDiscord(`Erro ao salvar Anexos ${error}`)
+          enviarErroDiscord(`Erro ao salvar Anexos ${error}`);
           logger.error({
             message: "Erro ao salvar anexos rota envio de dados da proposta",
             error: error.message,
@@ -1282,62 +1473,85 @@ app.post("/testeFormulario", async (req, res) => {
           console.error("Erro ao salvar anexos:", error);
         }
 
+        // ENVIAR EMAIL COM CONTRATO
+
         try {
           await sendContractEmail(
-            dados.emailtitularfinanceiro ? dados.emailtitularfinanceiro : dados.emailtitular,
+            dados.emailtitularfinanceiro
+              ? dados.emailtitularfinanceiro
+              : dados.emailtitular,
             resultImplantacaoId,
             numeroProposta,
             cpffinanceiro,
             nomefinanceiro,
             dados.idEntidade
           );
-        } catch (error){
-          enviarErroDiscord(`Erro ao enviar email para o titular do contrato ${error}`)
+        } catch (error) {
+          enviarErroDiscord(
+            `Erro ao enviar email para o titular do contrato ${error}`
+          );
           logger.error({
-            message: "Erro ao enviar email para o titular do contrato rota envio de dados da proposta",
+            message:
+              "Erro ao enviar email para o titular do contrato rota envio de dados da proposta",
             error: error.message,
             stack: error.stack,
             timestamp: new Date().toISOString(),
           });
-          console.error('Erro ao enviar email com contrato', error)
-
+          console.error("Erro ao enviar email com contrato", error);
         }
+
+          // ENVIAR PROPOSTA DIGITAL SAÚDE
 
         try {
           await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
         } catch (error) {
           // Tratamento de erro adicional, se necessário
-          enviarErroDiscord(`Erro ao enviar dados para o DS da proposta ${error}`)
+          enviarErroDiscord(
+            `Erro ao enviar dados para o DS da proposta ${error}`
+          );
           logger.error({
-            message: "Erro ao enviar proposta para o Digital Saúde rota envio de dados da proposta",
+            message:
+              "Erro ao enviar proposta para o Digital Saúde rota envio de dados da proposta",
             error: error.message,
             stack: error.stack,
             timestamp: new Date().toISOString(),
           });
-          await sendStatus(resultImplantacaoId, 4, "Erro ao enviar proposta para o digital");
+          await sendStatus(
+            resultImplantacaoId,
+            4,
+            "Erro ao enviar proposta para o digital"
+          );
           console.error("Erro inesperado ao enviar proposta:", error);
         }
 
         try {
-          await sendStatus(resultImplantacaoId, 2, "Implantação realizada com sucesso ao Ecommerce");
+          await sendStatus(
+            resultImplantacaoId,
+            2,
+            "Implantação realizada com sucesso ao Ecommerce"
+          );
         } catch (error) {
-          enviarErroDiscord(`Erro ao mudar status da proposta para realizada com sucesso ${error}`)
+          enviarErroDiscord(
+            `Erro ao mudar status da proposta para realizada com sucesso ${error}`
+          );
           logger.error({
-            message: "Erro ao enviar atualização de status da proposta para o Ecommerce rota envio de dados da proposta",
+            message:
+              "Erro ao enviar atualização de status da proposta para o Ecommerce rota envio de dados da proposta",
             error: error.message,
             stack: error.stack,
             timestamp: new Date().toISOString(),
           });
-          console.error('Erro ao mudar status da proposta', error)
+          console.error("Erro ao mudar status da proposta", error);
         }
         res.status(200).json({ numeroPropostaGerado: numeroProposta });
         //res.render('sucesso', {numeroPropostaGerado: numeroProposta})
-        //res.status(200).send({ message: "Implantação realizada com sucesso!" });  
+        //res.status(200).send({ message: "Implantação realizada com sucesso!" });
       })
       .catch((error) => {
-        enviarErroDiscord(`Erro durante a implantação ${error}`)
+        enviarErroDiscord(`Erro durante a implantação ${error}`);
         logger.error({
-          message: "Erro geral durante a implantação rota envio de dados da proposta",
+          message:
+            "Erro geral durante a implantação rota envio de dados da proposta",
           error: error.message,
           stack: error.stack,
           timestamp: new Date().toISOString(),
@@ -1345,17 +1559,18 @@ app.post("/testeFormulario", async (req, res) => {
         console.error("Erro durante a implantação:", error);
         res.status(500).send({ error: error.message });
       });
-    } catch (error) {
-      enviarErroDiscord(`Erro geral ${error}`)
-      logger.error({
-        message: "Erro2 geral durante a implantação rota envio de dados da proposta",
-        error: error.message,
-        stack: error.stack,
-        timestamp: new Date().toISOString(),
-      });
-      console.error("Erro geral:", error);
-      res.status(500).send({ error: error.message });
-    }
+  } catch (error) {
+    enviarErroDiscord(`Erro geral ${error}`);
+    logger.error({
+      message:
+        "Erro2 geral durante a implantação rota envio de dados da proposta",
+      error: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString(),
+    });
+    console.error("Erro geral:", error);
+    res.status(500).send({ error: error.message });
+  }
 });
 
 app.get("/buscar-corretor", async (req, res) => {
@@ -1369,7 +1584,7 @@ app.get("/buscar-corretor", async (req, res) => {
       headers: {
         "Content-Type": "text/plain;charset=UTF-8",
         token: `${token}`,
-        senhaApi: senhaApi
+        senhaApi: senhaApi,
       },
     };
 
@@ -1384,7 +1599,7 @@ app.get("/buscar-corretor", async (req, res) => {
         Erro na busca pelo corretor \n
         ${response.data}
         `
-      )
+      );
       return res.status(404).json({ error: "Corretor não encontrado" });
     }
 
@@ -1403,7 +1618,7 @@ app.get("/buscar-corretor", async (req, res) => {
           dadosProdutores.push({
             nome: corretor.produtor.nome,
             numeroDocumento: corretor.produtor.numeroDocumento,
-            codigoCorretora: corretor.produtor.codigo
+            codigoCorretora: corretor.produtor.codigo,
           });
         } else {
           nomeProdutores.push("Nome do produtor não encontrado");
@@ -1414,7 +1629,7 @@ app.get("/buscar-corretor", async (req, res) => {
         dadosProdutores.push({
           nome: corretorData.produtor.nome,
           numeroDocumento: corretorData.produtor.numeroDocumento,
-          codigoCorretora: corretorData.produtor.codigo
+          codigoCorretora: corretorData.produtor.codigo,
         });
       } else {
         nomeProdutores.push("Nome do produtor não encontrado");
@@ -1522,7 +1737,8 @@ app.get("/login", (req, res) => {
 
 /* ROTA PARA ASSINATURA DO CONTRATO */
 app.get(
-  "/assinar/:idImplantacao/:numeroProposta/:cpfTitularFinanceiro/:idEntidade", async (req, res) => {
+  "/assinar/:idImplantacao/:numeroProposta/:cpfTitularFinanceiro/:idEntidade",
+  async (req, res) => {
     const db = await mysql.createPool(config);
     const numeroProposta = req.params.numeroProposta;
     const cpfTitular = req.params.cpfTitularFinanceiro;
@@ -1578,7 +1794,7 @@ app.get(
           });
           console.error("Erro puxar entidade relacionada", err);
         }
-        
+
         db.query(queryPlano, [planoId], (err, resultPlano) => {
           if (err) {
             logger.error({
@@ -1588,10 +1804,7 @@ app.get(
               stack: err.stack,
               timestamp: new Date().toISOString(),
             });
-            console.error(
-              "Erro ao buscar plano vinculado à implantação",
-              err
-            );
+            console.error("Erro ao buscar plano vinculado à implantação", err);
             res
               .status(500)
               .send("Erro ao buscar plano vinculado à implantação");
@@ -1663,15 +1876,20 @@ app.get(
                           ? resultAssinatura[0].assinatura_base64
                           : null;
 
-                      const dependentes = resultDependentes
+                      const dependentes = resultDependentes;
 
-                      dependentes.forEach(dependente => {
-                        dependente.nascimentodependente = format(new Date(dependente.nascimentodependente), "dd/MM/yyyy");
-                      })
+                      dependentes.forEach((dependente) => {
+                        dependente.nascimentodependente = format(
+                          new Date(dependente.nascimentodependente),
+                          "dd/MM/yyyy"
+                        );
+                      });
 
-                      const implantacao = resultImplantacoes[0]
-                      implantacao.datadenascimento = format(new Date(implantacao.datadenascimento), "dd/MM/yyyy");
-
+                      const implantacao = resultImplantacoes[0];
+                      implantacao.datadenascimento = format(
+                        new Date(implantacao.datadenascimento),
+                        "dd/MM/yyyy"
+                      );
 
                       res.render("contrato", {
                         implantacao: implantacao,
@@ -1681,7 +1899,7 @@ app.get(
                         dependentes: dependentes,
                         documentos: resultDocumentos,
                         assinaturaBase64: assinaturaBase64,
-                        dadosAssinatura: resultAssinatura[0]
+                        dadosAssinatura: resultAssinatura[0],
                       });
                     }
                   );
@@ -1704,12 +1922,15 @@ app.post("/salva-assinatura", async (req, res) => {
   const urlContrato = req.body.urlContrato;
   const idImplantacao = req.body.idImplantacao;
   const assinatura = req.body.assinatura_base64;
-  
+
   // Capturar o IP do solicitante
-  const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  
+  const ipAddress =
+    req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+
   // Capturar a data e horário em UTC-3
-  const timestamp = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+  const timestamp = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })
+  );
 
   // Pegar localização se estiver disponível
   const location = req.body.location;
@@ -1717,34 +1938,48 @@ app.post("/salva-assinatura", async (req, res) => {
   const sqlInsertAssign =
     "INSERT INTO assinatura_implantacao(id_implantacao, assinatura_base64, ip_address, timestamp, location) VALUES (?,?,?,?,?)";
 
-  db.query(sqlInsertAssign, [idImplantacao, assinatura, ipAddress, timestamp, location], async (err, result) => {
-    if (err) {
-      logger.error({
-        message: "ROTA: ASSINAR | ERRO: ao salvar assinatura do beneficiário",
-        error: err.message,
-        stack: err.stack,
-        timestamp: new Date().toISOString(),
+  db.query(
+    sqlInsertAssign,
+    [idImplantacao, assinatura, ipAddress, timestamp, location],
+    async (err, result) => {
+      if (err) {
+        logger.info("ERRO: ao salvar assinatura do beneficiário no BD", err);
+        logger.error({
+          message: "ROTA: ASSINAR | ERRO: ao salvar assinatura do beneficiário",
+          error: err.message,
+          stack: err.stack,
+          timestamp: new Date().toISOString(),
+        });
+
+        console.error("Erro ao salvar assinatura do beneficiário");
+        res.cookie(
+          "alertError",
+          "Erro ao salvar assinatura, contate o suporte"
+        );
+        res
+          .status(500)
+          .send("Erro ao enviar assinatura, solicite auxílio do suporte");
+        return;
+      }
+      logger.info("MSG: Inseriu no banco a assinatura");
+
+      await sendStatus(idImplantacao, 2, "Proposta assinada pelo contratante");
+      await gerarSalvarPDFProposta(
+        urlContrato,
+        numeroProposta,
+        idImplantacao,
+        planoLogo,
+        dataVigencia
+      );
+      await enviarAnexosParaDSContrato(numeroProposta);
+
+      res.cookie("alertSuccess", "Assinatura feita com sucesso", {
+        maxAge: 3000,
       });
-
-      console.error("Erro ao salvar assinatura do beneficiário");
-      res.cookie("alertError", "Erro ao salvar assinatura, contate o suporte");
-      res
-        .status(500)
-        .send("Erro ao enviar assinatura, solicite auxílio do suporte");
-      return;
+      res.status(200).send("Assinado com sucesso.");
     }
-
-    await sendStatus(idImplantacao, 2, "Proposta assinada pelo contratante");
-    await gerarSalvarPDFProposta(urlContrato, numeroProposta, idImplantacao, planoLogo, dataVigencia);
-    await enviarAnexosParaDSContrato(numeroProposta);
-
-    res.cookie("alertSuccess", "Assinatura feita com sucesso", {
-      maxAge: 3000,
-    });
-    res.status(200).send("Assinado com sucesso.");
-  });
+  );
 });
-
 
 app.post("/login-verifica", async (req, res) => {
   const db = await mysql.createPool(config);
@@ -1784,7 +2019,6 @@ app.get("/sucesso/:numeroProposta", (req, res) => {
   };
   res.render("sucesso", dados);
 });
-
 
 app.get("/implantacoes", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
@@ -1856,37 +2090,33 @@ app.get("/visualizaImplantacao/:id", verificaAutenticacao, async (req, res) => {
   const queryStatus =
     "SELECT * FROM status_implantacao WHERE idimplantacao = ?";
 
-  
+  db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
+    if (err) {
+      console.log("Erro ao buscar implantação no BD", err);
+      res.status(500).send("Erro ao buscar implantação no BD");
+      return;
+    }
 
-db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
-  if (err) {
-    console.log("Erro ao buscar implantação no BD", err);
-    res.status(500).send("Erro ao buscar implantação no BD");
-    return;
-  }
+    if (resultImplantacoes.length === 0) {
+      res.status(404).send("Implantação não encontrada");
+      return;
+    }
 
-  if (resultImplantacoes.length === 0) {
-    res.status(404).send("Implantação não encontrada");
-    return;
-  }
+    const idImplantacao = resultImplantacoes[0].id;
 
-  const idImplantacao = resultImplantacoes[0].id;
+    const entidadeId = resultImplantacoes[0].idEntidade;
 
-  const entidadeId = resultImplantacoes[0].idEntidade;
-
-  const planoId = resultImplantacoes[0].planoSelecionado;
+    const planoId = resultImplantacoes[0].planoSelecionado;
 
     db.query(queryEntidade, [entidadeId], (err, resultEntidade) => {
       if (err) {
         console.error("Erro puxar entidade relacionada", err);
       }
-      
+
       db.query(queryPlano, [planoId], (err, resultPlano) => {
         if (err) {
           console.error("Erro ao buscar plano vinculado à implantação", err);
-          res
-            .status(500)
-            .send("Erro ao buscar plano vinculado à implantação");
+          res.status(500).send("Erro ao buscar plano vinculado à implantação");
           return;
         }
         db.query(
@@ -1909,41 +2139,35 @@ db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
                     err
                   );
                 }
-                db.query(
-                  queryStatus,
-                  [idImplantacao],
-                  (err, resultStatus) => {
-                    if (err) {
-                      console.error(
-                        "Erro ao buscar status da implantacao",
-                        err
-                      );
-                    }
-                    const data_implantacao = new Date(
-                      resultImplantacoes[0].data_implantacao
-                    );
-                    const dia = String(data_implantacao.getDate()).padStart(
-                      2,
-                      "0"
-                    );
-                    const mes = String(
-                      data_implantacao.getMonth() + 1
-                    ).padStart(2, "0");
-                    const ano = data_implantacao.getFullYear();
-                    const dataFormatada = `${dia}/${mes}/${ano}`;
-
-                    res.render("detalhes-implantacao", {
-                      implantacao: resultImplantacoes[0],
-                      plano: resultPlano[0],
-                      dataFormatada: dataFormatada,
-                      entidade: resultEntidade[0],
-                      dependentes: resultDependentes,
-                      documento: resultDocumentos,
-                      status: resultStatus,
-                      rotaAtual: "implantacoes",
-                    });
+                db.query(queryStatus, [idImplantacao], (err, resultStatus) => {
+                  if (err) {
+                    console.error("Erro ao buscar status da implantacao", err);
                   }
-                );
+                  const data_implantacao = new Date(
+                    resultImplantacoes[0].data_implantacao
+                  );
+                  const dia = String(data_implantacao.getDate()).padStart(
+                    2,
+                    "0"
+                  );
+                  const mes = String(data_implantacao.getMonth() + 1).padStart(
+                    2,
+                    "0"
+                  );
+                  const ano = data_implantacao.getFullYear();
+                  const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                  res.render("detalhes-implantacao", {
+                    implantacao: resultImplantacoes[0],
+                    plano: resultPlano[0],
+                    dataFormatada: dataFormatada,
+                    entidade: resultEntidade[0],
+                    dependentes: resultDependentes,
+                    documento: resultDocumentos,
+                    status: resultStatus,
+                    rotaAtual: "implantacoes",
+                  });
+                });
               }
             );
           }
@@ -1975,8 +2199,8 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   const { plano } = req.body;
   db.query("SELECT *FROM planos WHERE id = ?", [plano.id], (err, result) => {
-    if(err) {
-      console.error('Erro ao consultar plano ao tentar atualiza-lo', err)
+    if (err) {
+      console.error("Erro ao consultar plano ao tentar atualiza-lo", err);
     }
     if (result.length > 0) {
       // O plano existe, atualize-o
@@ -2060,7 +2284,7 @@ app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
         }
       );
     }
-  })
+  });
 });
 
 app.post("/deleta-plano", verificaAutenticacao, async (req, res) => {
@@ -2082,14 +2306,14 @@ app.get("/entidades", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   db.query("SELECT * FROM entidades", (error, resultsEntidades) => {
     if (error) throw error;
-    db.query('SELECT * FROM profissoes', (error, resultProfissoes) => {
-      if(error) throw error;
+    db.query("SELECT * FROM profissoes", (error, resultProfissoes) => {
+      if (error) throw error;
       res.render("entidades", {
         entidades: resultsEntidades,
         profissoes: resultProfissoes,
         rotaAtual: "entidades",
       });
-    })
+    });
   });
 });
 
@@ -2097,7 +2321,7 @@ app.post("/editar-entidade/:id", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   const idEntidade = req.params.id;
   const { nome, descricao, publico, documentos, taxa, profissoes } = req.body;
-  
+
   await db.query(
     qInsEntidade,
     [nome, descricao, publico, documentos, taxa, idEntidade],
@@ -2115,9 +2339,12 @@ app.post("/editar-entidade/:id", verificaAutenticacao, async (req, res) => {
         return; // Retorne caso haja erro
       }
 
-      res.cookie("alertSuccess", "Entidade atualizada com Sucesso", { maxAge: 3000 });
+      res.cookie("alertSuccess", "Entidade atualizada com Sucesso", {
+        maxAge: 3000,
+      });
       res.status(200).json({ message: "Entidade atualizada com sucesso" });
-    });
+    }
+  );
 });
 
 app.delete("/excluir-entidade/:id", verificaAutenticacao, async (req, res) => {
@@ -2178,25 +2405,31 @@ app.post("/cadastrar-entidade", verificaAutenticacao, async (req, res) => {
   );
 });
 
-app.post("/editar-profissao/:id", verificaAutenticacao, async (req,res) => {
+app.post("/editar-profissao/:id", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   const idProfissao = req.params.id;
   const { nome, idEntidade } = req.body;
 
-  await db.query("UPDATE profissoes SET nome=?, idEntidade=? WHERE id=?", [nome, idEntidade, idProfissao] ,async (error, result) => {
-    if(error){
-      res.cookie(
-        "alertError",
-        "Erro ao atualizar Entidade, verifique e tente novamente",
-        {
-          maxAge: 3000,
-        }
-      )
+  await db.query(
+    "UPDATE profissoes SET nome=?, idEntidade=? WHERE id=?",
+    [nome, idEntidade, idProfissao],
+    async (error, result) => {
+      if (error) {
+        res.cookie(
+          "alertError",
+          "Erro ao atualizar Entidade, verifique e tente novamente",
+          {
+            maxAge: 3000,
+          }
+        );
+      }
+      res.cookie("alertSuccess", "Profissão atualizada com sucesso", {
+        maxAge: 3000,
+      });
+      res.status(200).json({ message: "Profissão atualizada com sucesso" });
     }
-    res.cookie("alertSuccess", "Profissão atualizada com sucesso", { maxAge: 3000 });
-    res.status(200).json({ message: "Profissão atualizada com sucesso" });
-  })
-})
+  );
+});
 
 app.post("/cadastrar-profissao", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
@@ -2232,40 +2465,41 @@ app.delete("/excluir-profissao/:id", verificaAutenticacao, async (req, res) => {
   });
 });
 
-app.get('/generate-pdf', async (req, res) => {
+app.get("/generate-pdf", async (req, res) => {
   const link = req.query.url;
   const numeroProposta = req.query.numeroProposta;
-  const planoLogoSrc= req.query.planoLogo;
+  const planoLogoSrc = req.query.planoLogo;
   const dataVigencia = req.query.dataVigencia;
 
-
   try {
-    console.log('Launching browser');
+    console.log("Launching browser");
     const browser = await puppeteer.launch({
       headless: true, // Mude para true para produção
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
     const page = await browser.newPage();
 
     const url = link;
     console.log(`Navigating to URL: ${url}`);
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 180000 });
+    await page.goto(url, { waitUntil: "networkidle2", timeout: 180000 });
 
-    console.log('Waiting for CSS to load');
-    await page.waitForSelector('body'); // Aguarde um elemento específico que garante que os estilos foram aplicados
+    console.log("Waiting for CSS to load");
+    await page.waitForSelector("body"); // Aguarde um elemento específico que garante que os estilos foram aplicados
 
     // Aguarde até que o conteúdo da página esteja completamente carregado
     await page.evaluate(() => {
       return new Promise((resolve) => {
-        if (document.readyState === 'complete') {
+        if (document.readyState === "complete") {
           resolve();
         } else {
-          window.addEventListener('load', resolve);
+          window.addEventListener("load", resolve);
         }
       });
     });
 
-    const urlAdmBase64 = getBase64Image(path.join(__dirname, 'img', 'logomounthermonoriginal.png'));
+    const urlAdmBase64 = getBase64Image(
+      path.join(__dirname, "img", "logomounthermonoriginal.png")
+    );
     const urlPlanoBase64 = getBase64Image(path.join(__dirname, planoLogoSrc));
 
     const header = `
@@ -2321,23 +2555,23 @@ app.get('/generate-pdf', async (req, res) => {
       </footer>
     `;
 
-    console.log('Generating PDF');
+    console.log("Generating PDF");
     const pdf = await page.pdf({
-      format: 'A4',
+      format: "A4",
       displayHeaderFooter: true,
       headerTemplate: header,
       footerTemplate: footer,
-      printBackground: true
+      printBackground: true,
     });
 
     await browser.close();
-    console.log('PDF generated');
+    console.log("PDF generated");
 
-    const filePath = path.join(__dirname, 'arquivospdf', 'modeloProposta2.pdf');
+    const filePath = path.join(__dirname, "arquivospdf", "modeloProposta2.pdf");
     fs.writeFileSync(filePath, pdf);
     console.log(`PDF saved to ${filePath}`);
 
-    res.contentType('application/pdf');
+    res.contentType("application/pdf");
     res.send(pdf);
   } catch (error) {
     logger.error({
@@ -2346,15 +2580,14 @@ app.get('/generate-pdf', async (req, res) => {
       stack: error.stack,
       timestamp: new Date().toISOString(),
     });
-    console.error('Error generating PDF:', error);
-    res.status(500).send('Erro ao gerar PDF');
+    console.error("Error generating PDF:", error);
+    res.status(500).send("Erro ao gerar PDF");
   }
 });
 
 /* TESTES  */
 
 /* FIM TESTES */
-
 
 app.get("/logout", (req, res) => {
   // Remover as informações de autenticação da sessão
