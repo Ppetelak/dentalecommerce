@@ -167,6 +167,7 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
         arquivo: anexo.nome_arquivo,
         linkAnexo: anexo.caminho_arquivo,
       };
+      logger.info(`Enviado um anexo de link: ${data.linkAnexo}`)
       console.log("Enviando anexo:", data);
 
       try {
@@ -739,6 +740,11 @@ app.post("/upload", upload.array("file"), (req, res) => {
   console.log({ filepaths });
   res.json({ filepaths });
 });
+
+app.get("/rotaTeste", (req, res) => {
+  console.log('Rota puxou certo')
+  res.send('Está on e puxando a rota')
+})
 
 /* ROTA PARA REMOVER ARQUIVOS QUE FORAM FEITOS UPLOAD PELO FORMULÁRIO */
 app.post("/remove", (req, res) => {

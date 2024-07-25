@@ -40,6 +40,10 @@ const signaturePad = new SignaturePad(canvas, {
 });
 
 document.getElementById('save-btn').addEventListener('click', function () {
+    // Desabilitar o botão de salvar e mostrar o loader
+    this.disabled = true;
+    document.getElementById('loading-div').style.display = 'block';
+
     // Obtenha a imagem da assinatura em formato base64
     const signatureData = signaturePad.toDataURL();
 
@@ -70,7 +74,10 @@ document.getElementById('save-btn').addEventListener('click', function () {
             },
             error: function (error) {
                 console.error('Erro ao salvar assinatura:', error);
-                window.reload();
+                // Reabilitar o botão e esconder o loader em caso de erro
+                document.getElementById('save-btn').disabled = false;
+                document.getElementById('loading-div').style.display = 'none';
+                alert('Erro ao salvar assinatura. Tente novamente.');
             }
         });
     }
