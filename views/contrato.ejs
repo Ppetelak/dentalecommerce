@@ -3,18 +3,18 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proposta nº <%= implantacao.numeroProposta %></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style-contrato.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://unpkg.com/signature_pad"></script>
+        <link
+    href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Open+Sans:wght@300;400;600&family=Dancing+Script:wght@400;700&family=Satisfy&family=Shadows+Into+Light&family=Great+Vibes&family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet">
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Open+Sans:wght@300;400;600&display=swap"
-        rel="stylesheet">
 </head>
 
 <body>
@@ -34,6 +34,7 @@
                 <input type="hidden" id="numeroProposta" value="<%= implantacao.numeroProposta %>">
                 <input type="hidden" id="planoLogo" value="<%= plano.logo %>">
                 <input type="hidden" id="dataVigencia" value="<%= dataFormatada %>">
+                <input type="hidden" id="ansOperadora" value="<%= plano.ansOperadora %>">
                 <a id="pdfLink" target="_blank">
                     <button type="button" class="btn btn-primary salvar" id="btnSave">IMPRIMIR/ SALVAR PDF</button>
                 </a>
@@ -182,14 +183,24 @@
                                 </span> </p>
                         </div>
                         <div class="col-6">
-                            <p>COD. ANS: <span>
-                                    <%= plano.ans %>
+                            <p>Registro <strong>ANS</strong>: <span>
+                                    <%= plano.ANS %>
                                 </span> </p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <p>COBERTURA: </p>
+                            <p> Tipo de contratação: <span>COLETIVO POR ADESÃO</span></p>
+                        </div>
+                        <div class="col-6">
+                            <p> Segmentação Assistencial: <span>ODONTOLÓGICO</span></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <p>ABRANGÊNCIA: <span>
+                                <%= plano.abrangencia %>
+                            </span> </p>
                         </div>
                         <div class="col-6">
                             <p>COPARTICIPAÇÃO: <span>
@@ -199,14 +210,8 @@
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <p>ABRANGÊNCIA: <span>
-                                    <%= plano.abrangencia %>
-                                </span> </p>
-                        </div>
-                        <div class="col-6">
-                            <p>CONTRATAÇÃO: <span>
-                                    <%= plano.contratacao %>
-                                </span> </p>
+                            <p>Padrão de Acomodação e Internação: <span>
+                                    SEM ACOMODAÇÃO</span></p>
                         </div>
                     </div>
                 </div>
@@ -388,27 +393,31 @@
                 <div class="col-12">
                     <h6> FORMA DE PAGAMENTO </h6>
                     <div class="row">
-                        <div class="col-12">
-                            <p> <strong> RESUMO </strong></p>
-                            <p>
-                                Valor do plano contratado: 
-                                
-                                    <% if(implantacao.formaPagamento === 1) { %>
-                                        <span> 
-                                           R$ <%= plano.pgtoAnualAvista %> - Pago á vista via boleto, PIX ou cartão de crédito.
-                                        </span>
-                                        <%  } else if (implantacao.formaPagamento === 2) { %>
-                                        <span>
-                                           R$ <%= plano.pgtoAnualCartao %> - Pago em 12x de R$ <%= (plano.pgtoAnualCartao / 12).toFixed(2) %> no cartão de crédito.
-                                        </span>
-                                        <%  } else { %>
-                                        <span>
-                                            R$ <%= plano.pgtoAnualCartao3x %> - Pago em 3x de R$ <%= (plano.pgtoAnualCartao3x / 3).toFixed(2) %> no cartão de crédito.
-                                         </span>
-                                         <% } %>        
-                            </p>
-                            <p> Mês de reajuste: <span> <%= plano.reajuste %> </span></p>
-                        </div>
+                        <% if(implantacao.formaPagamento === 1) { %>
+                            <div class="col-4">
+                                <p> Forma de Pagamento: <span> Pago á vista via boleto, PIX ou cartão de crédito. </span> </p>
+                            </div>
+                            <div class="col-4">
+                                <p>Valor total: <span> R$ <%= plano.pgtoAnualAvista %> </span></p>
+                            </div>
+                        <%  } else if (implantacao.formaPagamento === 2) { %>
+                            <div class="col-4">
+                                <p> Forma de Pagamento <span> Pago em 12x de R$ <%= (plano.pgtoAnualCartao / 12).toFixed(2) %> no cartão de crédito. </span> </p>
+                            </div>
+                            <div class="col-4">
+                                <p>Valor total: <span> R$ <%= plano.pgtoAnualCartao %> </span></p>
+                            </div>
+                        <%  } else { %>
+                            <div class="col-4">
+                                <p> Forma de Pagamento <span> Pago em 3x de R$ <%= (plano.pgtoAnualCartao3x / 3).toFixed(2) %> no cartão de crédito. </span> </p>
+                            </div>
+                            <div class="col-4">
+                                <p>Valor total: <span> R$ <%= plano.pgtoAnualCartao3x %> </span></p>
+                            </div>
+                        <% } %>  
+                            <div class="col-4">                            
+                                <p> Mês de reajuste: <span> <%= plano.reajuste %> </span></p>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -419,12 +428,12 @@
                     <div class="row">
                         <p>
                             Pelo presente, declaro expressamente que li e compreendi o “Manual de Orientação para
-                            Contratação de Planos de Saúde” (MPS), editado pela Agência de Saúde Suplementar (ANS),
+                            Contratação de Planos de Saúde” (MPS), editado pela Agência de Saúde Suplementar (<strong>ANS</strong>),
                             CONCORDO E ESTOU CIENTE QUE:
                         </p>
                         <ol>
                             <li>
-                                Este instrumento é a <strong>Proposta de Adesão </strong>, doravante denominada simplesmente <strong> "Proposta" </strong>, ao plano odontológico coletivo por adesão, doravante denominado simplesmente “benefício”, estipulado pela Mount Hermon <strong> Administradora de Benefícios </strong> Ltda., doravante denominada simplesmente “<strong> Administradora de Benefícios </strong>”, com a Dental Uni - Cooperativa Odontológica, doravante denominada simplesmente <strong> "Operadora" </strong>, e destinada à população que mantenha vínculo com a minha entidade de classe, doravante denominada simplesmente <strong> "Entidade" </strong>, indicada na página 1 desta <strong>Proposta</strong>.
+                                Este instrumento é a <strong>Proposta de Adesão </strong>, doravante denominada simplesmente <strong> "Proposta" </strong>, ao plano odontológico coletivo por adesão, doravante denominado simplesmente <strong>"benefício"</strong>, estipulado pela Mount Hermon <strong> Administradora de Benefícios </strong> Ltda., doravante denominada simplesmente “<strong> Administradora de Benefícios </strong>”, com a Dental Uni - Cooperativa Odontológica, doravante denominada simplesmente <strong> "Operadora" </strong>, e destinada à população que mantenha vínculo com a minha entidade de classe, doravante denominada simplesmente <strong> "Entidade" </strong>, indicada na página 1 desta <strong>Proposta</strong>.
                             </li>
                             <li>
                                 Mantenho vínculo com a Entidade indicada na página 1 desta <strong>Proposta</strong>, sendo que a documentação comprobatória desse vínculo está sendo entregue por mim ao angariador, no ato da assinatura desta, para que seja conferida pela <strong><strong> Administradora de Benefícios </strong></strong>, podendo ser recusada em razão da falta de minha elegibilidade. Em caso de recusa da adesão, a taxa de angariação será devolvida a mim pelo angariador que a recebeu. A <strong> Administradora de Benefícios </strong> e/ou a <strong>Operadora</strong> poderão, a qualquer tempo, requerer a atualização da documentação comprobatória do meu vínculo com a Entidade.
@@ -439,7 +448,7 @@
                                 Efetivada a análise dos documentos e das informações prestadas nesta <strong>Proposta</strong>, de acordo com a legislação vigente, será implantada pela <strong>Operadora</strong> e o <strong>benefício</strong> terá início na data indicada no campo “Início da vigência”, na página 1 da presente; tanto eu quanto meu(s) dependente(s) passaremos a ser denominados <strong> "beneficiários" </strong>.
                             </li>
                             <li>
-                                Assim que eu assumir a condição de <strong>Beneficiário</strong> titular, ficam outorgados à <strong><strong> Administradora de Benefícios </strong></strong> amplos poderes para me representar, perante a <strong>Operadora</strong> e outros órgãos, em especial a ANS, no cumprimento e/ou nas alterações deste <strong>benefício</strong>, bem como na negociação dos reajustes dos valores mensais.
+                                Assim que eu assumir a condição de <strong>Beneficiário</strong> titular, ficam outorgados à <strong><strong> Administradora de Benefícios </strong></strong> amplos poderes para me representar, perante a <strong>Operadora</strong> e outros órgãos, em especial a <strong>ANS</strong>, no cumprimento e/ou nas alterações deste <strong>benefício</strong>, bem como na negociação dos reajustes dos valores mensais.
                             </li>
                             <li>
                                 O contrato do plano odontológico coletivo por adesão firmado entre a <strong><strong> Administradora de Benefícios </strong></strong> e a <strong>Operadora</strong>, no qual passarei a integrar, vigorará pelo prazo mínimo de 12 (doze) meses, podendo ser renovado automaticamente, por prazo indeterminado, desde que não ocorra denúncia, por escrito, no prazo de 60 (sessenta) dias, de qualquer das partes, seja pela <strong><strong> Administradora de Benefícios </strong></strong> ou pela <strong>Operadora</strong>. A vigência do <strong>benefício</strong> indicada na página 1 desta <strong>Proposta</strong> não se confunde com a vigência do contrato do plano odontológico coletivo por adesão. Em caso de rescisão desse contrato do plano odontológico coletivo por adesão, a <strong><strong> Administradora de Benefícios </strong></strong> me fará a comunicação desse fato em prazo não inferior a 30 (trinta) dias.
@@ -448,15 +457,15 @@
                                 Com antecedência mínima de 60 (sessenta) dias para o vencimento do período de cada 12 meses contratados, contados da primeira vigência, deverei denunciar à <strong><strong> Administradora de Benefícios </strong></strong>, por escrito, minha intenção em dar continuidade ou não no meu plano odontológico para o novo período anual. Não havendo minha manifestação de cancelamento, a <strong><strong> Administradora de Benefícios </strong></strong> procederá com renovação automática do meu plano odontológico e de meus dependentes, se houver. Receberei da <strong><strong> Administradora de Benefícios </strong></strong> informativo para quitação das mensalidades na mesma forma de pagamento em que foi aderido o contrato. Este será enviado em até 5 dias antes da renovação do mesmo produto com os valores atualizados, visto que o contrato prevê reajuste das mensalidades.
                             </li>
                             <li>
-                                Alguns planos coletivos por adesão, podem possuir entre os seus mecanismos de regulação a coparticipação, que é a participação na despesa assistencial a ser paga pelo <strong>Beneficiário</strong> sempre que houver a realização de consultas, exames, procedimentos, respeitadas as resoluções e instruções normativas da ANS vigentes à época da estipulação do contrato do plano odontológico coletivo por adesão e conforme o quadro a seguir:
+                                Alguns planos coletivos por adesão, podem possuir entre os seus mecanismos de regulação a coparticipação, que é a participação na despesa assistencial a ser paga pelo <strong>Beneficiário</strong> sempre que houver a realização de consultas, exames, procedimentos, respeitadas as resoluções e instruções normativas da <strong>ANS</strong> vigentes à época da estipulação do contrato do plano odontológico coletivo por adesão e conforme o quadro a seguir:
                             </li>
                             <table class="table table-contratoGerais">
                                 <thead>
                                     <th> PLANO </th>
-                                    <th> CÓDIGO ANS </th>
+                                    <th> CÓDIGO <strong>ANS</strong> </th>
                                     <th> SEGMENTAÇÃO </th>
                                     <th> ACOMODAÇÃO </th>
-                                    <th> MECANISMO DE REGULAÇÃO(COOPARTICIPAÇÃO) </th>
+                                    <th> MECANISMO DE REGULAÇÃO </th>
                                 </thead>
                                 <tbody>
                                     <tr>
@@ -464,7 +473,7 @@
                                             <%= plano.nome_do_plano %>
                                         </td>
                                         <td>
-                                            <%= plano.ans %>
+                                            <%= plano.ANS %>
                                         </td>
                                         <td>
                                             ODONTOLÓGICO
@@ -484,16 +493,16 @@
                             </table>
                         
                             <li>
-                                O <strong>benefício</strong> cobrirá as despesas com serviços médico-hospitalares relacionados no “Rol de Procedimentos e Eventos em Saúde”, instituído pela ANS, no tratamento das doenças codificadas na versão 11 da Classificação Estatística Internacional de Doenças e Problemas Relacionados à Saúde (CID-11), da Organização Mundial da Saúde (OMS), observadas as condições gerais deste <strong>benefício</strong>.
+                                O <strong>benefício</strong> cobrirá as despesas com serviços médico-hospitalares relacionados no “Rol de Procedimentos e Eventos em Saúde”, instituído pela <strong>ANS</strong>, no tratamento das doenças codificadas na versão 11 da Classificação Estatística Internacional de Doenças e Problemas Relacionados à Saúde (CID-11), da Organização Mundial da Saúde (OMS), observadas as condições gerais deste <strong>benefício</strong>.
                             </li>
                             <li>
                                 Além das coberturas referidas no item 9, este <strong>benefício</strong> pode oferecer, conforme as condições de cada plano, coberturas e/ou benefícios adicionais
                             </li>
                             <li>
-                                As coberturas excluídas do <strong>benefício</strong> são aquelas que não se incluem no “Rol de Procedimentos e Eventos em Saúde”, da ANS, nem nas coberturas adicionais eventualmente oferecidas por este <strong>benefício</strong>, bem como as despesas não cobertas citadas na Lei nº 9.656/98 e nas normas regulamentares da ANS.
+                                As coberturas excluídas do <strong>benefício</strong> são aquelas que não se incluem no “Rol de Procedimentos e Eventos em Saúde”, da <strong>ANS</strong>, nem nas coberturas adicionais eventualmente oferecidas por este <strong>benefício</strong>, bem como as despesas não cobertas citadas na Lei nº 9.656/98 e nas normas regulamentares da <strong>ANS</strong>.
                             </li>
                             <li>
-                                Os prazos de carência são os períodos nos quais nem eu nem meu(s) <strong>Beneficiário</strong>(s) dependente(s) teremos direito a determinadas coberturas, mesmo que em dia com o pagamento do <strong>benefício</strong>. Há prazos de carência para utilização do <strong>benefício</strong>, conforme tabela indicativa a seguir. Para efeitos de isenção de carências, devem-se observar as normas regulamentares da ANS e a legislação em vigor
+                                Os prazos de carência são os períodos nos quais nem eu nem meu(s) <strong>Beneficiário</strong>(s) dependente(s) teremos direito a determinadas coberturas, mesmo que em dia com o pagamento do <strong>benefício</strong>. Há prazos de carência para utilização do <strong>benefício</strong>, conforme tabela indicativa a seguir. Para efeitos de isenção de carências, devem-se observar as normas regulamentares da <strong>ANS</strong> e a legislação em vigor
                             </li>
 
                             <table class="table table-contratoGerais">
@@ -546,7 +555,7 @@
                             </table>
                             </br>
                             <li>
-                                As características do <strong>benefício</strong> relativa a: (i) segmentação assistencial e (ii) abrangência geográfica estão definidas na página 3 desta <strong>Proposta</strong> e, a área de atuação dos planos no quadro a seguir:
+                                As características do <strong>benefício</strong> relativa a: (i) segmentação assistencial e (ii) abrangência geográfica estão definidas na página 1 desta <strong>Proposta</strong> e, a área de atuação dos planos no quadro a seguir:
                             </li>
 
                             <table class="table table-contratoGerais">
@@ -562,7 +571,7 @@
                                             <%= plano.nome_do_plano %>
                                         </td>
                                         <td>
-                                            <%= plano.ans %>
+                                            <%= plano.ANS %>
                                         </td>
                                         <td>
                                             ODONTOLÓGICO
@@ -574,7 +583,7 @@
                                 </tbody>
                             </table>
                             <li>
-                                O pagamento do <strong>benefício</strong>, será no mesmo dia <%= implantacao.dataVencimento %> e sua forma será aquela indicada na página 1 desta <strong>Proposta</strong>, sendo que a falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao mês (0,033% ao dia) e à multa de 2% sobre o valor do débito em atraso, calculados proporcionalmente ao tempo de inadimplência e ainda, se for o caso, honorários advocatícios e reembolso de custas judiciais e outras despesas de cobrança. No período de inadimplência, poderá ocorrer a suspensão automática do <strong>benefício</strong>, cuja utilização somente será restabelecida a partir da quitação do(s) valor(es) pendente(s), acrescido(s) dos encargos supracitados, observada a possibilidade de cancelamento, conforme disposto no item 18 desta <strong>Proposta</strong>. No caso de inadimplência, a contar da data de seu vencimento, a <strong><strong> Administradora de Benefícios </strong></strong> adotará medidas para a cobrança dos valores em atraso, acarretando, inclusive, o envio das informações do <strong>Beneficiário</strong> titular, ou de seu responsável legal, aos órgãos de serviço de proteção ao crédito, mediante prévia comunicação, conforme determina o Código de Defesa do Consumidor
+                                O pagamento do <strong>benefício</strong>, será no dia e forma indicada na página 1 desta <strong>Proposta</strong>, sendo que a falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao mês (0,033% ao dia) e à multa de 2% sobre o valor do débito em atraso, calculados proporcionalmente ao tempo de inadimplência e ainda, se for o caso, honorários advocatícios e reembolso de custas judiciais e outras despesas de cobrança. No período de inadimplência, poderá ocorrer a suspensão automática do <strong>benefício</strong>, cuja utilização somente será restabelecida a partir da quitação do(s) valor(es) pendente(s), acrescido(s) dos encargos supracitados, observada a possibilidade de cancelamento, conforme disposto no item 18 desta <strong>Proposta</strong>. No caso de inadimplência, a contar da data de seu vencimento, a <strong><strong> Administradora de Benefícios </strong></strong> adotará medidas para a cobrança dos valores em atraso, acarretando, inclusive, o envio das informações do <strong>Beneficiário</strong> titular, ou de seu responsável legal, aos órgãos de serviço de proteção ao crédito, mediante prévia comunicação, conforme determina o Código de Defesa do Consumidor
                             </li>
                             <li>
                                 Independentemente da data da minha <strong>Proposta</strong>, o valor mensal do <strong>benefício</strong> poderá sofrer os seguintes reajustes:
@@ -589,10 +598,10 @@
                                 </ul>
                             </li>
                             <li>
-                                Devo solicitar e informar expressamente à <strong><strong> Administradora de Benefícios </strong></strong> toda e qualquer alteração cadastral, tal como a eventual perda de elegibilidade.
+                                Devo solicitar e informar expressamente à <strong>Administradora de Benefícios</strong> toda e qualquer alteração cadastral, tal como a eventual perda de elegibilidade. As informações relativas à alteração de e-mail, telefones celulares e demais dados deverão ser comunicados imediatamente à <strong>Administradora de Benefícios</strong>, visando o relacionamento e notificações a serem encaminhadas.
                             </li>
                             <li>
-                                Poderei solicitar o cancelamento do <strong>benefício</strong> à <strong><strong> Administradora de Benefícios </strong></strong>, de acordo com os normativos da legislação em vigor. O <strong>benefício</strong> poderá ser cancelado unilateralmente, conforme as regras e prazos previstos em contrato, nas seguintes situações (i) por uma das pessoas jurídicas contratantes (<strong>Operadora</strong>, <strong><strong> Administradora de Benefícios </strong></strong> ou <strong>Entidade</strong>); (ii) em caso de perda da elegibilidade, se constatada fraude no uso do plano ou nas informações prestadas na contratação; (iii) pela falta de pagamento do parcelamento contratado ou pela falta de pagamento da renovação anual, mediante comunicado prévio. No caso de cancelamento do <strong>benefício</strong>, haverá minha exclusão e a de meu(s) <strong>Beneficiário</strong>(s) dependente(s), sem prejuízo da cobrança do(s) valor(es) não pago(s), incluídos juros e multa.
+                                Poderei solicitar o cancelamento do <strong>benefício</strong> à <strong>Administradora de Benefícios</strong>, de acordo com os normativos da legislação em vigor. O <strong>benefício</strong> poderá ser cancelado unilateralmente, conforme as regras e prazos previstos em contrato, nas seguintes situações (i) por uma das pessoas jurídicas contratantes (Operadora, <strong>Administradora de Benefícios</strong> ou Entidade); (ii) em caso de perda da elegibilidade, se constatada fraude no uso do plano ou nas informações prestadas na contratação; (iii) pela falta de pagamento do valor mensal do <strong>benefício</strong> até o último dia da vigência referente ao mês não pago, mediante comunicado prévio, que será enviado através de e-mail, aplicativo de whatsapp constante na base de dados da <strong>Administradora de Benefícios</strong>. No caso de cancelamento do <strong>benefício</strong>, haverá minha exclusão e a de meu(s) <strong>beneficiário</strong>(s) dependente(s), sem prejuízo da cobrança do(s) valor(es) não pago(s), incluídos juros e multa.
                             </li>
                             <li>
                                 No caso de cancelamento do <strong>benefício</strong>, devolverei imediatamente à <strong><strong> Administradora de Benefícios </strong></strong> os cartões de identificação do(s) <strong>Beneficiário</strong>(s), assumindo todas as responsabilidades civis, criminais e financeiras por toda e qualquer utilização indevida do <strong>benefício</strong>, incluindo a utilização por terceiros, com ou sem o meu conhecimento.
@@ -610,7 +619,7 @@
                                 A minha manifestação de vontade, ao aceitar esta <strong>Proposta</strong>, não poderá ser questionada pelo mero fato de ter sido assinada por meio eletrônico e, para todos os fins de direito, esta <strong>Proposta</strong> equivale a um documento particular. Declaro, ainda, aceitar como válido o meio tecnológico adotado pela <strong><strong> Administradora de Benefícios </strong></strong> para a celebração desta <strong>Proposta</strong>, uma vez que garanti das a autoria e integridade do documento em forma eletrônica, nos termos da legislação em vigor.
                             </li>
                             <li>
-                                O tratamento de meus dados pessoais e dados pessoais sensíveis do(s) <strong>Beneficiário</strong>(s) dependente(s) pela <strong><strong> Administradora de Benefícios </strong></strong> e <strong>Operadora</strong>, para os fins do preenchimento da <strong>Proposta</strong> e regular prestação dos serviços de assistência à saúde contratados, visa atender as exigências de garantia assistencial obrigatória estabelecidas na Instrução Normativa - IN Nº 8, de 30 de março de 2022 da Agência Nacional de Saúde Suplementar - ANS, e será realizado independentemente do meu consentimento e do(s) <strong>Beneficiário</strong>(s) dependente(s) de dados manifestado no ato da contratação, sempre de modo a resguardar os direitos fundamentais de liberdade, privacidade e livre desenvolvimento da pessoa natural, em observância à Lei Federal nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD)” 
+                                O tratamento de meus dados pessoais e dados pessoais sensíveis do(s) <strong>Beneficiário</strong>(s) dependente(s) pela <strong><strong> Administradora de Benefícios </strong></strong> e <strong>Operadora</strong>, para os fins do preenchimento da <strong>Proposta</strong> e regular prestação dos serviços de assistência à saúde contratados, visa atender as exigências de garantia assistencial obrigatória estabelecidas na Instrução Normativa - IN Nº 8, de 30 de março de 2022 da Agência Nacional de Saúde Suplementar - <strong>ANS</strong>, e será realizado independentemente do meu consentimento e do(s) <strong>Beneficiário</strong>(s) dependente(s) de dados manifestado no ato da contratação, sempre de modo a resguardar os direitos fundamentais de liberdade, privacidade e livre desenvolvimento da pessoa natural, em observância à Lei Federal nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD)” 
                             </li>
                             <li>
                                 O Foro para dirimir quaisquer questões oriundas da presente <strong>Proposta</strong> é o do meu domicílio.
@@ -736,7 +745,7 @@
                                     <div class="interna">
                                         <h2> COLETIVO EMPRESARIAL</h2>
                                         <p>
-                                            Com menos de 30 participantes: Não é permitida a aplicação de Cobertura
+                                            Com 30 participantes ou mais: Não é permitida a aplicação de Cobertura
                                             Parcial Temporária (CPT) ou Agravo, desde que o <strong>Beneficiário</strong> formalize o
                                             pedido de ingresso em até trinta dias da celebração do contrato coletivo ou
                                             de sua vinculação a pessoa jurídica contratante
@@ -753,7 +762,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td style="text-align: left;">
                                     MECANISMOS DE REGULAÇÃO
                                 </td>
                                 <td colspan="2">
@@ -770,7 +779,7 @@
                                     REAJUSTE
                                 </td>
                                 <td>
-                                    Os planos individuais ou familiares precisam de autorização prévia da ANS para
+                                    Os planos individuais ou familiares precisam de autorização prévia da <strong>ANS</strong> para
                                     aplicação de reajuste anual, exceto para os de cobertura exclusivamente odontológica
                                     que devem ter cláusula clara elegendo um índice de preços divulgado por instituição
                                     externa. A variação da mensalidade por mudança de faixa etária é o aumento
@@ -778,31 +787,31 @@
                                     variação dispostos em contrato e atendendo a RN 563/2022.
                                 </td>
                                 <td>
-                                    Os planos coletivos não precisam de autorização prévia da ANS para aplicação de
+                                    Os planos coletivos não precisam de autorização prévia da <strong>ANS</strong> para aplicação de
                                     reajuste anual. Assim, nos reajustes aplicados às mensalidades dos contratos
                                     coletivos, prevalecerá o disposto no contrato ou índice resultante de negociação
                                     entre as partes contratantes (operadora de plano de saúde e pessoa jurídica),
-                                    devendo a operadora obrigatoriamente comunicar os reajustes à ANS. O <strong>Beneficiário</strong>
+                                    devendo a operadora obrigatoriamente comunicar os reajustes à <strong>ANS</strong>. O <strong>Beneficiário</strong>
                                     deverá ficar atento à periodicidade do reajuste que não poderá ser inferior a 12
                                     meses, que serão contados da celebração do contrato ou do último reajuste aplicado e
                                     não do ingresso do <strong>Beneficiário</strong> ao plano. Embora não haja a necessidade de prévia
-                                    autorização da ANS, esta faz um monitoramento dos reajustes aplicados nos contratos
+                                    autorização da <strong>ANS</strong>, esta faz um monitoramento dos reajustes aplicados nos contratos
                                     coletivos. A variação da mensalidade por mudança de faixa etária é o aumento
                                     decorrente da alteração de idade do <strong>Beneficiário</strong>, segundo faixas e percentuais de
                                     variação dispostos em contrato e atendendo a RN nº 563/2022.
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td style="text-align: left;">
                                     ALTERAÇÕES NA REDE ASSISTENCIAL DO PLANO
                                 </td>
                                 <td colspan="2">
                                     Alterações na rede de prestadores de serviço devem ser informadas pela operadora,
                                     inclusive as inclusões. No caso de redimensionamento por redução de prestador
-                                    hospitalar, a alteração necessita ser autorizada pela ANS antes da comunicação aos
+                                    hospitalar, a alteração necessita ser autorizada pela <strong>ANS</strong> antes da comunicação aos
                                     beneficiários. Esta comunicação deve observar 30 dias de antecedência no caso de
                                     substituição de prestador hospitalar para que a equivalência seja analisada pela
-                                    ANS.
+                                    <strong>ANS</strong>.
                                 </td>
                             </tr>
                             <tr>
@@ -818,7 +827,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td style="text-align: left;">
                                     REGRAS DE RESCISÃO E/OU SUSPENSÃO
                                 </td>
                                 <td>
@@ -935,8 +944,8 @@
                             <div class="rodapeManual">
                                 <p>
                                     Para informar-se sobre estes e outros detalhes da contratação de planos de saúde, o
-                                    <strong>Beneficiário</strong> deve contatar a operadora. Permanecendo dúvidas, pode consultar a ANS
-                                    pelo site www.ans.gov.br ou pelo Disque ANS (0800-701-9656).
+                                    <strong>Beneficiário</strong> deve contatar a operadora. Permanecendo dúvidas, pode consultar a <strong>ANS</strong>
+                                    pelo site www.ANS.gov.br ou pelo Disque ANS (0800-701-9656).
                                 </p>
                                 <p>
                                     ESTE MANUAL NÃO SUBSTITUI O CONTRATO
@@ -948,7 +957,7 @@
                                     Resolução Normativa 195/2009, da Agência Nacional de Saúde Suplementar
                                 </p>
                                 <div class="row">
-                                    <img src="/img/Anslogo.png">
+                                    <img src="/img/ANSlogo.png">
                                     <img src="/img/ministerio-da-saude.png">
                                 </div>
                             </div>
@@ -963,8 +972,8 @@
                                 <div class="col-6">
                                     <p>
                                         Disque-ANS: 0800 701 9656 </br>
-                                        www.ans.gov.br </br>
-                                        ouvidoria@ans.gov.br
+                                        www.ANS.gov.br </br>
+                                        ouvidoria@ANS.gov.br
                                     </p>
                                 </div>
                             </div>
@@ -991,7 +1000,7 @@
                                 >
                                 <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content">
                                     <div style="border: 1px solid white">
-                                      ANS Nº <%= plano.ansOperadora %>
+                                      <strong>ANS</strong> Nº <%= plano.ansOperadora %>
                                     </div>
                                   </div>
                             </div>
@@ -1077,7 +1086,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td style="text-align: left;">
                                     ÁREA GEOGRÁFICA DE ABRANGÊNCIA E ATUAÇÃO
                                 </td>
                                 <td>
@@ -1091,7 +1100,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td style="text-align: left;">
                                     COBERTURAS E PROCEDIMENTOS GARANTIDOS
                                 </td>
                                 <td>
@@ -1119,7 +1128,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td style="text-align: left;">
                                     DOENÇAS E LESÕES PREEXISTENTES (DLP)
                                 </td>
                                 <td>
@@ -1147,7 +1156,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td style="text-align: left;">
                                     CARÊNCIAS MECANISMOS DE REGULAÇÃO
                                 </td>
                                 <td>
@@ -1199,7 +1208,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td style="text-align: left;">
                                     CONTINUIDADE NO PLANO COLETIVO EMPRESARIAL (ART. 30 E 31 DA LEI Nº 9.656/1998)
                                 </td>
                                 <td>
@@ -1218,8 +1227,8 @@
                             <div class="rodapeManual">
                                 <p>
                                     Para informar-se sobre estes e outros detalhes da contratação de planos de saúde, o
-                                    <strong>Beneficiário</strong> deve contatar a operadora. Permanecendo dúvidas, pode consultar a ANS
-                                    pelo site www.ans.gov.br ou pelo Disque ANS (0800-701-9656).
+                                    <strong>Beneficiário</strong> deve contatar a operadora. Permanecendo dúvidas, pode consultar a <strong>ANS</strong>
+                                    pelo site www.ANS.gov.br ou pelo Disque <strong>ANS</strong> (0800-701-9656).
                                 </p>
                                 <p>
                                     ESTE MANUAL NÃO SUBSTITUI O CONTRATO
@@ -1231,7 +1240,7 @@
                                     Resolução Normativa 195/2009, da Agência Nacional de Saúde Suplementar
                                 </p>
                                 <div class="row">
-                                    <img src="/img/Anslogo.png">
+                                    <img src="/img/ANSlogo.png">
                                     <img src="/img/ministerio-da-saude.png">
                                 </div>
                             </div>
@@ -1246,8 +1255,8 @@
                                 <div class="col-6">
                                     <p>
                                         Disque-ANS: 0800 701 9656 </br>
-                                        www.ans.gov.br </br>
-                                        ouvidoria@ans.gov.br
+                                        www.ANS.gov.br </br>
+                                        ouvidoria@ANS.gov.br
                                     </p>
                                 </div>
                             </div>
@@ -1381,30 +1390,42 @@
                     <div class="loader"></div>
                 </div>
                 <div class="col-12">
-                    <h6> Assinatura da <strong>Proposta</strong></h6>
+                    <h6>Assinatura da <strong>Proposta</strong></h6>
                     <% if (assinaturaBase64) { %>
                         <img src="<%= assinaturaBase64 %>" alt="Assinatura do Usuário">
-                        <div style="
-                            width: 100%;
-                            text-align: left;">
-                            <p> <strong> Dados de Assinatura </strong> </p>
-                            <p> 
-                                <strong>Data e horário: </strong> <%= dadosAssinatura.timestamp %> </br>
-                                <strong>Localização: </strong>  <%= dadosAssinatura.location %> </br>
-                                <strong>IP computador:  </strong> <%= dadosAssinatura.ip_address %> </br>
+                        <div style="width: 100%; text-align: left;">
+                            <p><strong>Dados da Assinatura Eletrônica</strong></p>
+                            <p>
+                                <strong>Nome:</strong> <%= implantacao.nomefinanceiro %><br>
+                                <strong>CPF:</strong> <%= implantacao.cpffinanceiro %><br>
+                                <strong>Data e horário:</strong> <%= dadosAssinatura.timestamp %><br>
+                                <strong>Localização:</strong> <%= dadosAssinatura.location %><br>
+                                <strong>IP computador:</strong> <%= dadosAssinatura.ip_address %><br>
                             </p>
-                            
                         </div>
                     <% } else { %>
-                        <!-- Se não existir assinatura, renderize o canvas -->
-                        <canvas id="signature-pad" width="400" height="200"></canvas>
+                        <!-- Se não existir assinatura, renderize a entrada para o nome -->
+                        <div class="signature-input">
+                            <span>Insira seu Nome no campo abaixo e clique em gerar assinaturas em seguida escolha um modelo e clique em assinar proposta</span>
+                            <input type="text" id="signature-name" placeholder="Digite seu nome">
+                            <button id="generate-signature" class="btn btn-primary">Gerar Assinaturas</button>
+                        </div>
+                        <div class="signature-preview" style="display: none;">
+                            <h6>Escolha um Modelo de Assinatura</h6>
+                            <div id="signature-options" class="signature-options">
+                                <!-- Assinaturas geradas serão inseridas aqui -->
+                            </div>
+                        </div>
                         <div class="row btnAssinatura">
                             <button id="save-btn" class="btn btn-primary" data-implantacao-id="<%= implantacao.id %>">ASSINAR PROPOSTA</button>
                             <button id="reset-btn" class="btn btn-secondary">Resetar Assinatura</button>
                         </div>
                     <% } %>
-                </div>         
+                </div>
             </div>
+            
+            
+            
 
 
     <!-- Adicione um botão para salvar a assinatura -->

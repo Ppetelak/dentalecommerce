@@ -12,6 +12,71 @@
     vertical-align: baseline;
 }
 
+@font-face {
+    font-family: 'Dancing Script';
+    src: url('/fonts/dancing_script.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Satisfy';
+    src: url('/fonts/satisfy.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Shadows Into Light';
+    src: url('/fonts/shadows_into_light.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Great Vibes';
+    src: url('/fonts/great_vibes.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/roboto.woff2') format('woff2');
+}
+
+
+.signature-input {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.signature-input input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.signature-preview {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.signature-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.signature-option {
+    border: 2px solid transparent;
+    padding: 5px;
+    transition: border-color 0.3s;
+}
+
+.signature-option.selected {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    border-radius: 4px;
+    background-color: #e9ecef;
+}
+
+
+
+
 .loader {
     border: 16px solid #f3f3f3;
     border-radius: 50%;

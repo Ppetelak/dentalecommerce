@@ -49,6 +49,7 @@ app.use("/arquivos", express.static("arquivos"));
 app.use("/uploads", express.static("uploads"));
 app.use("/formulario", express.static("formulario"));
 app.use("/arquivospdf", express.static("arquivospdf"));
+app.use("/fonts", express.static("fonts"));
 app.use("/bootstrap-icons", express.static("node_modules/bootstrap-icons"));
 app.set("view engine", "ejs");
 app.use(cookie());
@@ -260,7 +261,8 @@ async function gerarSalvarPDFProposta(
   numeroProposta,
   idImplantacao,
   planoLogoSrc,
-  dataVigencia
+  dataVigencia,
+  ansOperadora
 ) {
   const db = await mysql.createPool(config);
   const query =
@@ -303,7 +305,7 @@ async function gerarSalvarPDFProposta(
                   <img style="max-width: 50%;" src="data:image/png;base64,${urlAdmBase64}">
                   <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content;-webkit-print-color-adjust: exact">
                     <div style="border: 1px solid white">
-                      ANS 42167-7
+                      ANS
                     </div>
                   </div>
                 </div>
@@ -312,7 +314,7 @@ async function gerarSalvarPDFProposta(
                   <img style="max-width: 50%;" src="data:image/png;base64,${urlPlanoBase64}">
                   <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content;-webkit-print-color-adjust: exact">
                     <div style="border: 1px solid white">
-                      ANS 42167-7
+                      ANS ${ansOperadora}
                     </div>
                   </div>
                 </div>
@@ -393,71 +395,70 @@ async function gerarSalvarPDFProposta(
 }
 
 async function sendContractEmail(
-    email,
-    idImplantacao,
-    numeroProposta,
-    cpfTitularFinanceiro,
-    nomeTitularFinanceiro,
-    idEntidade
-  ) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        logger.info("Iniciando a configuração do transporter");
-        const transporter = nodemailer.createTransport({
-          host: "mail.mounthermon.com.br",
-          port: 587,
-          secure: false,
-          auth: {
-            user: "naoresponda@mounthermon.com.br",
-            pass: "5w55t5$Ev",
-          },
-          tls: {
-            rejectUnauthorized: false,
-          },
-        });
-  
-        logger.info("Transporter configurado com sucesso");
-  
-        const linkAleatorio = `${appUrl}/assinar/${idImplantacao}/${numeroProposta}/${cpfTitularFinanceiro}/${idEntidade}`;
-        logger.info(`Link aleatório gerado: ${linkAleatorio}`);
-  
-        logger.info("Renderizando o template do email");
-        const html = await ejs.renderFile(
-          path.join(__dirname, "../httpdocs/views/emailTemplate.ejs"),
-          {
-            nomeTitularFinanceiro,
-            linkAleatorio,
-          }
-        );
-        logger.info("Template renderizado com sucesso");
-  
-        const htmlWithInlineStyles = juice(html);
-  
-        const mailOptions = {
-          from: "naoresponda@mounthermon.com.br",
-          to: email,
-          subject: `MOUNT HERMON - Assinatura Proposta Nº ${numeroProposta}`,
-          html: htmlWithInlineStyles,
-        };
-  
-        logger.info("Enviando email");
-        await transporter.sendMail(mailOptions);
-        logger.info("Email enviado com sucesso");
-        resolve(); // Resolva a promessa se o e-mail for enviado com sucesso
-      } catch (err) {
-        logger.error({
-          message: "Erro no envio do email ao beneficiário para assinatura",
-          error: err.message,
-          stack: err.stack,
-          timestamp: new Date().toISOString(),
-        });
-        enviarErroDiscord(
-          `Erro ao enviar email para o titular do contrato ${err}`
-        );
-        reject(err); // Rejeite a promessa se houver um erro no envio do e-mail
-      }
-    });
-  }
+  email,
+  idImplantacao,
+  numeroProposta,
+  cpfTitularFinanceiro,
+  nomeTitularFinanceiro,
+  idEntidade
+) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      logger.info("Iniciando a configuração do transporter");
+      const transporter = nodemailer.createTransport({
+        host: "mail.mounthermon.com.br",
+        port: 587,
+        secure: false,
+        auth: {
+          user: "naoresponda@mounthermon.com.br",
+          pass: "5w55t5$Ev",
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+      });
+
+      logger.info("Transporter configurado com sucesso");
+
+      const linkAleatorio = `${appUrl}/assinar/${idImplantacao}/${numeroProposta}/${cpfTitularFinanceiro}/${idEntidade}`;
+      logger.info(`Link aleatório gerado: ${linkAleatorio}`);
+
+      logger.info("Renderizando o template do email");
+      const html = await ejs.renderFile(
+        path.join(__dirname, "../dentalecommerce/views/emailTemplate.ejs"),
+        {
+          nomeTitularFinanceiro,
+          linkAleatorio,
+        }
+      );
+      logger.info("Template renderizado com sucesso");
+
+      const htmlWithInlineStyles = juice(html);
+
+      const mailOptions = {
+        from: "naoresponda@mounthermon.com.br",
+        to: email,
+        subject: `MOUNT HERMON - Assinatura Proposta Nº ${numeroProposta}`,
+        html: htmlWithInlineStyles,
+      };
+
+      logger.info("Enviando email");
+      await transporter.sendMail(mailOptions);
+      logger.info("Email enviado com sucesso");
+      resolve(); // Resolva a promessa se o e-mail for enviado com sucesso
+    } catch (err) {
+      logger.error({
+        message: "Erro no envio do email ao beneficiário para assinatura",
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString(),
+      });
+      enviarErroDiscord(`Erro ao enviar email para o titular do contrato ${err}`);
+      reject(err); // Rejeite a promessa se houver um erro no envio do e-mail
+    }
+  });
+}
+
   
 
 async function consultarNumeroProposta(idImplantacao) {
@@ -1698,44 +1699,51 @@ app.get("/enviar-email/:id", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   const idImplantacao = req.params.id;
   const queryImplantacoes = "SELECT * FROM implantacoes WHERE id=?";
-  db.query(queryImplantacoes, [idImplantacao], (err, result) => {
-    if (err) {
-      res.cookie(
-        "alertError",
-        "Erro ao pegar dados do beneficiário para disparo de email",
-        { maxAge: 3000 }
-      );
-    }
 
-    console.log(result);
-    let implantacao = result[0];
-    try {
-      sendContractEmail(
-        implantacao.emailtitularfinanceiro,
-        idImplantacao,
-        implantacao.numeroProposta,
-        implantacao.cpffinanceiro,
-        implantacao.nomefinanceiro,
-        implantacao.identidade
-      );
-      res.cookie(
-        "alertSuccess",
-        "Disparo de email feito com sucesso, aguarde até 5 minutos para verificar se usuário recebe o email",
-        { maxAge: 3000 }
-      );
-      res.status(200).send("Envio de email feito com sucesso.");
-    } catch (error) {
-      logger.error({
-        message: "Erro no envio do email ao beneficiário para assinatura",
-        error: error.message,
-        stack: error.stack,
-        timestamp: new Date().toISOString(),
-      });
-      console.error(error);
-      res.status(500).send("Erro ao enviar o e-mail");
-    }
-  });
+  try {
+    db.query(queryImplantacoes, [idImplantacao], async (err, result) => {
+      if (err) {
+        res.cookie("alertError", "Erro ao pegar dados do beneficiário para disparo de email", { maxAge: 3000 });
+        return res.status(500).send("Erro ao pegar dados do beneficiário");
+      }
+
+      console.log(result);
+      let implantacao = result[0];
+
+      try {
+        await sendContractEmail(
+          implantacao.emailtitularfinanceiro,
+          idImplantacao,
+          implantacao.numeroProposta,
+          implantacao.cpffinanceiro,
+          implantacao.nomefinanceiro,
+          implantacao.identidade
+        );
+        res.cookie("alertSuccess", "Disparo de email feito com sucesso, aguarde até 5 minutos para verificar se usuário recebe o email", { maxAge: 3000 });
+        res.status(200).send("Envio de email feito com sucesso.");
+      } catch (error) {
+        logger.error({
+          message: "Erro no envio do email ao beneficiário para assinatura",
+          error: error.message,
+          stack: error.stack,
+          timestamp: new Date().toISOString(),
+        });
+        console.error(error);
+        res.cookie("alertError", "Erro ao enviar o e-mail", { maxAge: 3000 });
+        res.status(500).send("Erro ao enviar o e-mail");
+      }
+    });
+  } catch (err) {
+    logger.error({
+      message: "Erro ao conectar com o banco de dados",
+      error: err.message,
+      stack: err.stack,
+      timestamp: new Date().toISOString(),
+    });
+    res.status(500).send("Erro ao conectar com o banco de dados");
+  }
 });
+
 
 app.get("/login", (req, res) => {
   res.render("login");
@@ -1928,6 +1936,7 @@ app.post("/salva-assinatura", async (req, res) => {
   const urlContrato = req.body.urlContrato;
   const idImplantacao = req.body.idImplantacao;
   const assinatura = req.body.assinatura_base64;
+  const ansOperadora = req.body.ansOperadora
 
   // Capturar o IP do solicitante
   const ipAddress =
@@ -1975,7 +1984,8 @@ app.post("/salva-assinatura", async (req, res) => {
         numeroProposta,
         idImplantacao,
         planoLogo,
-        dataVigencia
+        dataVigencia,
+        ansOperadora
       );
       await enviarAnexosParaDSContrato(numeroProposta);
 
@@ -2476,6 +2486,8 @@ app.get("/generate-pdf", async (req, res) => {
   const numeroProposta = req.query.numeroProposta;
   const planoLogoSrc = req.query.planoLogo;
   const dataVigencia = req.query.dataVigencia;
+  const ansOperadora = req.query.ansOperadora;
+
 
   try {
     console.log("Launching browser");
@@ -2527,7 +2539,7 @@ app.get("/generate-pdf", async (req, res) => {
                 <img style="max-width: 50%;" src="data:image/png;base64,${urlPlanoBase64}">
                 <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content;-webkit-print-color-adjust: exact">
                   <div style="border: 1px solid white">
-                    ANS 42167-7
+                    ANS ${ansOperadora}
                   </div>
                 </div>
               </div>

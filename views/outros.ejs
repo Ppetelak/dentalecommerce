@@ -1,0 +1,30 @@
+<div class="row assinatura page-break" id="assinar">
+    <div id="loading-div" style="display: none;">
+        <p>Aguarde, enviando...</p>
+        <div class="loader"></div>
+    </div>
+    <div class="col-12">
+        <h6> Assinatura da <strong>Proposta</strong></h6>
+        <% if (assinaturaBase64) { %>
+            <img src="<%= assinaturaBase64 %>" alt="Assinatura do Usuário">
+            <div style="
+                width: 100%;
+                text-align: left;">
+                <p> <strong> Dados de Assinatura </strong> </p>
+                <p> 
+                    <strong>Data e horário: </strong> <%= dadosAssinatura.timestamp %> </br>
+                    <strong>Localização: </strong>  <%= dadosAssinatura.location %> </br>
+                    <strong>IP computador:  </strong> <%= dadosAssinatura.ip_address %> </br>
+                </p>
+                
+            </div>
+        <% } else { %>
+            <!-- Se não existir assinatura, renderize o canvas -->
+            <canvas id="signature-pad" width="400" height="200"></canvas>
+            <div class="row btnAssinatura">
+                <button id="save-btn" class="btn btn-primary" data-implantacao-id="<%= implantacao.id %>">ASSINAR PROPOSTA</button>
+                <button id="reset-btn" class="btn btn-secondary">Resetar Assinatura</button>
+            </div>
+        <% } %>
+    </div>         
+</div>
