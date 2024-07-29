@@ -177,42 +177,38 @@
                 <div class="col-12">
                     <h6> Plano Pretendido </h6>
                     <div class="row">
-                        <div class="col-6">
-                            <p>PLANOS: <span>
-                                    <%= plano.nome_do_plano %>
-                                </span> </p>
-                        </div>
-                        <div class="col-6">
-                            <p>Registro <strong>ANS</strong>: <span>
-                                    <%= plano.ANS %>
-                                </span> </p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <p> Tipo de contratação: <span>COLETIVO POR ADESÃO</span></p>
-                        </div>
-                        <div class="col-6">
-                            <p> Segmentação Assistencial: <span>ODONTOLÓGICO</span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <p>ABRANGÊNCIA: <span>
-                                <%= plano.abrangencia %>
-                            </span> </p>
-                        </div>
-                        <div class="col-6">
-                            <p>COPARTICIPAÇÃO: <span>
-                                    <%= plano.coparticipacao %>
-                                </span></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <p>Padrão de Acomodação e Internação: <span>
-                                    SEM ACOMODAÇÃO</span></p>
-                        </div>
+                        <table class="table table-contratoGerais">
+                            <thead>
+                                <th> PLANO </th>
+                                <th> CÓDIGO <strong>ANS</strong> </th>
+                                <th> SEGMENTAÇÃO </th>
+                                <th> ACOMODAÇÃO </th>
+                                <th> MECANISMO DE REGULAÇÃO </th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <%= plano.nome_do_plano %>
+                                    </td>
+                                    <td>
+                                        <%= plano.ans %>
+                                    </td>
+                                    <td>
+                                        ODONTOLÓGICO
+                                    </td>
+                                    <td>
+                                        -
+                                    </td>
+                                    <td>
+                                        <% if (plano.coparticipacao === 'Sim') { %>
+                                            Com coparticipação
+                                        <% } else { %>
+                                            Sem coparticipação
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1014,283 +1010,115 @@
             <div class="row dados guiaLeitura page-break">
                 <div class="col-12">
                     <h6> Guia de Leitura Contratual (GLC)</h6>
-                    <div style="
-                            width: 100%;
-                            display: flex;
-                            flex-direction: row;">
-                            <div style="
-                                width: 50%;
-                                display: flex;
-                                flex-direction: column;
-                                align-items: center;">
-                                <img 
-                                    class="mw-100" 
-                                    src="<%= plano.logo %>" 
-                                    style="
-                                        width: 50%;"
-                                />
-                            </div>
-                            <div style="
-                                width: 50%;
-                                display: flex;
-                                flex-direction: column;
-                                color: #0E3178;
-                                font-weight: 900;
-                                align-items: center;
-                                text-align: end;
-                                font-size: 12px;"
-                                >
-                                <%= plano.razaoSocialOperadora %> <br>
-                                CPNJ: <%= plano.cnpjOperadora %> <br>
-                                Registro na ANS: <%= plano.ansOperadora %> <br>
-                                <%= plano.siteOperadora %> | Tel: <%= plano.telefoneOperadora %>
-                            </div>
+                    <div style="width: 100%; display: flex; flex-direction: row;">
+                        <div style="width: 50%; display: flex; flex-direction: column; align-items: center;">
+                            <img class="mw-100" src="<%= plano.logo %>" style="width: 50%;" />
                         </div>
+                        <div style="width: 50%; display: flex; flex-direction: column; color: #0E3178; font-weight: 900; align-items: center; text-align: end; font-size: 12px;">
+                            <%= plano.razaoSocialOperadora %> <br>
+                            CPNJ: <%= plano.cnpjOperadora %> <br>
+                            Registro na ANS: <%= plano.ansOperadora %> <br>
+                            <%= plano.siteOperadora %> | Tel: <%= plano.telefoneOperadora %>
+                        </div>
+                    </div>
                     <div class="row manual">
-                        <table class="table table-glc">
+                        <table class="table table-glc" style="border-collapse: separate; border-spacing: 0 20px;">
                             <tr>
+                                <td>CONTRATAÇÃO</td>
+                                <td>Determina se o plano destina-se à pessoa física ou jurídica. A contratação pode ser Individual/ Familiar, Coletivo por Adesão ou Coletivo Empresarial.</td>
                                 <td>
-                                    CONTRATAÇÃO
-                                </td>
-                                <td>
-                                    Determina se o plano destina-se à pessoa física ou jurídica. A contratação pode ser
-                                    Individual/ Familiar, Coletivo por Adesão ou Coletivo Empresarial.
-                                </td>
-                                <td>
-                                    3
+                                    <%= dependentes.length > 3 ? 4 : 3 %>
                                 </td>
                             </tr>
                             <tr>
+                                <td>SEGMENTAÇÃO ASSISTENCIAL</td>
+                                <td>Define a amplitude da cobertura assistencial do plano de saúde. A segmentação assistencial é categorizada em: referência, hospitalar com obstetrícia, hospitalar sem obstetrícia, ambulatorial, odontológica e suas combinações.</td>
                                 <td>
-                                    SEGMENTAÇÃO ASSISTENCIAL
-                                </td>
-                                <td>
-                                    Define a amplitude da cobertura assistencial do plano de saúde. A segmentação
-                                    assistencial é categorizada em: referência, hospitalar com obstetrícia, hospitalar
-                                    sem obstetrícia, ambulatorial, odontológica e suas combinações.
-                                </td>
-                                <td>
-                                    1
+                                    <%= dependentes.length > 3 ? 2 : 1 %>
                                 </td>
                             </tr>
                             <tr>
+                                <td>PADRÃO DE ACOMODAÇÃO</td>
+                                <td>Define o padrão de acomodação para o leito de internação nos planos hospitalares: pode ser coletiva ou individual.</td>
                                 <td>
-                                    PADRÃO DE ACOMODAÇÃO
-                                </td>
-                                <td>
-                                    Define o padrão de acomodação para o leito de internação nos planos hospitalares:
-                                    pode ser coletiva ou individual.
-                                </td>
-                                <td>
-                                    1
+                                    <%= dependentes.length > 3 ? 2 : 1 %>
                                 </td>
                             </tr>
                             <tr>
-                                <td style="text-align: left;">
-                                    ÁREA GEOGRÁFICA DE ABRANGÊNCIA E ATUAÇÃO
-                                </td>
+                                <td style="text-align: left;">ÁREA GEOGRÁFICA DE ABRANGÊNCIA E ATUAÇÃO</td>
+                                <td>Área em que a operadora de plano de saúde se compromete a garantir todas as coberturas de assistência à saúde contratadas. A exceção da nacional, é obrigatória a especificação nominal do(s) estado(s) ou município(s) que compõem as áreas de abrangência estadual, grupo de estados, grupo de municípios ou municipal</td>
                                 <td>
-                                    Área em que a operadora de plano de saúde se compromete a garantir todas as
-                                    coberturas de assistência à saúde contratadas. A exceção da nacional, é obrigatória
-                                    a especificação nominal do(s) estado(s) ou município(s) que compõem as áreas de
-                                    abrangência estadual, grupo de estados, grupo de municípios ou municipal
-                                </td>
-                                <td>
-                                    4
+                                    <%= dependentes.length > 3 ? 5 : 4 %>
                                 </td>
                             </tr>
                             <tr>
-                                <td style="text-align: left;">
-                                    COBERTURAS E PROCEDIMENTOS GARANTIDOS
-                                </td>
+                                <td style="text-align: left;">COBERTURAS E PROCEDIMENTOS GARANTIDOS</td>
+                                <td>É o conjunto de procedimentos a que o <strong>Beneficiário</strong> tem direito, previsto na legislação de saúde suplementar pelo Rol de Procedimentos e Eventos cm Saúde, que constitui a referência básica para cobertura mínima obrigatória, e no contrato firmado com a operadora, conforme a segmentação assistencial do plano contratado. O <strong>Beneficiário</strong> deve analisar detalhadamente as coberturas a que tem direito.</td>
                                 <td>
-                                    É o conjunto de procedimentos a que o <strong>Beneficiário</strong> tem direito, previsto na
-                                    legislação de saúde suplementar pelo Rol de Procedimentos e Eventos cm Saúde, que
-                                    constitui a referência básica para cobertura mínima obrigatória, e no contrato
-                                    firmado com a operadora, conforme a segmentação assistencial do plano contratado. O
-                                    <strong>Beneficiário</strong> deve analisar detalhadamente as coberturas a que tem direito.
-                                </td>
-                                <td>
-                                    3
+                                    <%= dependentes.length > 3 ? 4 : 3 %>
                                 </td>
                             </tr>
                             <tr>
+                                <td>EXCLUSÕES DE COBERTURAS</td>
+                                <td>E o conjunto de procedimentos a que o <strong>Beneficiário</strong> não tem direito, previsto na legislação de saúde suplementar, conforme a segmentação assistencial do plano contratado.</td>
                                 <td>
-                                    EXCLUSÕES DE COBERTURAS
-                                </td>
-                                <td>
-                                    E o conjunto de procedimentos a que o <strong>Beneficiário</strong> não tem direito, previsto na
-                                    legislação de saúde suplementar, conforme a segmentação assistencial do plano
-                                    contratado.
-                                </td>
-                                <td>
-                                    3
+                                    <%= dependentes.length > 3 ? 4 : 3 %>
                                 </td>
                             </tr>
                             <tr>
-                                <td style="text-align: left;">
-                                    DOENÇAS E LESÕES PREEXISTENTES (DLP)
-                                </td>
+                                <td style="text-align: left;">DOENÇAS E LESÕES PREEXISTENTES (DLP)</td>
+                                <td>Doenças e lesões preexistentes - DLP - são aquelas existentes antes da contratação do plano de saúde, e que o <strong>Beneficiário</strong> ou seu responsável saiba ser portador</td>
                                 <td>
-                                    Doenças e lesões preexistentes - DLP - são aquelas existentes antes da contratação
-                                    do plano de saúde, e que o <strong>Beneficiário</strong> ou seu responsável saiba ser portador
-                                </td>
-                                <td>
-                                    3
+                                    <%= dependentes.length > 3 ? 4 : 3 %>
                                 </td>
                             </tr>
                             <tr>
+                                <td>CARÊNCIAS</td>
+                                <td>Carência é o período em que o <strong>Beneficiário</strong> não tem direito a cobertura após a contratação do plano. Quando a operadora exigir cumprimento de carência, este período deve estar obrigatoriamente escrito, de forma clara, no contrato. Após cumprida a carência, o <strong>Beneficiário</strong> terá acesso a todos os procedimentos previstos em seu contrato e na legislação, exceto eventual cobertura parcial temporária por DLP.</td>
                                 <td>
-                                    CARÊNCIAS
-                                </td>
-                                <td>
-                                    Carência é o período em que o <strong>Beneficiário</strong> não tem direito a cobertura após a
-                                    contratação do plano. Quando a operadora exigir cumprimento de carência, este
-                                    período deve estar obrigatoriamente escrito, de forma clara, no contrato. Após
-                                    cumprida a carência, o <strong>Beneficiário</strong> terá acesso a todos os procedimentos previstos
-                                    em seu contrato e na legislação, exceto eventual cobertura parcial temporária por
-                                    DLP.
-                                </td>
-                                <td>
-                                    3
+                                    <%= dependentes.length > 3 ? 4 : 3 %>
                                 </td>
                             </tr>
                             <tr>
-                                <td style="text-align: left;">
-                                    CARÊNCIAS MECANISMOS DE REGULAÇÃO
-                                </td>
+                                <td style="text-align: left;">CARÊNCIAS MECANISMOS DE REGULAÇÃO</td>
+                                <td>São os mecanismos financeiros (franquia e/ou coparticipação), assistenciais (direcionamento e/ou perícia profissional) e/ou administrativos (autorização prévia) que a operadora utiliza para gerenciar a demanda e/ou utilização dos serviços de saúde.</td>
                                 <td>
-                                    São os mecanismos financeiros (franquia e/ou coparticipação), assistenciais
-                                    (direcionamento e/ou perícia profissional) e/ou administrativos (autorização prévia)
-                                    que a operadora utiliza para gerenciar a demanda e/ou utilização dos serviços de
-                                    saúde.
-                                </td>
-                                <td>
-                                    3
+                                    <%= dependentes.length > 3 ? 4 : 3 %>
                                 </td>
                             </tr>
                             <tr>
+                                <td>VIGÊNCIAS</td>
+                                <td>Define o período em que vigorará o contrato.</td>
                                 <td>
-                                    VIGÊNCIAS
-                                </td>
-                                <td>
-                                    Define o período em que vigorará o contrato.
-                                </td>
-                                <td>
-                                    3
+                                    <%= dependentes.length > 3 ? 4 : 3 %>
                                 </td>
                             </tr>
                             <tr>
+                                <td>RESCISÃO/ SUSPENSÃO</td>
+                                <td>A rescisão põe fim definitivamente à vigência do contrato. A suspensão descontinua a vigência do contrato.</td>
                                 <td>
-                                    RESCISÃO/ SUSPENSÃO
-                                </td>
-                                <td>
-                                    A rescisão põe fim definitivamente à vigência do contrato. A suspensão descontinua a
-                                    vigência do contrato.
-                                </td>
-                                <td>
-                                    4
+                                    <%= dependentes.length > 3 ? 5 : 4 %>
                                 </td>
                             </tr>
                             <tr>
+                                <td>REAJUSTE</td>
+                                <td>O reajuste por variação de custos é o aumento anual de mensalidade do plano de saúde em ramo de alteração nos custos, ocasionada por fatores tais como inflação, uso de novas tecnologias e nível de utilização dos serviços. A variação da mensalidade por mudança de faixa etária é o aumento decorrente da alteração de idade do <strong>Beneficiário</strong>.</td>
                                 <td>
-                                    REAJUSTE
-                                </td>
-                                <td>
-                                    O reajuste por variação de custos é o aumento anual de mensalidade do plano de saúde
-                                    em ramo de alteração nos custos, ocasionada por fatores tais como inflação, uso de
-                                    novas tecnologias e nível de utilização dos serviços. A variação da mensalidade por
-                                    mudança de faixa etária é o aumento decorrente da alteração de idade do
-                                    <strong>Beneficiário</strong>.
-                                </td>
-                                <td>
-                                    4
+                                    <%= dependentes.length > 3 ? 5 : 4 %>
                                 </td>
                             </tr>
                             <tr>
-                                <td style="text-align: left;">
-                                    CONTINUIDADE NO PLANO COLETIVO EMPRESARIAL (ART. 30 E 31 DA LEI Nº 9.656/1998)
-                                </td>
+                                <td style="text-align: left;">CONTINUIDADE NO PLANO COLETIVO EMPRESARIAL (ART. 30 E 31 DA LEI Nº 9.656/1998)</td>
+                                <td>A existência da contribuição do empregado para o pagamento da mensalidade do plano de saúde, regular e não vinculada à coparticipação em eventos, habilita ao direito de continuar vinculado por determinados períodos ao plano coletivo empresarial, nos casos de demissão sem justa causa ou aposentadoria, observadas as regras para oferecimento, opção e gozo, previstas na Lei e sua regulamentação.</td>
                                 <td>
-                                    A existência da contribuição do empregado para o pagamento da mensalidade do plano
-                                    de saúde, regular e não vinculada à coparticipação em eventos, habilita ao direito
-                                    de continuar vinculado por determinados períodos ao plano coletivo empresarial, nos
-                                    casos de demissão sem justa causa ou aposentadoria, observadas as regras para
-                                    oferecimento, opção e gozo, previstas na Lei e sua regulamentação.
-                                </td>
-                                <td>
-                                    4
+                                    <%= dependentes.length > 3 ? 5 : 4 %>
                                 </td>
                             </tr>
                         </table>
-                        <div class="rodape">
-                            <div class="rodapeManual">
-                                <p>
-                                    Para informar-se sobre estes e outros detalhes da contratação de planos de saúde, o
-                                    <strong>Beneficiário</strong> deve contatar a operadora. Permanecendo dúvidas, pode consultar a <strong>ANS</strong>
-                                    pelo site www.ANS.gov.br ou pelo Disque <strong>ANS</strong> (0800-701-9656).
-                                </p>
-                                <p>
-                                    ESTE MANUAL NÃO SUBSTITUI O CONTRATO
-                                </p>
-                            </div>
-                            <div class="rodapeAns">
-                                <p>
-                                    O Manual de Orientação para Contratação de Planos de Saúde é uma exigência da
-                                    Resolução Normativa 195/2009, da Agência Nacional de Saúde Suplementar
-                                </p>
-                                <div class="row">
-                                    <img src="/img/ANSlogo.png">
-                                    <img src="/img/ministerio-da-saude.png">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <p>
-                                        Agência Nacional de Saúde Suplementar </br>
-                                        Av. Augusto Severo, 84 - Glória - CEP: 20021-040</br>
-                                        Rio de Janeiro - RJ
-                                    </p>
-                                </div>
-                                <div class="col-6">
-                                    <p>
-                                        Disque-ANS: 0800 701 9656 </br>
-                                        www.ANS.gov.br </br>
-                                        ouvidoria@ANS.gov.br
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="
-                            width: 100%;
-                            display: flex;
-                            flex-direction: row;">
-                            <div style="
-                                width: 50%;
-                                display: flex;
-                                flex-direction: column;
-                                ">
-                                <%= plano.siteOperadora %> | Tel: <%= plano.telefoneOperadora %>
-                            </div>
-                            <div style="
-                                width: 50%;
-                                display: flex;
-                                flex-direction: column;
-                                color: #0E3178;
-                                font-weight: 900;
-                                font-size: 12px;
-                                text-align: end;"
-                                >
-                                <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content">
-                                    <div style="border: 1px solid white">
-                                      ANS Nº <%= plano.ansOperadora %>
-                                    </div>
-                                  </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
+            
 
 
             <% if (implantacao.formaPagamento === '1') { %>

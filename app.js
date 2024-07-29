@@ -19,6 +19,7 @@ const fsPromises = require("fs").promises;
 const axios = require("axios");
 const winston = require("winston");
 const uuid = require("uuid");
+const moment = require("moment");
 const { format } = require("date-fns");
 const { ptBR } = require("date-fns/locale");
 const nodemailer = require("nodemailer");
@@ -27,6 +28,7 @@ const juice = require("juice");
 const { default: parseJSON } = require("date-fns/parseJSON");
 const port = process.env.PORT || 5586;
 const appUrl = process.env.APP_URL || "http://localhost:5586";
+const pastaInterna = process.env.PASTA_INTERNA || "dentalEcommerce"
 
 /* Verificar se usuário está logado */
 const verificaAutenticacao = (req, res, next) => {
@@ -425,7 +427,7 @@ async function sendContractEmail(
 
       logger.info("Renderizando o template do email");
       const html = await ejs.renderFile(
-        path.join(__dirname, "../dentalecommerce/views/emailTemplate.ejs"),
+        path.join(__dirname, `../${pastaInterna}/views/emailTemplate.ejs`),
         {
           nomeTitularFinanceiro,
           linkAleatorio,
@@ -458,8 +460,6 @@ async function sendContractEmail(
     }
   });
 }
-
-  
 
 async function consultarNumeroProposta(idImplantacao) {
   const db = await mysql.createPool(config);
@@ -2105,6 +2105,7 @@ app.get("/visualizaImplantacao/:id", verificaAutenticacao, async (req, res) => {
     "SELECT * FROM anexos_implantacoes WHERE id_implantacao = ?";
   const queryStatus =
     "SELECT * FROM status_implantacao WHERE idimplantacao = ?";
+  const numeroProposta = await consultarNumeroProposta(idImplantacao);
 
   db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
     if (err) {
@@ -2147,7 +2148,7 @@ app.get("/visualizaImplantacao/:id", verificaAutenticacao, async (req, res) => {
             }
             db.query(
               queryDocumentos,
-              [idImplantacao],
+              [numeroProposta],
               (err, resultDocumentos) => {
                 if (err) {
                   console.error(
@@ -2179,9 +2180,10 @@ app.get("/visualizaImplantacao/:id", verificaAutenticacao, async (req, res) => {
                     dataFormatada: dataFormatada,
                     entidade: resultEntidade[0],
                     dependentes: resultDependentes,
-                    documento: resultDocumentos,
+                    documentos: resultDocumentos,
                     status: resultStatus,
                     rotaAtual: "implantacoes",
+                    moment: moment
                   });
                 });
               }
