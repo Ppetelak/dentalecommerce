@@ -237,19 +237,16 @@ section#planos {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 2.5rem;
-
-    height: 100vh;
+    gap: 1rem;
 }
 
 .planoLogo img {
-    width: min(50vw, 25rem);
+    width: min(20vw, 15rem);
 }
 
 h3.planoNome {
     text-transform: uppercase;
-    font-size: clamp(1.5rem, 1.375rem + 0.5vw, 2rem);
+    font-size: 1.5rem;
     color: var(--gray-700);
     padding-bottom: .75rem;
     border-bottom: 2px solid var(--secondary-color);
