@@ -56,44 +56,52 @@
                 <p> Confira as vantagens dos nossos planos</p>
             </div>
             <div id="planoGallery">
-                <% planos.forEach(function(plano) { %>  
-                    <div class="plano-card">
-                        <div class="planoLogo">
-                            <img src="<%= plano.logo %>">
-                        </div>
-
-                        <h3 class="planoNome">
-                            <%= plano.nome_do_plano %>
-                        </h3>
-                        
-                        <ul class="planoDescricao">
-                            <% const descricaoLinhas = plano.descricao.split('\n'); %>
-                            <% descricaoLinhas.forEach(function(linha) { %>
-                              <li><%= linha.trim() %></li>
-                            <% }); %>
-                          </ul>
-
-                        <p class="ANSbox">
-                            ANS - nº <span class="planoANS"><%= plano.ans %></span>
-                        </p>
-
-                        <div class="valores">
-                                        <p> Á partir de 12x de </p>
-                                        <h4 class="planoValor"> R$ <%= (plano.pgtoAnualAvista / 12).toFixed(2) %> </h4>
-                        </div>
-                        <p class="planoPgmento">
-                            <%= plano.observacoes %>
-                        </p>
-                        <form action="/formulario" method="post">
-                            <input type="hidden" value="<%= plano.id %>" name="planoSelecionado">  
-                        <button class="planoEscolher">escolher este</button>
-                        </form>
-                    </div>
-                <% }); %>
-            </div>
+                <script>
+                    // Transforme a lista de planos em um array JavaScript
+                    let planos = <%- JSON.stringify(planos) %>;
         
-
+                    // Função para calcular o valor mensal
+                    function calcularValorMensal(plano) {
+                        return (plano.pgtoAnualAvista / 12).toFixed(2);
+                    }
+        
+                    // Ordene os planos do mais barato para o mais caro
+                    planos.sort((a, b) => calcularValorMensal(a) - calcularValorMensal(b));
+        
+                    // Renderize os planos na ordem desejada
+                    planos.forEach(plano => {
+                        document.write(`
+                            <div class="plano-card">
+                                <div class="planoLogo">
+                                    <img src="${plano.logo}">
+                                </div>
+                                <h3 class="planoNome">
+                                    ${plano.nome_do_plano}
+                                </h3>
+                                <ul class="planoDescricao">
+                                    ${plano.descricao.split('\n').map(linha => `<li>${linha.trim()}</li>`).join('')}
+                                </ul>
+                                <p class="ANSbox">
+                                    ANS - nº <span class="planoANS">${plano.ans}</span>
+                                </p>
+                                <div class="valores">
+                                    <p> Á partir de 12x de </p>
+                                    <h4 class="planoValor"> R$ ${calcularValorMensal(plano)} </h4>
+                                </div>
+                                <p class="planoPgmento">
+                                    ${plano.observacoes}
+                                </p>
+                                <form action="/formulario" method="post">
+                                    <input type="hidden" value="${plano.id}" name="planoSelecionado">
+                                    <button class="planoEscolher">escolher este</button>
+                                </form>
+                            </div>
+                        `);
+                    });
+                </script>
+            </div>
         </section>
+        
 
         <section id="redeCredenciada">
             <div class="row">
@@ -115,16 +123,18 @@
                             <div class="planoLogo">
                                 <img src="/img/dental_uni_logo.jpg">
                             </div>
-        
-                            <button class="planoRede">consultar rede</button>
+                            <a href="https://www.dentaluni.com.br/encontreseudentista" target="_blank">
+                                <button class="planoRede">consultar rede</button>
+                            </a>
                         </div>
         
                         <div class="rede-card">
                             <div class="planoLogo">
                                 <img src="/img/logo_odontogroup.png">
                             </div>
-        
-                            <button class="planoRede">consultar rede</button>
+                            <a href="https://prod.odontogroup.com.br/rede-credenciada" target="_blank">
+                                <button class="planoRede">consultar rede</button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -135,7 +145,7 @@
             <div class="row">
                 <div class="col-6 contato-col">
                     <h2>contato</h2>
-                    <a href="" target="_blank"><button class="btnContato"><i class="bi bi-whatsapp"></i>  Converse conosco</button></a>
+                    <a href="https://api.whatsapp.com/send?phone=5511953662806&text=Ol%C3%A1%2C%20estava%20no%20site%20da%20Mount%20Hermon%20Dental%2C%20gostaria%20de%20falar%20com%20algu%C3%A9m" target="_blank"><button class="btnContato"><i class="bi bi-whatsapp"></i>  Converse conosco</button></a>
                 </div>
                 <div class="col-6 contato-col">
                     <img src="/img/contato.png" alt="Contato">

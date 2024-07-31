@@ -240,7 +240,7 @@ section#planos {
     justify-content: space-between;
     gap: 2.5rem;
 
-    height: 80vh;
+    height: 100vh;
 }
 
 .planoLogo img {
