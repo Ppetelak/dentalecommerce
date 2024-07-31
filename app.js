@@ -1769,6 +1769,7 @@ app.get(
       "SELECT * FROM anexos_implantacoes WHERE id_implantacao = ?";
     const queryAssinatura =
       "SELECT * FROM assinatura_implantacao WHERE id_implantacao = ?";
+    var view;
 
     db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
       if (err) {
@@ -1899,13 +1900,30 @@ app.get(
                         );
                       });
 
+                      const plano = resultPlano[0];
+                      var tipoContrato = plano.tipoContrato;
+
+                      console.log(tipoContrato)
+
+                      if (tipoContrato === "OdontoGroup") {
+                        view = "contratoOdontoGroup";
+                      } else if (tipoContrato === "DentalUni") {
+                        view = "contratoDentalUni";
+                      } else if (tipoContrato === "Porto") {
+                        view = "contratoPorto";
+                      } else {
+                        view = "contrato";
+                      }
+
+                      console.log(view)
+
                       const implantacao = resultImplantacoes[0];
                       implantacao.datadenascimento = format(
                         new Date(implantacao.datadenascimento),
                         "dd/MM/yyyy"
                       );
 
-                      res.render("contrato", {
+                      res.render(view, {
                         implantacao: implantacao,
                         plano: resultPlano[0],
                         dataFormatada: dataFormatada,
