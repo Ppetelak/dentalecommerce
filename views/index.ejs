@@ -53,21 +53,21 @@
         <section id="planos">
             <div class="cabecalhoPlanos">
                 <h2>PLANOS ODONTO</h2>
-                <p> Confira as vantagens dos nossos planos</p>
+                <p>Confira as vantagens dos nossos planos</p>
             </div>
             <div id="planoGallery">
                 <script>
                     // Transforme a lista de planos em um array JavaScript
                     let planos = <%- JSON.stringify(planos) %>;
-        
+            
+                    // Ordene os planos conforme o campo 'ordem'
+                    planos.sort((a, b) => a.ordem - b.ordem);
+            
                     // Função para calcular o valor mensal
                     function calcularValorMensal(plano) {
                         return (plano.pgtoAnualAvista / 12).toFixed(2);
                     }
-        
-                    // Ordene os planos do mais barato para o mais caro
-                    planos.sort((a, b) => calcularValorMensal(a) - calcularValorMensal(b));
-        
+            
                     // Renderize os planos na ordem desejada
                     planos.forEach(plano => {
                         document.write(`
@@ -85,8 +85,8 @@
                                     ANS - nº <span class="planoANS">${plano.ans}</span>
                                 </p>
                                 <div class="valores">
-                                    <p> Á partir de 12x de </p>
-                                    <h4 class="planoValor"> R$ ${calcularValorMensal(plano)} </h4>
+                                    <p>Á partir de 12x de</p>
+                                    <h4 class="planoValor">R$ ${calcularValorMensal(plano)}</h4>
                                 </div>
                                 <p class="planoPgmento">
                                     ${plano.observacoes}
@@ -101,6 +101,7 @@
                 </script>
             </div>
         </section>
+        
         
 
         <section id="redeCredenciada">
