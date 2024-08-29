@@ -4,6 +4,237 @@ function mascaras() {
   $('[name="pgtoAnualAvista"]').mask('0000.00', { reverse: true });
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.addPaymentMethodBtn').forEach(button => {
+    button.addEventListener('click', function() {
+      const planoId = this.getAttribute('data-plano-id');
+      const form = document.querySelector(`.newPaymentMethodForm[data-plano-id="${planoId}"]`);
+  
+      if (form) {
+        form.style.display = 'block'; // Exibe o formulário correspondente ao plano
+      } else {
+        console.error('Formulário de nova forma de pagamento não encontrado');
+      }
+    });
+  });
+  
+  document.querySelectorAll('.savePaymentMethodBtn').forEach(button => {
+    button.addEventListener('click', function() {
+      const planoId = this.getAttribute('data-plano-id');
+      const form = this.closest('.newPaymentMethodForm');
+      savePaymentMethod(planoId, form);
+    });
+  });
+});
+
+document.querySelectorAll('.editPaymentMethodBtn').forEach(button => {
+  button.addEventListener('click', function() {
+      // Aqui você precisa capturar os dados da linha correspondente
+      console.log('entrou aqui')
+      const row = this.closest('tr');
+      const form = document.querySelector(`.newPaymentMethodForm[data-plano-id="${row.getAttribute('data-plano-id')}"]`);
+      const idForma = row.getAttribute('data-id'); // Supondo que você tenha o ID da forma de pagamento armazenado em um atributo data-id
+      const paymentDescription = row.querySelector('.paymentDescription').textContent;
+      const paymentType = row.querySelector('.paymentType').textContent;
+      const minParcelValue = row.querySelector('.minParcelValue').textContent.replace('R$ ', '');
+      const totalPaymentValue = row.querySelector('.totalPaymentValue').textContent.replace('R$ ', '');
+
+      console.log(form);
+      console.log(row);
+
+      console.log({
+        idForma,
+        paymentDescription,
+        paymentType,
+        minParcelValue,
+        totalPaymentValue
+      })
+
+      // Preencha o formulário com os dados para edição
+      form.querySelector('[name="paymentDescription"]').value = paymentDescription;
+      form.querySelector('[name="paymentType"]').value = paymentType;
+      form.querySelector('[name="minParcelValue"]').value = minParcelValue;
+      form.querySelector('[name="totalPaymentValue"]').value = totalPaymentValue;
+
+
+      // Mostre o formulário de edição
+      form.style.display = 'block';
+
+      // Mude a função do botão "Salvar" para "Atualizar"
+      const saveButton = form.querySelector('.savePaymentMethodBtn');
+      const atualizarBtn = form.querySelector('.atualizarPaymentMethodBtn');
+      saveButton.classList.add('d-none');
+      atualizarBtn.classList.remove('d-none');
+      atualizarBtn.addEventListener('click', function() {
+          console.log('Entrou aqui');
+          updatePaymentMethod(idForma, form);
+      });
+  });
+})
+
+function savePaymentMethod(idPlano, form) {
+  const paymentDescription = form.querySelector('[name="paymentDescription"]').value;
+  const paymentType = form.querySelector('[name="paymentType"]').value;
+  const minParcelValue = form.querySelector('[name="minParcelValue"]').value;
+  const totalPaymentValue = form.querySelector('[name="totalPaymentValue"]').value;
+
+  fetch(`/planos/${idPlano}/forma-pagamento`, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          paymentDescription,
+          paymentType,
+          minParcelValue,
+          totalPaymentValue
+      })
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.message) {
+          alert(data.message);
+          form.style.display = 'none';
+          location.reload();
+          //loadPaymentMethods(idPlano)
+      }
+  })
+  .catch(error => console.error('Erro ao salvar forma de pagamento:', error));
+}
+
+
+function updatePaymentMethod(idForma, form) {
+  console.log('Entrou na função update e o form recebido foi esse ai')
+  console.log(form);
+  const idPlano = form.querySelector('.idDoPlano').value;
+  const paymentDescription = form.querySelector('[name="paymentDescription"]').value;
+  const paymentType = form.querySelector('[name="paymentType"]').value;
+  const minParcelValue = form.querySelector('[name="minParcelValue"]').value;
+  const totalPaymentValue = form.querySelector('[name="totalPaymentValue"]').value;
+
+  console.log({
+    'Id forma de Pagamento ': idForma,
+    'Id Plano ': idPlano,
+    'Descrição do pagamento ': paymentDescription,
+    'Tipo de Pagamento ': paymentType,
+    'Valor de parcela mínima ': minParcelValue,
+    'Valor total ' : totalPaymentValue
+  })
+
+  fetch(`/planos/${idPlano}/forma-pagamento/${idForma}`, {
+      method: 'PUT',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          paymentDescription,
+          paymentType,
+          minParcelValue,
+          totalPaymentValue
+      })
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.message) {
+          alert(data.message);
+          location.reload(); // Simplesmente recarrega a página para ver as atualizações
+          //loadPaymentMethods(idPlano);
+      }
+  })
+  .catch(error => console.error('Erro ao atualizar forma de pagamento:', error));
+}
+
+document.querySelectorAll('.deletePaymentMethodBtn').forEach(button => {
+  button.addEventListener('click', function() {
+      if (!confirm('Tem certeza de que deseja excluir esta forma de pagamento?')) return;
+
+      const row = this.closest('tr');
+      const idForma = row.getAttribute('data-id');
+      const idPlano = row.getAttribute('data-plano-id');
+
+      fetch(`/planos/${idPlano}/forma-pagamento/${idForma}`, {
+          method: 'DELETE'
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.message) {
+              alert(data.message);
+              location.reload()
+              //loadPaymentMethods(idPlano); //Atualiza a tabela de formas de pagamento
+          }
+      })
+      .catch(error => console.error('Erro ao excluir forma de pagamento:', error));
+  });
+});
+
+/* function loadPaymentMethods(idPlano) {
+  fetch(`/planos/${idPlano}/formas-pagamento`)
+      .then(response => response.json())
+      .then(formasDePagamento => {
+          const tableBody = document.querySelector('.table-responsive table tbody');
+
+          // Se não houver um <tbody>, cria um novo
+          if (!tableBody) {
+              const newTbody = document.createElement('tbody');
+              document.querySelector('.table-responsive table').appendChild(newTbody);
+              tableBody = newTbody;
+          }
+
+          // Itera sobre as formas de pagamento recebidas do servidor
+          formasDePagamento.forEach(pagamento => {
+              // Verifica se já existe uma linha com o mesmo data-id
+              const existingRow = tableBody.querySelector(`tr[data-id="${pagamento.id}"]`);
+
+              // Se a linha já existir, não faz nada
+              if (existingRow) return;
+
+              // Cria uma nova linha se não existir
+              const row = document.createElement('tr');
+              row.setAttribute('data-id', pagamento.id);
+
+              row.innerHTML = `
+                  <td class="paymentDescription">${pagamento.descricao}</td>
+                  <td class="paymentType">${pagamento.parametrizacao}</td>
+                  <td class="minParcelValue">R$ ${parseFloat(pagamento.valor_parcela_minima).toFixed(2)}</td>
+                  <td class="totalPaymentValue">R$ ${parseFloat(pagamento.valor_total_pgto).toFixed(2)}</td>
+                  <td>
+                      <button type="button" class="btn btn-warning btn-sm editPaymentMethodBtn">Editar</button>
+                      <button type="button" class="btn btn-danger btn-sm deletePaymentMethodBtn">Excluir</button>
+                  </td>
+              `;
+
+              tableBody.appendChild(row);
+          });
+
+          attachEventHandlers(); // Reatacha os eventos de clique para os botões
+      })
+      .catch(error => console.error('Erro ao carregar formas de pagamento:', error));
+} */
+
+
+function attachEventHandlers() {
+  document.querySelectorAll('.editPaymentMethodBtn').forEach(button => {
+      button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const idForma = row.getAttribute('data-id');
+          const paymentDescription = row.querySelector('.paymentDescription').textContent;
+          const paymentType = row.querySelector('.paymentType').textContent;
+          const minParcelValue = row.querySelector('.minParcelValue').textContent.replace('R$ ', '');
+          const totalPaymentValue = row.querySelector('.totalPaymentValue').textContent.replace('R$ ', '');
+
+          document.getElementById('paymentDescription').value = paymentDescription;
+          document.getElementById('paymentType').value = paymentType;
+          document.getElementById('minParcelValue').value = minParcelValue;
+          document.getElementById('totalPaymentValue').value = totalPaymentValue;
+
+          document.getElementById('savePaymentMethodBtn').textContent = 'Atualizar';
+          document.getElementById('savePaymentMethodBtn').removeEventListener('click', savePaymentMethod);
+          document.getElementById('savePaymentMethodBtn').addEventListener('click', function() {
+              updatePaymentMethod(idForma);
+          });
+      });
+  });
+}
 
 
 $(document).ready(function () {

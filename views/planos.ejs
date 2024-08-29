@@ -80,64 +80,84 @@
                         data-target="#imagemModal" data-type="logo"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
                       </br>
                     </div>
-                    <div class="col-6">
-                      <label for="banner">Banner</label>
-                      <img class="banner-preview form-control" src="<%= plano.banner %>" style="width: 50%;"
-                    data-name="banner" name="banner" id="banner">
-                      <button class="edit-image-btn btn btn-info" title="Editar Imagem" data-toggle="modal"
-                    data-target="#imagemModal" data-type="banner"><i class="bi bi-images"></i> EDITAR IMAGEM </button>
-                    </div>
                   </div>
                 </div>
                 <div class="formasdepagamento">
                   <h4 class="text-center">Formas de pagamento</h4>
-                  <div class="row">
-                    <div class="col-7">
-                      <label><strong>Descrição</strong></label>
+                
+                  <!-- Botão para adicionar nova forma de pagamento -->
+                  <div class="text-end mb-3">
+                    <button type="button" class="btn btn-primary addPaymentMethodBtn" data-plano-id="<%= plano.id %>">Nova Forma de Pagamento</button>
+                  </div>
+                
+                  <!-- Formulário para nova forma de pagamento -->
+                  <div class="newPaymentMethodForm" data-plano-id="<%= plano.id %>" style="display:none;">
+                    <div class="row mb-3">
+                      <div class="col-7">
+                        <label for="paymentDescription">Descrição</label>
+                        <input type="text" class="form-control" name="paymentDescription" required>
+                      </div>
+                      <div class="col-5">
+                        <label for="paymentType">Parametrização</label>
+                        <select class="form-control" name="paymentType" required>
+                          <option value="À vista">À vista</option>
+                          <option value="Cartão Parcelado">Cartão Parcelado</option>
+                          <option value="Boleto 2x">Boleto 2x</option>
+                          <option value="Boleto 3x">Boleto 3x</option>
+                          <option value="Cartão à vista">Cartão à vista</option>
+                          <option value="Cartão Parcelado">Cartão Parcelado</option>
+                        </select>
+                      </div>
                     </div>
-                    <div class="col-3">
-                      <label><strong>Valor</strong></label>
+                    <div class="row mb-3">
+                      <div class="col-6">
+                        <label for="minParcelValue">Valor Parcela Mínima</label>
+                        <input type="text" class="form-control" name="minParcelValue" required>
+                      </div>
+                      <div class="col-6">
+                        <label for="totalPaymentValue">Valor Total Pgto</label>
+                        <input type="text" class="form-control" name="totalPaymentValue" required>
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <input type="hidden" class="idDoPlano" value="<%= plano.id %>">
+                      <button type="button" class="btn btn-success savePaymentMethodBtn" data-plano-id="<%= plano.id %>">Salvar</button>
+                      <button type="button" class="btn btn-success d-none atualizarPaymentMethodBtn" data-plano-id="<%= plano.id %>">Atualizar</button>
                     </div>
                   </div>
-                  <div class="row pagamento">
-                    <div class="row">
-                      <div class="col-7">
-                        <label for="pgtoAnualAvista"> Valor anual á vista <span> (Válido para pgto no boleto, pix ou cartão de crédito)</span>  </label> 
-                      </div>
-                      <div class="col-3">
-                        <div class="input-group">
-                          <span class="input-group-text">R$</span>
-                          <input type="text" class="form-control" id="pgtoAnualAvista" name="pgtoAnualAvista"
-                              value="<%= plano.pgtoAnualAvista %>" required>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-7">
-                        <label for="pgtoAnualCartao"> Valor anual no cartão de crédito <span>(em até 12x)</span> </label>   
-                      </div>
-                      <div class="col-3">
-                        <div class="input-group">
-                          <span class="input-group-text">R$</span>
-                          <input type="text" class="form-control" id="pgtoAnualCartao" name="pgtoAnualCartao"
-                              value="<%= plano.pgtoAnualCartao %>" required>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-7">
-                        <label for="pgtoAnualCartao3x"> Valor anual no cartão de crédito <span>(em 3x)</span> </label>   
-                      </div>
-                      <div class="col-3">
-                        <div class="input-group">
-                          <span class="input-group-text">R$</span>
-                          <input type="text" class="form-control" id="pgtoAnualCartao3x" name="pgtoAnualCartao3x"
-                              value="<%= plano.pgtoAnualCartao3x %>" required>
-                        </div>
-                      </div>
-                    </div>
+                
+                  <!-- Tabela de formas de pagamento cadastradas -->
+                  <div class="table-responsive mt-4">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Descrição</th>
+                          <th>Parametrização</th>
+                          <th>Valor Parcela Mínima</th>
+                          <th>Valor Total Pgto</th>
+                          <th>Ações</th>
+                        </tr>
+                      </thead>
+                      <% formasDePagamento.forEach(function(pagamento) { %>
+                        <tbody>
+                          <% if(plano.id === pagamento.id_plano) { %>
+                            <tr data-id="<%= pagamento.id %>" data-plano-id="<%= pagamento.id_plano %>">
+                              <td class="paymentDescription"><%= pagamento.descricao %></td>
+                              <td class="paymentType"><%= pagamento.parametrizacao %></td>
+                              <td class="minParcelValue">R$ <%= pagamento.valor_parcela_minima.toFixed(2) %></td>
+                              <td class="totalPaymentValue">R$ <%= pagamento.valor_total_pgto.toFixed(2) %></td>
+                              <td>
+                                  <button type="button" class="btn btn-warning btn-sm editPaymentMethodBtn">Editar</button>
+                                  <button type="button" class="btn btn-danger btn-sm deletePaymentMethodBtn">Excluir</button>
+                              </td>
+                          </tr>
+                          <% }  %>
+                        </tbody>
+                      <% }); %>
+                    </table>
                   </div>
                 </div>
+                
                 <div class="row">
                   <div class="col-6">
                     <div class="form-group">

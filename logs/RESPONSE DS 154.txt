@@ -1,0 +1,3 @@
+[2024-08-27T11:33:37.256Z] Response Completo: [
+  "Grupo de Código KUS41MB4WJ não foi encontrado."
+]

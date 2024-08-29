@@ -141,3 +141,52 @@ CREATE TABLE propostas_codigods (
 ALTER TABLE anexos_implantacoes MODIFY COLUMN id_implantacao VARCHAR(255);
 ALTER TABLE implantacoes ADD numerocns VARCHAR(200)
 ALTER TABLE planos MODIFY COLUMN abrangencia ENUM('Nacional', 'Grupo de Estados', 'Grupo de Municípios', 'Municipal');
+
+CREATE TABLE entidades_parametros (
+    id INT AUTO_INCREMENT PRIMARY KEY AUTO_INCREMENT,
+    id_entidade INT,
+    nome_entidade VARCHAR(255) NOT NULL,
+    forma_pagamento ENUM('À vista', 'Cartão Parcelado', 'Boleto 2x', 'Boleto 3x') NOT NULL,
+    codigo_ds VARCHAR(255) NOT NULL,
+    operadora VARCHAR(255) NOT NULL,
+    id_plano INT
+);
+
+
+CREATE TABLE operadoras (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255) NOT NULL
+);
+
+INSERT INTO operadoras (nome)
+VALUES 
+('DentalUni'),
+('OdontoGroup'),
+('Porto Seguro');
+
+ALTER TABLE entidades_parametros
+MODIFY forma_pagamento ENUM(
+    'À vista', 
+    'Cartão Parcelado', 
+    'Cartão à vista', 
+    'Boleto à vista', 
+    'Boleto 2x', 
+    'Boleto 3x', 
+    'Boleto 4x', 
+    'Boleto 12x', 
+    'Boleto Parcelado'
+) NOT NULL;
+
+CREATE TABLE formas_pagamento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_plano INT NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    parametrizacao ENUM('À vista', 'Cartão Parcelado', 'Boleto 2x', 'Boleto 3x', 'Cartão à vista', 'Cartão Parcelado') NOT NULL,
+    valor_parcela_minima DECIMAL(10, 2) NOT NULL,
+    valor_total_pgto DECIMAL(10, 2) NOT NULL
+);
+
+
+
+
+

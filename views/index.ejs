@@ -57,12 +57,20 @@
             </div>
             <div id="planoGallery">
                 <script>
-                    // Transforme a lista de planos em um array JavaScript
+                    // Transforme as listas de planos e pagamentos em arrays JavaScript
                     let planos = <%- JSON.stringify(planos) %>;
+                    let pagamentos = <%- JSON.stringify(pagamentos) %>;
         
                     // Função para calcular o valor mensal
                     function calcularValorMensal(plano) {
                         return (plano.pgtoAnualAvista / 12).toFixed(2);
+                    }
+        
+                    // Função para encontrar o menor valor de parcela mínima de um plano
+                    function menorValorParcela(pagamentos, planoId) {
+                        let pagamentosFiltrados = pagamentos.filter(p => p.id_plano === planoId);
+                        let menorParcela = Math.min(...pagamentosFiltrados.map(p => p.valor_parcela_minima));
+                        return menorParcela.toFixed(2);
                     }
         
                     // Ordene os planos do mais barato para o mais caro
@@ -70,6 +78,8 @@
         
                     // Renderize os planos na ordem desejada
                     planos.forEach(plano => {
+                        let planoPagamentos = pagamentos.filter(p => p.id_plano === plano.id);
+        
                         document.write(`
                             <div class="plano-card">
                                 <div class="planoLogo">
@@ -79,21 +89,24 @@
                                     ${plano.nome_do_plano}
                                 </h3>
                                 <ul class="planoDescricao">
-                                    ${plano.descricao.split('\n').map(linha => `<li>${linha.trim()}</li>`).join('')}
+                                    ${plano.descricao.split('\n').map(linha => `<li>${linha}</li>`).join('')}
                                 </ul>
+
                                 <p class="ANSbox">
                                     ANS - nº <span class="planoANS">${plano.ans}</span>
                                 </p>
                                 <div class="valores">
-                                    <p> Á partir de 12x de </p>
-                                    <h4 class="planoValor"> R$ ${calcularValorMensal(plano)} </h4>
+                                    <p> A partir de 12x de </p>
+                                    <h4 class="planoValor"> R$ ${menorValorParcela(planoPagamentos, plano.id)} </h4>
                                 </div>
-                                <p class="planoPgmento">
-                                    ${plano.observacoes}
-                                </p>
+                                <div class="pagamentos-lista">
+                                    ${planoPagamentos.map(p => `
+                                        <p class="planoPgmento">${p.descricao}: R$ ${p.valor_parcela_minima.toFixed(2)}</p>
+                                    `).join('')}
+                                </div>
                                 <form action="/formulario" method="post">
                                     <input type="hidden" value="${plano.id}" name="planoSelecionado">
-                                    <button class="planoEscolher">escolher este</button>
+                                    <button class="planoEscolher">Escolher este</button>
                                 </form>
                             </div>
                         `);
@@ -101,6 +114,7 @@
                 </script>
             </div>
         </section>
+        
         
 
         <section id="redeCredenciada">

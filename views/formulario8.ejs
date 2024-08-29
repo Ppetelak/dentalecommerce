@@ -1,24 +1,86 @@
 <h1>Pagamento</h1>
 <div class="form-group">
     <label for="formaPagamento">Forma de Pagamento:</label>
-    <div class="custom-control custom-radio">
-        <input type="radio" id="pgtoAnualAvista" name="formaPagamento" class="custom-control-input" value="1" required>
-        <label class="custom-control-label" for="pgtoAnualAvista"> Valor anual á vista para pgto no boleto, cartão de crédito ou no pix com 10% de desconto
-            <strong>R$ <span class="valorAnual"><%= planoSelecionado.pgtoAnualAvista %></span> </strong>
-        </label>
-    </div>
-    <div class="custom-control custom-radio">
-        <input type="radio" name="formaPagamento" id="pgtoAnualCartao" class="custom-control-input" value="2" required>
-        <label class="custom-control-label" for="pgtoAnualCartao">Valor anual no cartão de crédito em 12x de <strong> R$
-            <span class="valorAnualCartao"><%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %> </span> </strong>
-        </label>
-    </div>
-    <div class="custom-control custom-radio">
-        <input type="radio" name="formaPagamento" id="pgtoAnualCartao3x" class="custom-control-input" value="3"
-            required>
-        <label class="custom-control-label" for="pgtoAnualCartao3x"> Valor Anual no boleto em 3x de <strong> R$ 
-                    <span class="valorAnualCartao3Vezes"><%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2) %> </span></strong>
-        </label>
-    </div>
-    <div id="dataVencimentoEscolha"></div>
+    <% pagamentos.forEach(function (pagamento) { %>
+        <% if(pagamento.parametrizacao === 'À vista') { %>
+            <div class="custom-control custom-radio">
+                <input type="radio" id="formaPagamentoId-<%= pagamento.id %>" name="formaPagamento" class="custom-control-input" value="<%= pagamento.id %>" data-id-tipo="<%= pagamento.parametrizacao %>" required>
+                <label class="custom-control-label" for="pgtoAnualAvista"> <%= pagamento.descricao %>
+                    <strong> Valor Total Pago:</strong> R$ <%= pagamento.valor_total_pgto %>
+                </label>
+            </div>
+        <% } else { %> 
+            <div class="custom-control custom-radio">
+                <input type="radio" id="formaPagamentoId-<%= pagamento.id %>" name="formaPagamento" class="custom-control-input" value="<%= pagamento.id %>" data-id-tipo="<%= pagamento.parametrizacao %>" required>
+                <label class="custom-control-label" for="pgtoAnualAvista"> <%= pagamento.descricao %>
+                    <strong> Valor mensal:</strong> R$ <span class="valorAnual"><%= pagamento.valor_parcela_minima %></span>
+                    <strong> Valor Total Pago:</strong> R$ <%= pagamento.valor_total_pgto %>
+                </label>
+            </div>
+        <% } %>
+    <% }) %>
+    <div id="dataVencimentoContainer" class="mt-3"></div>
 </div>
+
+<script>
+    document.querySelectorAll('input[name="formaPagamento"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            const dataVencimentoContainer = document.getElementById('dataVencimentoContainer');
+            const selectedPaymentType = this.getAttribute('data-id-tipo');
+
+            // Limpa o contêiner sempre que o usuário mudar a seleção
+            dataVencimentoContainer.innerHTML = '';
+
+            if (selectedPaymentType !== 'À vista') {
+                // Obter a data e hora atuais
+                const now = new Date();
+                const currentDay = now.getDate();
+                const currentHour = now.getHours();
+                const currentWeekDay = now.getDay(); // 0: Domingo, 6: Sábado
+
+                // Passando os vencimentos como string JSON segura
+                const vencimentos = JSON.parse('<%- JSON.stringify(vencimentos) %>');
+
+                // Ordenar os vencimentos pelo dia inicial
+                vencimentos.sort((a, b) => a.pagamento1 - b.pagamento1);
+
+                // Função para verificar se uma data cai no final de semana
+                const isWeekend = (day, month) => {
+                    const date = new Date(now.getFullYear(), month, day);
+                    const weekDay = date.getDay();
+                    return weekDay === 0 || weekDay === 6; // 0: Domingo, 6: Sábado
+                };
+
+                // Filtrar opções com base no dia, hora atuais e evitar finais de semana
+                const filteredOptions = vencimentos.filter(vencimento => {
+                    // Verifica se o vencimento final cai no final de semana
+                    if (isWeekend(vencimento.pagamento2 - 1, now.getMonth())) {
+                        return false;
+                    }
+                    if (currentDay > vencimento.pagamento2) {
+                        return false;
+                    }
+                    if (currentDay >= vencimento.pagamento1 && currentDay <= vencimento.pagamento2) {
+                        return currentHour < 17;
+                    }
+                    return true;
+                });
+
+                // Renderizar o select filtrado
+                let optionsHTML = filteredOptions.map(vencimento => 
+                    `<option value="${vencimento.id}">De ${vencimento.pagamento1} até ${vencimento.pagamento2}</option>`
+                ).join('');
+
+                dataVencimentoContainer.innerHTML = `
+                    <div id="dataVencimentoEscolha" class="mb-3">
+                        <label class="form-label">Escolha os melhores dias para o primeiro pagamento</label>
+                        <select class="form-select">
+                            ${optionsHTML}
+                        </select>
+                    </div>
+                `;
+            }
+        });
+    });
+</script>
+

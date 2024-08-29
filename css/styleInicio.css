@@ -263,10 +263,10 @@ ul.planoDescricao {
     padding-right: .5rem;
 }
 
-ul.planoDescricao li:before {
+/* ul.planoDescricao li:before {
     content: "✅";
     margin-right: .5rem;
-}
+} */
 
 .ANSbox {
     background-color: black;

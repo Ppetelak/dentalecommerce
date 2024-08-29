@@ -1,0 +1,415 @@
+[2024-08-27T18:49:59.567Z] Response Completo: {
+  "ajuste": 0,
+  "anexoList": [],
+  "angariador": null,
+  "beneficiarioList": [
+    {
+      "altura": 0,
+      "bairro": "Sítio Cercado",
+      "carencia": null,
+      "celular": "999999999",
+      "cep": "81920060",
+      "cns": null,
+      "codigo": "HBA2PT7B93",
+      "complemento": "null",
+      "cpf": "72396567640",
+      "dataInicioOrigem": null,
+      "dataNascimento": "10/08/2000",
+      "dataPagamentoOrigem": null,
+      "dataVigencia": "26/02/2024",
+      "dddCelular": "41",
+      "dddTelefone": "41",
+      "declaracaoSaudeList": [],
+      "dnv": "string",
+      "email": "berakyvy@mailinator.com",
+      "emailSecundario": null,
+      "endereco": "Rua Doutor José de Almeida Pimpão",
+      "estadoCivil": {
+        "id": 4,
+        "nome": "Solteiro"
+      },
+      "etiquetaList": [],
+      "id": 2316512,
+      "imc": 0,
+      "linkCarteiraProvisoria": "",
+      "marcaOptica": "",
+      "marcaOpticaOpcional": "",
+      "mensalidade": 0,
+      "municipio": "Curitiba",
+      "nome": "Pablo Teste Uploads de arquivos 3",
+      "nomeMae": "Consectetur illum e",
+      "nomeOperadoraOrigem": null,
+      "numero": "111",
+      "orgaoEmissor": "Praesentium sit mag",
+      "parentesco": {
+        "id": 1,
+        "nome": "Titular"
+      },
+      "peso": 0,
+      "pis": "string",
+      "rg": "Non omnis aut offici",
+      "sexo": {
+        "id": 2,
+        "nome": "Feminino"
+      },
+      "statusBeneficiario": {
+        "id": 7,
+        "nome": "Produzido"
+      },
+      "telefone": "99999999",
+      "tipoBeneficiario": {
+        "id": 1,
+        "nome": "Titular"
+      },
+      "uf": "PR"
+    },
+    {
+      "altura": 0,
+      "bairro": "Sítio Cercado",
+      "carencia": null,
+      "celular": "999998888",
+      "cep": "81920060",
+      "cns": null,
+      "codigo": "1PHX1WCVD2",
+      "complemento": "null",
+      "cpf": "35203159041",
+      "dataInicioOrigem": null,
+      "dataNascimento": "30/05/2000",
+      "dataPagamentoOrigem": null,
+      "dataVigencia": "26/02/2024",
+      "dddCelular": "41",
+      "dddTelefone": "41",
+      "declaracaoSaudeList": [],
+      "dnv": "string",
+      "email": "dependente@dependente.com.br",
+      "emailSecundario": null,
+      "endereco": "Rua Doutor José de Almeida Pimpão",
+      "estadoCivil": {
+        "id": 2,
+        "nome": "Divorciado"
+      },
+      "etiquetaList": [],
+      "id": 2316513,
+      "imc": 0,
+      "linkCarteiraProvisoria": "",
+      "marcaOptica": "",
+      "marcaOpticaOpcional": "",
+      "mensalidade": 0,
+      "municipio": "Curitiba",
+      "nome": "Anim doloremque prae",
+      "nomeMae": "Proident non explic",
+      "nomeOperadoraOrigem": null,
+      "numero": "111",
+      "orgaoEmissor": "null",
+      "parentesco": {
+        "id": 3,
+        "nome": "Companheiro"
+      },
+      "peso": 0,
+      "pis": "string",
+      "rg": null,
+      "sexo": {
+        "id": 2,
+        "nome": "Feminino"
+      },
+      "statusBeneficiario": {
+        "id": 7,
+        "nome": "Produzido"
+      },
+      "telefone": "999998888",
+      "tipoBeneficiario": {
+        "id": 2,
+        "nome": "Dependente"
+      },
+      "uf": "PR"
+    },
+    {
+      "altura": 0,
+      "bairro": "Sítio Cercado",
+      "carencia": null,
+      "celular": "999998888",
+      "cep": "81920060",
+      "cns": null,
+      "codigo": "8FJENV622N",
+      "complemento": "null",
+      "cpf": "61601637012",
+      "dataInicioOrigem": null,
+      "dataNascimento": "15/05/2000",
+      "dataPagamentoOrigem": null,
+      "dataVigencia": "26/02/2024",
+      "dddCelular": "41",
+      "dddTelefone": "41",
+      "declaracaoSaudeList": [],
+      "dnv": "string",
+      "email": "dependente@dependente.com.br",
+      "emailSecundario": null,
+      "endereco": "Rua Doutor José de Almeida Pimpão",
+      "estadoCivil": {
+        "id": 2,
+        "nome": "Divorciado"
+      },
+      "etiquetaList": [],
+      "id": 2316514,
+      "imc": 0,
+      "linkCarteiraProvisoria": "",
+      "marcaOptica": "",
+      "marcaOpticaOpcional": "",
+      "mensalidade": 0,
+      "municipio": "Curitiba",
+      "nome": "erewrewr",
+      "nomeMae": "Mãe dependente 1",
+      "nomeOperadoraOrigem": null,
+      "numero": "111",
+      "orgaoEmissor": "null",
+      "parentesco": {
+        "id": 13,
+        "nome": "Enteado"
+      },
+      "peso": 0,
+      "pis": "string",
+      "rg": null,
+      "sexo": {
+        "id": 1,
+        "nome": "Masculino"
+      },
+      "statusBeneficiario": {
+        "id": 7,
+        "nome": "Produzido"
+      },
+      "telefone": "999998888",
+      "tipoBeneficiario": {
+        "id": 2,
+        "nome": "Dependente"
+      },
+      "uf": "PR"
+    }
+  ],
+  "codigo": "2PVJML8H2K",
+  "convenio": {
+    "codigo": "LRYT12JW8T",
+    "diaVigencia": 10,
+    "estipulante": {
+      "codigo": "XY86KUJ42E",
+      "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=EL15735892678564YH5N43P69.jpg&tamanho=200&opcao=pad",
+      "nome": "MOUNT HERMON ADMINISTRADORA DE BENEFÍCIOS LTDA",
+      "numeroAns": "421677"
+    },
+    "filialList": [
+      {
+        "codigo": "BETRHPTL2K",
+        "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+      }
+    ],
+    "nome": "Dental Uni",
+    "produto": {
+      "anexoList": [],
+      "codigo": "KS6KL1THKL",
+      "linkManualUsuario": "https://play.google.com/store/apps/details?id=com.dentaluni.app&pcampaignid=web_share",
+      "linkRedeCredenciada": "https://www.planosdentaluni.com.br/",
+      "nome": "Coletivo por Adesão - DENTAL UNI",
+      "opcionalList": [],
+      "operadora": {
+        "id": 77,
+        "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=OL14885545849577H4CA1L54N.jpg&tamanho=200&opcao=pad",
+        "nome": "Dental Uni",
+        "numeroAns": "304484",
+        "site": null
+      }
+    },
+    "tipoTaxaCadastroApi": {
+      "id": 1,
+      "nome": "Valor por Contrato"
+    },
+    "valorTaxaCadastro": 0
+  },
+  "corretora": {
+    "bairro": "CENTRO",
+    "canal": 1,
+    "celular": "",
+    "cep": "80010010",
+    "codigo": "S62MXENV8X",
+    "complemento": "806",
+    "contaBancaria": null,
+    "corretor": 0,
+    "dataInclusao": "18/11/2019",
+    "dataNascimento": null,
+    "dddCelular": "",
+    "dddTelefone": "41",
+    "email": "almir@classeadministradora.com.brx",
+    "endereco": "RUA MARECHAL DEODORO",
+    "filial": {
+      "codigo": "BETRHPTL2K",
+      "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+    },
+    "grupoProdutor": {
+      "codigo": "LN7ZPS3BEB",
+      "nome": "CORRETORA PJ CASA"
+    },
+    "id": 42231,
+    "login": "espaco",
+    "municipio": "CURITIBA",
+    "nome": "ESPAÇO CORRETOR LTDA",
+    "numero": "826",
+    "numeroDocumento": "16585286000154",
+    "produtor": null,
+    "senha": "Espaco1234",
+    "sexo": null,
+    "telefone": "38881000",
+    "uf": "PR"
+  },
+  "cpfResponsavel": "88648777038",
+  "dataAssinatura": "26/02/2024",
+  "dataInclusao": "27/08/2024",
+  "diaVencimento": 15,
+  "entidade": null,
+  "filial": {
+    "codigo": "BETRHPTL2K",
+    "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+  },
+  "formaAjuste": null,
+  "gerente": null,
+  "grupo": {
+    "codigo": "V2CAVAD6U2",
+    "nome": "ABRAER Cartão Parcelado"
+  },
+  "id": 1827870,
+  "matricula": null,
+  "nomeResponsavel": "José da Silva Teste",
+  "nomeTitular": "Pablo Teste Uploads de arquivos 3",
+  "numeroProposta": "202408273081",
+  "observacao": "\n            O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n\n            ----> Dados responsável Financeiro <---- \n\n            CPF: 88648777038 \n\n            Nome: José da Silva Teste \n\n            Data de Nascimento: 2024-05-24 \n\n            Telefone: 41992414553 \n\n            Email: p.petelak@gmail.com \n\n            Sexo: masculino \n\n            Estado Civil: solteiro \n\n            Grau de Parentesco: Bisneto \n\n            \n        \n\n        Pagamento: \n          Cartão de Crédito em 3x \n\n          Profissão selecionada: Profissional Liberal\n        ",
+  "opcionalList": [],
+  "pendenciaList": [],
+  "plano": {
+    "abrangencia": {
+      "id": 3,
+      "nome": "Nacional"
+    },
+    "acomodacaoApi": {
+      "id": 4,
+      "nome": "Odontológico"
+    },
+    "codigo": "KUS41MB4WJ",
+    "nome": "PLANO AMPLO",
+    "produto": {
+      "anexoList": [],
+      "codigo": "KS6KL1THKL",
+      "linkManualUsuario": "https://play.google.com/store/apps/details?id=com.dentaluni.app&pcampaignid=web_share",
+      "linkRedeCredenciada": "https://www.planosdentaluni.com.br/",
+      "nome": "Coletivo por Adesão - DENTAL UNI",
+      "opcionalList": [],
+      "operadora": {
+        "id": 77,
+        "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=OL14885545849577H4CA1L54N.jpg&tamanho=200&opcao=pad",
+        "nome": "Dental Uni",
+        "numeroAns": "304484",
+        "site": null
+      }
+    },
+    "registroAns": "464766111",
+    "statusPlanoApi": {
+      "id": 1,
+      "nome": "Aberto"
+    },
+    "valorTotal": 0
+  },
+  "prazoAjuste": 0,
+  "produtor": {
+    "bairro": "",
+    "canal": 0,
+    "celular": "",
+    "cep": "",
+    "codigo": "E17NJPUZM2",
+    "complemento": "",
+    "contaBancaria": {
+      "agencia": "000",
+      "banco": {
+        "ativo": 1,
+        "codigo": "457",
+        "debitoAutomatico": 0,
+        "dvCodigo": "0",
+        "id": 150,
+        "integrado": 0,
+        "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=BC1709841087855EVD1DS8W69.png&tamanho=200&opcao=pad",
+        "nome": "Banco MountPay",
+        "ordem": 0,
+        "urlReemissao": ""
+      },
+      "conta": "632725105",
+      "dvAgencia": "1",
+      "dvConta": "",
+      "id": 116754,
+      "tipoContaBancaria": {
+        "id": 1,
+        "nome": "Conta Corrente"
+      }
+    },
+    "corretor": 0,
+    "dataInclusao": "27/11/2019",
+    "dataNascimento": null,
+    "dddCelular": "",
+    "dddTelefone": "81",
+    "email": "adriana.freitas.hlk@gmail.com",
+    "endereco": "",
+    "filial": {
+      "codigo": "BETRHPTL2K",
+      "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+    },
+    "grupoProdutor": {
+      "codigo": "3S48S6KL2Z",
+      "nome": "CONSULTOR"
+    },
+    "id": 42981,
+    "login": "",
+    "municipio": "",
+    "nome": "ADRIANA CARLA DE FREITAS ALMEIDA",
+    "numero": "",
+    "numeroDocumento": "77594924487",
+    "produtor": {
+      "bairro": "CENTRO",
+      "canal": 1,
+      "celular": "",
+      "cep": "80010010",
+      "codigo": "S62MXENV8X",
+      "complemento": "806",
+      "contaBancaria": null,
+      "corretor": 0,
+      "dataInclusao": "18/11/2019",
+      "dataNascimento": null,
+      "dddCelular": "",
+      "dddTelefone": "41",
+      "email": "almir@classeadministradora.com.brx",
+      "endereco": "RUA MARECHAL DEODORO",
+      "filial": {
+        "codigo": "BETRHPTL2K",
+        "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+      },
+      "grupoProdutor": {
+        "codigo": "LN7ZPS3BEB",
+        "nome": "CORRETORA PJ CASA"
+      },
+      "id": 42231,
+      "login": "espaco",
+      "municipio": "CURITIBA",
+      "nome": "ESPAÇO CORRETOR LTDA",
+      "numero": "826",
+      "numeroDocumento": "16585286000154",
+      "produtor": null,
+      "senha": "Espaco1234",
+      "sexo": null,
+      "telefone": "38881000",
+      "uf": "PR"
+    },
+    "senha": "",
+    "sexo": null,
+    "telefone": "992676717",
+    "uf": ""
+  },
+  "saldoDevedor": 0,
+  "statusContrato": {
+    "id": 6,
+    "nome": "Produzido"
+  },
+  "supervisor": null,
+  "valor": 1222.92
+}

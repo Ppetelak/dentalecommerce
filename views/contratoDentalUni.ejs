@@ -81,7 +81,6 @@
         <div class="content">
             <div class="row">
                 <div class="col-6">
-
                 </div>
                 <div class="col-6">
                     <strong>Movimentação: </strong> Inclusão
@@ -389,6 +388,7 @@
                 <div class="col-12">
                     <h6> FORMA DE PAGAMENTO </h6>
                     <div class="row">
+                        
                         <% if(implantacao.formaPagamento === 1) { %>
                             <div class="col-4">
                                 <p> Forma de Pagamento: <span> Pago á vista via boleto, PIX ou cartão de crédito. </span> </p>
@@ -418,6 +418,93 @@
                 </div>
             </div>
 
+            <div class="row dados">
+                <div class="col-12">
+                    <h6> VIGÊNCIA </h6>
+                    <table class="table table-contratoGerais">
+                        <thead>
+                            <th> PAGAMENTO </th>
+                            <th> VIGÊNCIA </th>
+                            <th> VENCIMENTO </th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    De 01 a 05
+                                </td>
+                                <td>
+                                    10
+                                </td>
+                                <td>
+                                    10
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 06 a 10
+                                </td>
+                                <td>
+                                    15
+                                </td>
+                                <td>
+                                    15
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 11 a 15
+                                </td>
+                                <td>
+                                    20
+                                </td>
+                                <td>
+                                    20
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 16 a 20
+                                </td>
+                                <td>
+                                    25
+                                </td>
+                                <td>
+                                    25
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 21 a 25
+                                </td>
+                                <td>
+                                    25
+                                </td>
+                                <td>
+                                    25
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 26 a 30/31
+                                </td>
+                                <td>
+                                    05 do mês subsequente
+                                </td>
+                                <td>
+                                    05 do mês subsequente
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <p><span>*Quando não for identificado o pagamento seja via boleto ou cartão de crédito até a data do vencimento inicialmente selecionado, o proponente titular ou responsável financeiro da proposta será notificado pela Administradora de Benefícios e orientado sobre a adesão da proposta com nova data de vigência. A proposta também poderá sofrer alteração de vigência quando, a data selecionada para pagamento compreender um dia de feriado ou final de semana e para tanto o proponente titular ou responsável financeiro também serão notificados pela Administradora de Benefícios com e-mail de boas-vindas informando o início da cobertura.<br>
+                        **Vigência significa início da cobertura e conforme indicado no parágrafo acima está sujeita a alterações. <br>
+                        ***Vencimento é o dia do pagamento a partir da segunda mensalidade, quando o benefício for contratado na opção parcelamento no boleto. </span></p>
+                    </div>
+                    <br>
+                </div>
+            </div>
+
             <div class="row dados condicoesContrato page-break">
                 <div class="col-12">
                     <h6> Condições Gerais do Contrato</h6>
@@ -441,7 +528,7 @@
                                 A responsabilidade pelos documentos e informações fornecidos por mim e por meu(s) dependente(s) sobre toda e qualquer circunstância que possa influir na aceitação desta <strong>Proposta</strong>, na permanência e/ou no valor mensal do <strong>benefício</strong> é única e exclusivamente minha; Omissões ou dados errôneos acarretarão na perda de todos os meus direitos, bem como os do(s) meu(s) dependente(s), decorrentes do <strong>benefício</strong>.
                             </li>
                             <li>
-                                Efetivada a análise dos documentos e das informações prestadas nesta <strong>Proposta</strong>, de acordo com a legislação vigente, será implantada pela <strong>Operadora</strong> e o <strong>benefício</strong> terá início na data indicada no campo “Início da vigência”, na página 1 da presente; tanto eu quanto meu(s) dependente(s) passaremos a ser denominados <strong> "beneficiários" </strong>.
+                                EEfetivada a análise dos documentos e das informações prestadas nesta <strong>Proposta</strong>, de acordo com a legislação vigente, será implantada pela <strong>Operadora</strong> e o <strong>benefício</strong> terá início na data indicada no campo <strong>VIGÊNCIA</strong> após o pagamento da 1ª mensalidade realizado nos intervalos descritos na tabela de <strong>DATAS DE PAGAMENTO/VIGÊNCIA/VENCIMENTO</strong> indicada na página 1 desta proposta, tanto eu quanto meu(s) dependente(s) passaremos a ser denominados <strong>“beneficiários”</strong>.
                             </li>
                             <li>
                                 Assim que eu assumir a condição de <strong>Beneficiário</strong> titular, ficam outorgados à <strong><strong> Administradora de Benefícios </strong></strong> amplos poderes para me representar, perante a <strong>Operadora</strong> e outros órgãos, em especial a <strong>ANS</strong>, no cumprimento e/ou nas alterações deste <strong>benefício</strong>, bem como na negociação dos reajustes dos valores mensais.
@@ -579,7 +666,7 @@
                                 </tbody>
                             </table>
                             <li>
-                                O pagamento do <strong>benefício</strong>, será no dia e forma indicada na página 1 desta <strong>Proposta</strong>, sendo que a falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao mês (0,033% ao dia) e à multa de 2% sobre o valor do débito em atraso, calculados proporcionalmente ao tempo de inadimplência e ainda, se for o caso, honorários advocatícios e reembolso de custas judiciais e outras despesas de cobrança. No período de inadimplência, poderá ocorrer a suspensão automática do <strong>benefício</strong>, cuja utilização somente será restabelecida a partir da quitação do(s) valor(es) pendente(s), acrescido(s) dos encargos supracitados, observada a possibilidade de cancelamento, conforme disposto no item 18 desta <strong>Proposta</strong>. No caso de inadimplência, a contar da data de seu vencimento, a <strong><strong> Administradora de Benefícios </strong></strong> adotará medidas para a cobrança dos valores em atraso, acarretando, inclusive, o envio das informações do <strong>Beneficiário</strong> titular, ou de seu responsável legal, aos órgãos de serviço de proteção ao crédito, mediante prévia comunicação, conforme determina o Código de Defesa do Consumidor
+                                O pagamento/vencimento do <strong>benefício</strong>, a partir da segunda mensalidade, será no mesmo dia do mês da data do início de vigência  e a forma de pagamento indicadas na página 1 desta <strong>Proposta</strong> , sendo que a falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao mês (0,033% ao dia) e à multa de 2% sobre o valor do débito em atraso, calculados proporcionalmente ao tempo de inadimplência e ainda, se for o caso, honorários advocatícios e reembolso de custas judiciais e outras despesas de cobrança. No período de inadimplência, poderá ocorrer a suspensão automática do <strong>benefício</strong>, cuja utilização somente será restabelecida a partir da quitação do(s) valor(es) pendente(s), acrescido(s)dos encargos supracitados, observada a possibilidade de cancelamento, conforme disposto no item 18 desta <strong>Proposta</strong>. No caso de inadimplência, a contar da data de seu vencimento, a Administradora de Benefícios adotará medidas para a cobrança dos valores em atraso, acarretando, inclusive, o envio das informações do <strong>Beneficiário</strong> titular, ou de seu responsável legal, aos órgãos de serviço de proteção ao crédito, mediante prévia comunicação, conforme determina o Código de Defesa do Consumidor
                             </li>
                             <li>
                                 Independentemente da data da minha <strong>Proposta</strong>, o valor mensal do <strong>benefício</strong> poderá sofrer os seguintes reajustes:
@@ -1121,96 +1208,93 @@
             
 
 
-            <% if (implantacao.formaPagamento === '1') { %>
-                <div class="row dados aditivoReducaoCarencia page-break">
-                    <div class="col-12">
-                        <h6> ADITIVO DE REDUÇÃO DE CARÊNCIA </h6>
-                        <div class="row">
-                            <p>
-                                Este Aditivo de Redução de Carências é parte integrante da Proposta acima referida e visa conceder prazos de carência reduzidos, contados a partir do início de vigência do benefício, aos proponentes elegíveis a essa redução.
-                            </p>
-    
-                            <table class="table table-contratoGerais">
-                                <thead>
-                                    <th> DESCRIÇÃO </th>
-                                    <th> CARÊNCIA CONTRATUAL * </th>
-                                    <th> CARÊNCIA REDUZIDA* </th>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            Urgência
-                                        </td>
-                                        <td>
-                                            24 horas
-                                        </td>
-                                        <td>
-                                            Zero
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Diagnóstico e Ortodontia
-                                        </td>
-                                        <td>
-                                            30 dias
-                                        </td>
-                                        <td>
-                                            Zero
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Dentística, Prevenção, Radiologia, Cirurgia e Odontopediatria
-                                        </td>
-                                        <td>
-                                            60 dias
-                                        </td>
-                                        <td>
-                                            Zero
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Periodontia e Endodontia
-                                        </td>
-                                        <td>
-                                            90 Dias
-                                        </td>
-                                        <td>
-                                            Zero
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Prótese
-                                        </td>
-                                        <td>
-                                            180 Dias
-                                        </td>
-                                        <td>
-                                            Zero
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-    
-                            <p>
-                                *Carência Contratual válida para pagamento em boleto parcelado.  
-                            </p>
-                            <p> 
-                                **Carência Reduzida válida para pagamento em cartão de crédito, débito, pix ou em boleto único. 
-                            </p> 
-    
-                            <p>
-                                Declaro ter recebido cópia deste Aditivo de Redução de Carências e estou de acordo com os seus termos. Estou ciente de que a possibilidade de redução de carências será analisada de forma individual, para cada proponente, e que essa possibilidade está subordinada à análise e aprovação de documentos por parte da Operadora. Estou ciente também de que os proponentes que não se enquadrarem nas condições descritas neste aditivo e não forem elegíveis à redução de carências deverão cumprir integralmente as carências descritas no Manual do Beneficiário.
-                            </p>
-                        </div>
-    
+            <div class="row dados aditivoReducaoCarencia page-break">
+                <div class="col-12">
+                    <h6> ADITIVO DE REDUÇÃO DE CARÊNCIA </h6>
+                    <div class="row">
+                        <p>
+                            Este Aditivo de Redução de Carências é parte integrante da Proposta acima referida e visa conceder prazos de carência reduzidos, contados a partir do início de vigência do benefício, aos proponentes elegíveis a essa redução.
+                        </p>
+
+                        <table class="table table-contratoGerais">
+                            <thead>
+                                <th> DESCRIÇÃO </th>
+                                <th> CARÊNCIA CONTRATUAL * </th>
+                                <th> CARÊNCIA REDUZIDA** </th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        Urgência
+                                    </td>
+                                    <td>
+                                        24 horas
+                                    </td>
+                                    <td>
+                                        Zero
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Diagnóstico e Ortodontia
+                                    </td>
+                                    <td>
+                                        30 dias
+                                    </td>
+                                    <td>
+                                        Zero
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Dentística, Prevenção, Radiologia, Cirurgia e Odontopediatria
+                                    </td>
+                                    <td>
+                                        60 dias
+                                    </td>
+                                    <td>
+                                        Zero
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Periodontia e Endodontia
+                                    </td>
+                                    <td>
+                                        90 Dias
+                                    </td>
+                                    <td>
+                                        Zero
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Prótese
+                                    </td>
+                                    <td>
+                                        180 Dias
+                                    </td>
+                                    <td>
+                                        Zero
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p>
+                            *Carência Contratual válida para pagamento em boleto parcelado.  
+                        </p>
+                        <p> 
+                            **Carência Reduzida válida para pagamento em cartão de crédito, débito, pix ou em boleto único. 
+                        </p> 
+
+                        <p>
+                            Declaro ter recebido cópia deste Aditivo de Redução de Carências e estou de acordo com os seus termos. Estou ciente de que a possibilidade de redução de carências será analisada de forma individual, para cada proponente, e que essa possibilidade está subordinada à análise e aprovação de documentos por parte da Operadora. Estou ciente também de que os proponentes que não se enquadrarem nas condições descritas neste aditivo e não forem elegíveis à redução de carências deverão cumprir integralmente as carências descritas no Manual do Beneficiário.
+                        </p>
                     </div>
+
                 </div>
-            <% } %>
-            
+            </div>            
 
             <div class="row assinatura page-break" id="assinar">
                 <div id="loading-div" style="display: none;">

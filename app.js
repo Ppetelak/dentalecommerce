@@ -26,6 +26,8 @@ const nodemailer = require("nodemailer");
 const puppeteer = require("puppeteer");
 const juice = require("juice");
 const { default: parseJSON } = require("date-fns/parseJSON");
+const { create } = require("domain");
+const { default: id } = require("date-fns/locale/id");
 const port = process.env.PORT || 5586;
 const appUrl = process.env.APP_URL || "http://localhost:5586";
 const pastaInterna = process.env.PASTA_INTERNA || "dentalEcommerce"
@@ -114,6 +116,21 @@ const uploadForm = multer({ storage: storageForm });
 
 const upload = multer({ storage: storage });
 
+const logDirectory = path.join(__dirname, 'logs');
+
+// Garantir que a pasta de logs exista
+if (!fs.existsSync(logDirectory)) {
+  fs.mkdirSync(logDirectory);
+}
+
+function logToFile(filename, message) {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] ${message}\n`;
+  const logFilepath = path.join(logDirectory, `${filename}.txt`);
+  
+  fs.appendFileSync(logFilepath, logMessage, 'utf8');
+}
+
 /* --------------------------------------- FUNÇÕES ÚTEIS --------------------------------- */
 
 async function enviarAnexosParaDSContrato(numeroProposta) {
@@ -148,10 +165,10 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
     const anexos = rows;
     var quantidadeAnexos = anexos.length;
 
-    logger.info(`Quantidade de anexos encontrados para a proposta de id ${idImplantacao}: ${quantidadeAnexos}`)
+    enviarMensagemDiscord(`Quantidade de anexos encontrados para a proposta de id ${idImplantacao}: ${quantidadeAnexos}`, 'erro');
 
     if (!anexos || anexos.length === 0) {
-      console.log("Nenhum anexo encontrado para a proposta:", numeroProposta);
+      enviarMensagemDiscord(`Nenhum anexo encontrado para a proposta: ${numeroProposta}`, 'erro');
       logger.info("ERRO: Nenhum anexo encontrado para a proposta");
       return { success: true, message: "Nenhum anexo para enviar" };
     }
@@ -170,7 +187,7 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
         arquivo: anexo.nome_arquivo,
         linkAnexo: anexo.caminho_arquivo,
       };
-      logger.info(`Enviado um anexo de link: ${data.linkAnexo}`)
+      enviarMensagemDiscord(`Enviado um anexo de link: ${data.linkAnexo} para a proposta de número: ${numeroProposta}`, 'erro')
       console.log("Enviando anexo:", data);
 
       try {
@@ -182,6 +199,7 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
             4,
             `Anexo de nome "${data.nomeArquivo}" anexado ao contrato com sucesso`
           );
+          enviarMensagemDiscord(`MENSAGEM: Anexo enviado com sucesso ${response.data}`, 'erro')
           console.log("Anexo enviado com sucesso:", response.data);
           logger.info("SUCESS: Anexo enviado com sucesso");
         } else {
@@ -190,10 +208,10 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
             4,
             `ERRO ao anexar arquivo de nome "${data.nomeArquivo}" ao contrato`
           );
-          console.error(`Erro: Recebido status ${response.status}`);
+          enviarMensagemDiscord(`ERRO: Recebido status ${response.status}`, "erro");
         }
       } catch (error) {
-        logger.info("ERRO: Erro ao enviar anexo ao digital saúde", error.message);
+        enviarMensagemDiscord(`ERRO: Erro ao enviar anexo ao digital saúde ${error.message}`, 'erro');
         await sendStatus(
           numeroProposta,
           4,
@@ -215,6 +233,7 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
           }
 
           console.error(message, error.response.data);
+          enviarMensagemDiscord(`ERRO: ${message}, ERRO: ${error.response.data}`, 'erro')
         } else {
           console.error("Erro ao enviar anexo:", error.message);
         }
@@ -373,10 +392,8 @@ async function gerarSalvarPDFProposta(
 
       db.query(query, [numeroProposta, nomeArquivo, fileUrl], (err, result) => {
         if (err) {
+          enviarMensagemDiscord( `Erro ao salvar anexo do PDF gerado da proposta ao banco de dados, ERRO: ${err} -------- Proposta Nº ${numeroProposta}`, 'erro')
           reject(err);
-          enviarErroDiscord(
-            `Erro ao salvar anexo do PDF gerado da proposta ao banco de dados, ERRO: ${err} -------- Proposta Nº ${numeroProposta}`
-          );
         } else {
           sendStatus(
             idImplantacao,
@@ -388,9 +405,7 @@ async function gerarSalvarPDFProposta(
       });
     } catch (error) {
       console.error("Error salvar PDF:", error);
-      enviarErroDiscord(
-        `Erro geral na função de gerar PDF ERRO: ${error} ------ Proposta Nº ${numeroProposta}`
-      );
+      enviarMensagemDiscord(`Erro geral na função de gerar PDF ERRO: ${error} ------ Proposta Nº ${numeroProposta}`, 'erro');
       reject(error);
     }
   });
@@ -455,7 +470,7 @@ async function sendContractEmail(
         stack: err.stack,
         timestamp: new Date().toISOString(),
       });
-      enviarErroDiscord(`Erro ao enviar email para o titular do contrato ${err}`);
+      enviarMensagemDiscord(`Erro ao enviar email para o titular do contrato ${err}`, 'erro');
       reject(err); // Rejeite a promessa se houver um erro no envio do e-mail
     }
   });
@@ -554,13 +569,26 @@ function formatarDataDs(data) {
   return dataFormatada;
 }
 
-async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
+async function sendCodigoPropostaIdProposta(codigoPropostaDs, idImplantacao) {
   const db = await mysql.createPool(config);
+  try {
+    await db.query('INSERT INTO propostas_codigods (numeroProposta, codigo_ds) VALUES (?, ?)', [idImplantacao, codigoPropostaDs], (err, result) => {
+      return result;
+    })
+  } catch (err) {
+    enviarMensagemDiscord(`Erro ao cadastrar código de proposta gerado no DS: ${err}`, 'erro')
+  }
+}
+
+async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
+  //const db = await mysql.createPool(config);
   const token = "X43ADVSEXM";
   const senhaApi = "kgt87pkxc2";
   const apiUrl = "https://digitalsaude.com.br/api/v2/contrato/";
 
-  const data = JSON.stringify(jsonModeloDS);
+/*   const data = JSON.stringify(jsonModeloDS); */
+  const data = jsonModeloDS;
+  console.log(data);
 
   const configDS = {
     headers: {
@@ -569,44 +597,36 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
       senhaApi: senhaApi,
     },
   };
-
-  console.log(data);
+/* 
+  logToFile(idImplantacao, `Enviando proposta: ${data}`); */
 
   try {
     const response = await axios.post(apiUrl, data, configDS);
     const codigoImplantacaoDS = response.data.codigo;
+    console.log(codigoImplantacaoDS)
+    enviarMensagemDiscord(`Response do DS para chamada de API para envio da Proposta RESPOSTA ${response.data}`, 'erro')
+    logToFile(`RESPONSE DS ${idImplantacao}`, `Response Completo: ${JSON.stringify(response.data, null, 2)}`);
+    sendCodigoPropostaIdProposta(codigoImplantacaoDS, idImplantacao);
+
     if (response.status === 200) {
-      await sendStatus(
-        idImplantacao,
-        4,
-        "Implantação realizada com sucesso no digital saúde"
-      );
-      await db.query(
-        "INSERT INTO propostas_codigods (numeroProposta, codigo_ds) VALUES (?, ?)",
-        [idImplantacao, codigoImplantacaoDS]
-      );
-      console.log("Proposta enviada com sucesso:", response.data);
+      logToFile(idImplantacao, `Proposta enviada com sucesso. Código de Implantação DS: ${codigoImplantacaoDS}`);
+      await sendStatus(idImplantacao, 4, "Implantação realizada com sucesso no digital saúde");
       return { success: true, data: response.data };
     } else {
-      await sendStatus(
-        idImplantacao,
-        4,
-        "Erro ao enviar proposta para o digital"
-      );
-      console.error(`Erro: Recebido status ${response.status}`);
+      enviarMensagemDiscord(` 2 Erro ao enviar proposta para o DS: ${error.message}`, 'erro')
+      logToFile(idImplantacao, `Erro ao enviar proposta. Status: ${response.status}`);
+      await sendStatus(idImplantacao, 4, "Erro ao enviar proposta para o digital 1");
       return {
         success: false,
         message: `Erro: Recebido status ${response.status}`,
       };
     }
   } catch (error) {
-    await sendStatus(
-      idImplantacao,
-      4,
-      "Erro ao enviar proposta para o digital"
-    );
+    enviarMensagemDiscord(` 1 Erro ao enviar proposta para o DS: ${error.message}`, 'erro')
+    logToFile(idImplantacao, `Erro ao enviar proposta: ${error.message}`);
+    await sendStatus(idImplantacao, 4, "Erro ao enviar proposta para o digital 2");
+
     if (error.response) {
-      // A resposta foi recebida e o servidor respondeu com um código de status diferente de 2xx
       const status = error.response.status;
       let message = "Erro desconhecido ao enviar a proposta.";
 
@@ -617,12 +637,12 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
       } else if (status === 500) {
         message = "Erro interno no servidor (500). Tente novamente mais tarde.";
       }
-
-      console.error(message, error.response.data);
+      enviarMensagemDiscord(`2 Erro ao enviar proposta para o DS: ${error.message}`, 'erro')
+      logToFile(idImplantacao, `${message}: ${JSON.stringify(error.response.data)}`);
       return { success: false, message: message, data: error.response.data };
     } else {
-      // Ocorreu um erro ao configurar a solicitação ou algo similar
-      console.error("Erro ao enviar a proposta:", error.message);
+      enviarMensagemDiscord(` 3 Erro ao enviar proposta para o DS: ${error.message}`, 'erro')
+      logToFile(idImplantacao, `Erro ao configurar a solicitação: ${error.message}`);
       return {
         success: false,
         message: "Erro ao enviar a proposta.",
@@ -708,15 +728,69 @@ async function rollbackAndRespond(res, message) {
   });
 }
 
-async function enviarErroDiscord(mensagem) {
+async function enviarMensagemDiscord(mensagem, tipo) {
+  if (tipo === "erro"){
+    try {
+      console.log(`Mensagem para discord: ${mensagem}`);
+      await axios.post('https://bot.midiaideal.com/mensagem-erros-ecommerce', { mensagem });
+      console.log('Mensagem enviada com sucesso');
+    } catch (error) {
+      console.error("Erro ao enviar mensagem erro:", error);
+    }
+  }
+  if (tipo === "financeiro"){
+    try {
+      console.log(`Mensagem para discord: ${mensagem}`);
+      await axios.post('https://bot.midiaideal.com/mensagem-financeiro-ecommerce', { mensagem });
+      console.log('Mensagem enviada com sucesso');
+    } catch (error) {
+      console.error("Erro ao enviar mensagem erro:", error);
+    }
+  }
+  if(tipo === "implantacao") {
+    try {
+      console.log(`Mensagem para discord: ${mensagem}`);
+      await axios.post('https://bot.midiaideal.com/mensagem-implantacoes-ecommerce', { mensagem });
+      console.log('Mensagem enviada com sucesso');
+    } catch (error) {
+      console.error("Erro ao enviar mensagem erro:", error);
+    }
+  }  
+}
+
+async function pegarCodigoDSGrupo(idFormaPagamento, idEntidade) {
+  const db = await mysql.createPool(config);
+
   try {
-    console.log(`Mensagem para discord: ${mensagem}`);
-    /* await axios.post('https://bot.midiaideal.com/mensagem-erros-ecommerce', { mensagem });
-    console.log('Mensagem enviada com sucesso'); */
+    const resultFormaPagamento = await db.query(
+      `SELECT parametrizacao FROM formas_pagamento WHERE id = ?`,
+      [idFormaPagamento]
+    );
+
+    if (resultFormaPagamento.length === 0) {
+      throw new Error("Forma de pagamento não encontrada");
+    }
+
+    const formaDePagamento = resultFormaPagamento[0].parametrizacao;
+
+    const resultCodigo = await db.query(
+      `SELECT codigo_ds FROM entidades_parametros WHERE id_entidade = ? AND forma_pagamento = ?`,
+      [idEntidade, formaDePagamento]
+    );
+
+    if (resultCodigo.length === 0) {
+      throw new Error("Código DS não encontrado para a entidade e forma de pagamento");
+    }
+    console.log(resultCodigo[0].codigo_ds);
+
+    return resultCodigo[0].codigo_ds;
   } catch (error) {
-    console.error("Erro ao enviar mensagem erro:", error);
+    console.error("Erro ao pegar código DS do grupo:", error);
+    throw error; // Opcional: Rejeitar a promessa para que o chamador saiba que ocorreu um erro
   }
 }
+
+
 
 /* ---------------------------------------- ROTAS ---------------------------------------- */
 
@@ -727,7 +801,7 @@ app.get("/files", verificaAutenticacao, (req, res) => {
 
 app.get("/mandarMensagemRobo/:mensagem", (req, res) => {
   const mensagem = req.params.mensagem;
-  enviarErroDiscord(mensagem);
+  enviarMensagemDiscord(mensagem, 'erro');
   res.send("mensagem enviada com sucesso");
 });
 
@@ -819,6 +893,7 @@ app.post("/salvarLogo", verificaAutenticacao, (req, res) => {
 app.get("/", async (req, res) => {
   const db = await mysql.createPool(config);
   const queryPlanos = "SELECT * FROM planos";
+  const queryFormasDePagamento = "SELECT * FROM formas_pagamento";
   db.query(queryPlanos, (err, resultPlanos) => {
     if (err) {
       console.error("Erro ao consultar o banco de dados:", err);
@@ -826,7 +901,17 @@ app.get("/", async (req, res) => {
         .status(500)
         .json({ error: "Erro ao processar consulta ao BD" });
     }
-    res.render("index", { planos: resultPlanos });
+    db.query(queryFormasDePagamento, (err, resultFormasDePagamentos) => {
+      if (err) {
+        console.error('Erro ao buscar oas formas de pagamento')
+      }
+      res.render(
+        "index", 
+        { 
+          planos: resultPlanos,
+          pagamentos: resultFormasDePagamentos
+        });
+    })
   });
 });
 
@@ -835,6 +920,8 @@ app.post("/formulario", async (req, res) => {
   const planoId = req.body.planoSelecionado;
   const query = "SELECT * FROM planos WHERE id = ?";
   const queryProfissoes = "SELECT * FROM profissoes";
+  const queryFormasPagamento = "SELECT * FROM formas_pagamento WHERE id_plano = ?";
+  const queryVencimentosDatas = "SELECT * FROM datasVencimentos"
   db.query(query, [planoId], (err, result) => {
     if (err) {
       console.error("Erro ao consultar o banco de dados:", err);
@@ -849,18 +936,32 @@ app.post("/formulario", async (req, res) => {
         if (err) {
           console.error("Erro ao resgatar profissoes do BD");
         }
-        const planoSelecionado = result[0];
+        db.query(queryFormasPagamento, [planoId],  (err, resultPagamentos) => {
+          if (err) {
+            console.error("Erro ao resgatar formas de pagamento do BD");
+          }
+          const planoSelecionado = result[0];
+          db.query([queryVencimentosDatas], (err, resultVencimentos) => {
+            if(err) {
+              console.error("Erro ao resgatar vencimentos do BD")
+            }
+            res.render("form", {
+              planoSelecionado: planoSelecionado,
+              profissoes: resultProfissoes,
+              pagamentos: resultPagamentos,
+              vencimentos: resultVencimentos
+            });
+          })
         /* req.session.planoSelecionado = planoSelecionado; */
-        res.render("form", {
-          planoSelecionado: planoSelecionado,
-          profissoes: resultProfissoes,
-        });
+        
+      })
+        
       });
     }
   });
 });
 
-app.post("/testeFormularioDS", async (req, res) => {
+/* app.post("/testeFormularioDS", async (req, res) => {
   const dados = req.body.inputs;
   const dependentes = req.body.dependentes;
   const anexos = req.body.anexos;
@@ -1120,7 +1221,8 @@ app.post("/testeFormularioDS", async (req, res) => {
 
   console.log("Foi");
   res.send("Sucesso na rota, se páh na implantação também");
-});
+}); */
+
 
 app.post("/testeFormulario", async (req, res) => {
   const db = await mysql.createPool(config);
@@ -1150,8 +1252,6 @@ app.post("/testeFormulario", async (req, res) => {
     var emailtitularfinanceiro = dados.emailtitularfinanceiro
       ? dados.emailtitularfinanceiro
       : dados.emailtitular;
-
-    console.log(dados);
 
     const numeroProposta = await generateUniqueProposalNumber();
     const dadosImplantacao = [
@@ -1203,36 +1303,36 @@ app.post("/testeFormulario", async (req, res) => {
         return `O TITULAR É O MESMO TITULAR FINANCEIRO`;
       } else {
         return `
-          O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
-          ----> Dados responsável Financeiro <---- \n
-          CPF: ${dados.cpffinanceiro} \n
-          Nome: ${dados.nomefinanceiro} \n
-          Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
-          Telefone: ${dados.telefonetitularfinanceiro} \n
-          Email: ${dados.emailtitularfinanceiro} \n
-          Sexo: ${dados.sexotitularfinanceiro} \n
-          Estado Civil: ${dados.estadociviltitularfinanceiro} \n
-          Grau de Parentesco: ${dados.grauparentesco} \n
-          `;
+            O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
+            ----> Dados responsável Financeiro <---- \n
+            CPF: ${dados.cpffinanceiro} \n
+            Nome: ${dados.nomefinanceiro} \n
+            Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
+            Telefone: ${dados.telefonetitularfinanceiro} \n
+            Email: ${dados.emailtitularfinanceiro} \n
+            Sexo: ${dados.sexotitularfinanceiro} \n
+            Estado Civil: ${dados.estadociviltitularfinanceiro} \n
+            Grau de Parentesco: ${dados.grauparentesco} \n
+            `;
       }
     }
 
     let observacoesDigitalSaude = await obsDigitalSaude();
 
     observacoesDigitalSaude += `
-      \n
-      Pagamento: 
-        ${
-          dados.formaPagamento === 1
-            ? "Boleto"
-            : dados.formaPagamento === 2
-            ? "Cartão de Crédito em 12x"
-            : "Cartão de Crédito em 3x"
-        } \n
-        Profissão selecionada: ${dados.profissaotitular}
-      `;
+        \n
+        Pagamento: 
+          ${
+            dados.formaPagamento === 1
+              ? "Boleto"
+              : dados.formaPagamento === 2
+              ? "Cartão de Crédito em 12x"
+              : "Cartão de Crédito em 3x"
+          } \n
+          Profissão selecionada: ${dados.profissaotitular}
+        `;
 
-    const jsonModeloDS = {
+        const jsonModeloDS = {
       numeroProposta: `${numeroProposta}`,
       dataAssinatura: "26/02/2024",
       diaVencimento: `${dados.dataVencimento}`,
@@ -1256,7 +1356,7 @@ app.post("/testeFormulario", async (req, res) => {
         codigo: `${dados.codigoCorretora}`,
       },
       grupo: {
-        codigo: "V2CAVAD6U2",
+        codigo: `${await pegarCodigoDSGrupo(dados.formaPagamento, dados.idEntidade)}`,
       },
       filial: {
         codigo: "BETRHPTL2K",
@@ -1279,9 +1379,9 @@ app.post("/testeFormulario", async (req, res) => {
           uf: dados.estado,
           cep: dados.cep,
           dddTelefone: "41",
-          telefone: "992414553",
+          telefone: "99999999",
           dddCelular: "41",
-          celular: "999665588",
+          celular: "999999999",
           email: dados.emailtitular,
           altura: 0,
           peso: 0,
@@ -1322,8 +1422,8 @@ app.post("/testeFormulario", async (req, res) => {
         },
       ],
     };
-
     /* INSERÇÃO DE DADOS AO BANCO DE DADOS DAS INFORMAÇÕES SOBRE A IMPLANTAÇÃO */
+    console.log(dadosImplantacao);
 
     await db
       .query(qInsImplantacao, dadosImplantacao)
@@ -1468,9 +1568,38 @@ app.post("/testeFormulario", async (req, res) => {
         );
 
         try {
+          await enviarMensagemDiscord(
+            `
+            NOVA PROPOSTA RECEBIDA DE Nº: ${numeroProposta}
+            TItular: ${dados.nomecompleto},
+            Titular Financeiro: ${dados.titularresponsavelfinanceiro}
+            `,
+            'implantacao'
+          )
+        } catch (error) {
+          logToFile (`ERRO DISCORD MSG: ${numeroProposta}`, 'Erro ao enviar mensagem para o discord sobre nova implantacao')
+        }
+
+        try {
+          await enviarMensagemDiscord(
+            `
+            NOVA PROPOSTA RECEBIDA DE Nº: ${numeroProposta}
+            TItular Financeiro: ${nomefinanceiro}
+            CPF: ${cpffinanceiro}
+            Endereço: ${dados.enderecoresidencial}, Nº ${dados.numeroendereco}, Bairro: ${dados.bairro}, Cidade: ${dados.cidade}, Estado: ${dados.estado}, CEP: ${dados.cep}
+            --- Forma de Pagamento ---
+
+            `,
+            'financeiro'
+          )
+        } catch (error) {
+          logToFile (`ERRO DISCORD MSG: ${numeroProposta}`, 'Erro ao enviar mensagem para o discord sobre nova implantacao')
+        }
+
+        try {
           await salvarAnexos(numeroProposta, anexos);
         } catch (error) {
-          enviarErroDiscord(`Erro ao salvar Anexos ${error}`);
+          enviarMensagemDiscord(`Erro ao salvar Anexos ${error}`, 'erro');
           logger.error({
             message: "Erro ao salvar anexos rota envio de dados da proposta",
             error: error.message,
@@ -1494,8 +1623,8 @@ app.post("/testeFormulario", async (req, res) => {
             dados.idEntidade
           );
         } catch (error) {
-          enviarErroDiscord(
-            `Erro ao enviar email para o titular do contrato ${error}`
+          enviarMensagemDiscord(
+            `Erro ao enviar email para o titular do contrato ${error}`, 'erro'
           );
           logger.error({
             message:
@@ -1507,14 +1636,14 @@ app.post("/testeFormulario", async (req, res) => {
           console.error("Erro ao enviar email com contrato", error);
         }
 
-          // ENVIAR PROPOSTA DIGITAL SAÚDE
+        // ENVIAR PROPOSTA DIGITAL SAÚDE
 
         try {
           await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
         } catch (error) {
           // Tratamento de erro adicional, se necessário
-          enviarErroDiscord(
-            `Erro ao enviar dados para o DS da proposta ${error}`
+          enviarMensagemDiscord(
+            `Erro ao enviar dados para o DS da proposta ${error}`, 'erro'
           );
           logger.error({
             message:
@@ -1526,7 +1655,7 @@ app.post("/testeFormulario", async (req, res) => {
           await sendStatus(
             resultImplantacaoId,
             4,
-            "Erro ao enviar proposta para o digital"
+            "Erro ao enviar proposta para o digital 3"
           );
           console.error("Erro inesperado ao enviar proposta:", error);
         }
@@ -1538,8 +1667,8 @@ app.post("/testeFormulario", async (req, res) => {
             "Implantação realizada com sucesso ao Ecommerce"
           );
         } catch (error) {
-          enviarErroDiscord(
-            `Erro ao mudar status da proposta para realizada com sucesso ${error}`
+          enviarMensagemDiscord(
+            `Erro ao mudar status da proposta para realizada com sucesso ${error}`, 'erro'
           );
           logger.error({
             message:
@@ -1555,7 +1684,7 @@ app.post("/testeFormulario", async (req, res) => {
         //res.status(200).send({ message: "Implantação realizada com sucesso!" });
       })
       .catch((error) => {
-        enviarErroDiscord(`Erro durante a implantação ${error}`);
+        enviarMensagemDiscord(`Erro durante a implantação ${error}`, 'erro');
         logger.error({
           message:
             "Erro geral durante a implantação rota envio de dados da proposta",
@@ -1567,7 +1696,7 @@ app.post("/testeFormulario", async (req, res) => {
         res.status(500).send({ error: error.message });
       });
   } catch (error) {
-    enviarErroDiscord(`Erro geral ${error}`);
+    enviarMensagemDiscord(`Erro geral ${error}`, 'erro');
     logger.error({
       message:
         "Erro2 geral durante a implantação rota envio de dados da proposta",
@@ -1601,11 +1730,12 @@ app.get("/buscar-corretor", async (req, res) => {
 
     // Verificar se a API retornou algum resultado
     if (response.data.length === 0) {
-      enviarErroDiscord(
+      enviarMensagemDiscord(
         `
         Erro na busca pelo corretor \n
         ${response.data}
-        `
+        `,
+        'erro'
       );
       return res.status(404).json({ error: "Corretor não encontrado" });
     }
@@ -1743,7 +1873,6 @@ app.get("/enviar-email/:id", verificaAutenticacao, async (req, res) => {
     res.status(500).send("Erro ao conectar com o banco de dados");
   }
 });
-
 
 app.get("/login", (req, res) => {
   res.render("login");
@@ -2216,6 +2345,7 @@ app.get("/visualizaImplantacao/:id", verificaAutenticacao, async (req, res) => {
 app.get("/planos", verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
   const queryPlanos = "SELECT * FROM planos";
+  const queryFormasPagamento = "SELECT * FROM formas_pagamento";
   const files = fs.readdirSync("arquivos/");
 
   db.query(queryPlanos, (err, resultPlanos) => {
@@ -2223,12 +2353,90 @@ app.get("/planos", verificaAutenticacao, async (req, res) => {
       console.error("Erro ao consultar o banco de dados:", err);
       res.status(500).send("Erro ao consultar os planos");
     }
-    res.render("planos", {
-      planos: resultPlanos,
-      files: files,
-      rotaAtual: "planos",
-    });
+    db.query(queryFormasPagamento, (err, resultFormasPagamento) => {
+      if(err) {
+        console.error('Erro ao trazer as formas de pagamento cadastradas', err)
+      }
+      res.render("planos", {
+        planos: resultPlanos,
+        formasDePagamento: resultFormasPagamento,
+        files: files,
+        rotaAtual: "planos",
+      });
+    })
   });
+});
+
+app.post('/planos/:idPlano/forma-pagamento', async (req, res) => {
+  const db = await mysql.createPool(config);
+  const { idPlano } = req.params;
+  console.log(idPlano)
+  const { paymentDescription, paymentType, minParcelValue, totalPaymentValue } = req.body;
+
+  try {
+      const query = `
+          INSERT INTO formas_pagamento (id_plano, descricao, parametrizacao, valor_parcela_minima, valor_total_pgto)
+          VALUES (?, ?, ?, ?, ?)
+      `;
+      await db.query(query, [idPlano, paymentDescription, paymentType, minParcelValue, totalPaymentValue]);
+      res.status(200).json({ message: 'Forma de pagamento salva com sucesso!' });
+  } catch (error) {
+      console.error('Erro ao salvar forma de pagamento:', error);
+      res.status(500).json({ message: 'Erro ao salvar forma de pagamento.' });
+  }
+});
+
+app.put('/planos/:idPlano/forma-pagamento/:idForma', async (req, res) => {
+  console.log('entrou na rota de atualização da forma de pagamento do plano');
+  const db = await mysql.createPool(config);
+  const { idPlano, idForma } = req.params;
+  const { paymentDescription, paymentType, minParcelValue, totalPaymentValue } = req.body;
+
+  try {
+      const query = `
+          UPDATE formas_pagamento
+          SET descricao = ?, parametrizacao = ?, valor_parcela_minima = ?, valor_total_pgto = ?
+          WHERE id = ? AND id_plano = ?
+      `;
+      await db.query(query, [paymentDescription, paymentType, minParcelValue, totalPaymentValue, idForma, idPlano]);
+      res.status(200).json({ message: 'Forma de pagamento atualizada com sucesso!' });
+  } catch (error) {
+      console.error('Erro ao atualizar forma de pagamento:', error);
+      res.status(500).json({ message: 'Erro ao atualizar forma de pagamento.' });
+  }
+});
+
+// Rota para excluir uma forma de pagamento
+app.delete('/planos/:idPlano/forma-pagamento/:idForma', async (req, res) => {
+  const db = await mysql.createPool(config);
+  const { idPlano, idForma } = req.params;
+
+  try {
+      const query = `
+          DELETE FROM formas_pagamento WHERE id = ? AND id_plano = ?
+      `;
+      await db.query(query, [idForma, idPlano]);
+      res.status(200).json({ message: 'Forma de pagamento excluída com sucesso!' });
+  } catch (error) {
+      console.error('Erro ao excluir forma de pagamento:', error);
+      res.status(500).json({ message: 'Erro ao excluir forma de pagamento.' });
+  }
+});
+
+app.get('/planos/:idPlano/formas-pagamento', async (req, res) => {
+  const db = await mysql.createPool(config);
+  const { idPlano }  = req.params;
+  console.log('entrou aqui com o id do Plano:' + idPlano)
+  try {
+      const query = `
+          SELECT * FROM formas_pagamento WHERE id_plano = ?
+      `;
+      const formasDePagamento = await db.query(query, [idPlano]);
+      res.status(200).json(formasDePagamento);
+  } catch (error) {
+      console.error('Erro ao buscar formas de pagamento:', error);
+      res.status(500).json({ message: 'Erro ao buscar formas de pagamento.' });
+  }
 });
 
 app.post("/atualiza-planos", verificaAutenticacao, async (req, res) => {
@@ -2572,7 +2780,7 @@ app.get("/generate-pdf", async (req, res) => {
                 <span style="background: white; color: black; padding: 10px; border-radius: 5px;">${numeroProposta}</span>
               </div>
               <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
-                Data Vigência <br>
+                Data Proposta <br>
                 <span style="background: white; color: black; padding: 10px; border-radius: 5px;">${dataVigencia}</span>
               </div>
             </div>
@@ -2623,7 +2831,156 @@ app.get("/generate-pdf", async (req, res) => {
   }
 });
 
+app.get('/entidades-parametros', verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
+  db.query("SELECT * FROM entidades_parametros", (error, resultsEntidades) => {
+    if (error) throw error;
+      res.render("entidades-parametros", {
+        entidades: resultsEntidades,
+        rotaAtual: "entidades-parametros",
+      });
+    });
+});
+
+app.get('/get-entidades', verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
+  db.query('SELECT id, nome FROM entidades', (err, results) => {
+    if (err) throw err;
+    res.json({ entidades: results });
+  });
+});
+
+app.get('/get-operadoras', verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
+  db.query('SELECT id, nome FROM operadoras', (err, results) => {
+    if (err) throw err;
+    res.json({ operadoras: results });
+  });
+});
+
+// Rota para obter os parâmetros existentes
+app.get('/get-entidades-parametros', verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
+  db.query('SELECT * FROM entidades_parametros', (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+// Rota para cadastrar novos parâmetros
+app.post('/cadastrar-entidade-parametro', verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
+  const { id_entidade, nome_entidade, forma_pagamento, codigo_ds, id_operadora } = req.body;
+  const query = 'INSERT INTO entidades_parametros (id_entidade, nome_entidade, forma_pagamento, codigo_ds, operadora) VALUES (?, ?, ?, ?, ?)';
+  db.query(query, [id_entidade, nome_entidade, forma_pagamento, codigo_ds, id_operadora], (err, result) => {
+    if (err) throw err;
+    res.json({ success: true });
+  });
+});
+
+// Rota para editar parâmetros
+app.put('/editar-entidade-parametro/:id', verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
+  console.log('chegou aqui')
+  const { id } = req.params;
+  const { id_entidade_edit, nome_entidade_edit, forma_pagamento_edit, codigo_ds_edit, id_operadora_edit} = req.body;
+  const query = 'UPDATE entidades_parametros SET id_entidade = ?,forma_pagamento = ?, nome_entidade = ?, codigo_ds = ?, operadora = ? WHERE id = ?';
+  console.log({
+    id_entidade_edit, 
+    forma_pagamento_edit, 
+    nome_entidade_edit, 
+    codigo_ds_edit, 
+    id_operadora_edit,
+    id
+  })
+  db.query(query, [id_entidade_edit, forma_pagamento_edit, nome_entidade_edit, codigo_ds_edit, id_operadora_edit, id], (err, result) => {
+    if (err) {
+      console.log(err);
+      throw err;
+    }
+    res.json({ success: true });
+  });
+});
+
+// Rota para deletar parâmetros
+app.delete('/deletar-entidade-parametro/:id', verificaAutenticacao, async (req, res) => {
+  const db = await mysql.createPool(config);
+  const { id } = req.params;
+  const query = 'DELETE FROM entidades_parametros WHERE id = ?';
+  db.query(query, [id], (err, result) => {
+    if (err) throw err;
+    res.json({ success: true });
+  });
+});
+
 /* TESTES  */
+
+app.get('/testeMensagem', async (req, res) => {
+  const { mensagem, tipo } = req.query;
+  const result = await enviarMensagemDiscord(mensagem, tipo);
+  res.send(result);
+
+})
+
+app.get('/teste001', async (req, res) => {
+  const db = await mysql.createPool(config);
+  const planoId = 1
+  const query = "SELECT * FROM planos WHERE id = ?";
+  const queryProfissoes = "SELECT * FROM profissoes";
+  const queryFormasPagamento = "SELECT * FROM formas_pagamento WHERE id_plano = ?";
+  const queryVencimentosDatas = "SELECT * FROM datasVencimento"
+  db.query(query, [planoId], (err, result) => {
+    if (err) {
+      console.error("Erro ao consultar o banco de dados:", err);
+      return res
+        .status(500)
+        .json({ error: "Erro ao processar consulta ao BD" });
+    } else {
+      if (result.length === 0) {
+        return res.status(404).json({ error: "Plano não encontrado" });
+      }
+      db.query(queryProfissoes, (err, resultProfissoes) => {
+        if (err) {
+          console.error("Erro ao resgatar profissoes do BD");
+        }
+        db.query(queryFormasPagamento, [planoId],  (err, resultPagamentos) => {
+          if (err) {
+            console.error("Erro ao resgatar formas de pagamento do BD");
+          }
+          const planoSelecionado = result[0];
+          db.query(queryVencimentosDatas, (err, resultVencimentos) => {
+              if(err) {
+                console.error('Erro ao buscar datas de vencimento')
+              }
+              console.log(resultVencimentos);
+              res.render("formulario8", {
+                planoSelecionado: planoSelecionado,
+                profissoes: resultProfissoes,
+                pagamentos: resultPagamentos,
+                vencimentos: resultVencimentos
+              });
+            }
+          )
+      })
+      });
+    }
+  });
+})
+
+app.get('/testecodigodsgrupo', async (req, res) => {
+  const { idEntidade, idPagamento } = req.query;
+  try {
+    let result = await pegarCodigoDSGrupo(idPagamento, idEntidade);
+    console.log(result)
+    res.send({
+      'Código DS referente aos parametros ': result
+    });
+  } catch (error) {
+    console.error('Erro ao obter o código DS:', error);
+    res.status(500).send('Erro ao obter o código DS');
+  }
+});
+
 
 /* FIM TESTES */
 
