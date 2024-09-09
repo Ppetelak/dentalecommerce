@@ -380,7 +380,7 @@ async function gerarSalvarPDFProposta(
 
       await browser.close();
 
-      const nomeArquivo = `Proposta Nº ${numeroProposta}.pdf`;
+      const nomeArquivo = `PropostaN${numeroProposta}.pdf`;
 
       const filePath = path.join(
         __dirname,
@@ -491,6 +491,64 @@ async function consultarNumeroProposta(idImplantacao) {
       }
     );
   });
+}
+
+async function pegarNomeEntidade(idEntidade) {
+  const db = await mysql.createPool(config);
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT nome FROM entidades WHERE id=?",
+      [idEntidade],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result[0].nome);
+        }
+      }
+    );
+  });
+}
+
+async function pegarNomeFormaDePagamento(idFormaPagamento) {
+  const db = await mysql.createPool(config);
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT parametrizacao FROM formas_pagamento WHERE id=?",
+      [idFormaPagamento],
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result[0].parametrizacao);
+        }
+      }
+    );
+  });
+}
+
+async function separarDDDNumero(telefone, celular) {
+  // Função auxiliar para separar DDD e número
+  function separar(dado) {
+    // Verifica se o dado tem 11 dígitos (ex: 41999999999)
+    if (dado.length === 10 || dado.length === 11) { 
+      return {
+        ddd: dado.slice(0, 2),  // Primeiro 2 dígitos para o DDD
+        numero: dado.slice(2)   // Resto dos dígitos para o número
+      };
+    } else {
+      // Retorna objeto vazio se o formato for inesperado
+      return {
+        ddd: '',
+        numero: ''
+      };
+    }
+  }
+
+  return {
+    telefone: separar(telefone),
+    celular: separar(celular)
+  };
 }
 
 async function consultarIDProposta(numeroProposta) {
@@ -921,7 +979,6 @@ app.post("/formulario", async (req, res) => {
   const query = "SELECT * FROM planos WHERE id = ?";
   const queryProfissoes = "SELECT * FROM profissoes";
   const queryFormasPagamento = "SELECT * FROM formas_pagamento WHERE id_plano = ?";
-  const queryVencimentosDatas = "SELECT * FROM datasVencimentos"
   db.query(query, [planoId], (err, result) => {
     if (err) {
       console.error("Erro ao consultar o banco de dados:", err);
@@ -941,22 +998,13 @@ app.post("/formulario", async (req, res) => {
             console.error("Erro ao resgatar formas de pagamento do BD");
           }
           const planoSelecionado = result[0];
-          db.query([queryVencimentosDatas], (err, resultVencimentos) => {
-            if(err) {
-              console.error("Erro ao resgatar vencimentos do BD")
-            }
-            res.render("form", {
-              planoSelecionado: planoSelecionado,
-              profissoes: resultProfissoes,
-              pagamentos: resultPagamentos,
-              vencimentos: resultVencimentos
-            });
-          })
-        /* req.session.planoSelecionado = planoSelecionado; */
-        
+          res.render("form", {
+            planoSelecionado: planoSelecionado,
+            profissoes: resultProfissoes,
+            pagamentos: resultPagamentos,
+          });
+        })        
       })
-        
-      });
     }
   });
 });
@@ -1249,9 +1297,15 @@ app.post("/testeFormulario", async (req, res) => {
     var telefonetitularfinanceiro = dados.telefonetitularfinanceiro
       ? dados.telefonetitularfinanceiro
       : dados.telefonetitular;
+    var celulartitularfinanceiro = dados.celulartitularfinanceiro
+    ? dados.celulartitularfinanceiro
+    : dados.celulartitular;
     var emailtitularfinanceiro = dados.emailtitularfinanceiro
       ? dados.emailtitularfinanceiro
       : dados.emailtitular;
+    var nomeEntidade = await pegarNomeEntidade(dados.idEntidade);
+    var nomeFormaPagamento = await pegarNomeFormaDePagamento(dados.formaPagamento);
+    var numerosContato = await separarDDDNumero (telefonetitularfinanceiro, celulartitularfinanceiro)
 
     const numeroProposta = await generateUniqueProposalNumber();
     const dadosImplantacao = [
@@ -1298,9 +1352,22 @@ app.post("/testeFormulario", async (req, res) => {
       dados.numerocns,
     ];
 
+    console.log({
+      dadosinput: dados,
+      dependentes: dependentes,
+      anexos: anexos,
+      nomeEntidade: nomeEntidade,
+      nomeFormaPagamento: nomeFormaPagamento,
+      numeroProposta: numeroProposta,
+    })
+
     async function obsDigitalSaude() {
       if (dados.titularresponsavelfinanceiro === "Sim") {
-        return `O TITULAR É O MESMO TITULAR FINANCEIRO`;
+        return `O TITULAR É O MESMO TITULAR FINANCEIRO \n
+        Forma de Pagamento selecionada: ${nomeFormaPagamento} \n
+        Entidade Vinculada: ${nomeEntidade} \n
+        Profissão Titular do Plano: ${dados.profissaotitular} \n
+        `;
       } else {
         return `
             O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
@@ -1313,26 +1380,16 @@ app.post("/testeFormulario", async (req, res) => {
             Sexo: ${dados.sexotitularfinanceiro} \n
             Estado Civil: ${dados.estadociviltitularfinanceiro} \n
             Grau de Parentesco: ${dados.grauparentesco} \n
+            Forma de Pagamento selecionada: ${nomeFormaPagamento} \n
+            Entidade Vinculada: ${nomeEntidade} \n
+            Profissão Titular do Plano: ${dados.profissaotitular} \n
             `;
       }
     }
 
     let observacoesDigitalSaude = await obsDigitalSaude();
 
-    observacoesDigitalSaude += `
-        \n
-        Pagamento: 
-          ${
-            dados.formaPagamento === 1
-              ? "Boleto"
-              : dados.formaPagamento === 2
-              ? "Cartão de Crédito em 12x"
-              : "Cartão de Crédito em 3x"
-          } \n
-          Profissão selecionada: ${dados.profissaotitular}
-        `;
-
-        const jsonModeloDS = {
+    const jsonModeloDS = {
       numeroProposta: `${numeroProposta}`,
       dataAssinatura: "26/02/2024",
       diaVencimento: `${dados.dataVencimento}`,
@@ -1378,10 +1435,10 @@ app.post("/testeFormulario", async (req, res) => {
           municipio: dados.cidade,
           uf: dados.estado,
           cep: dados.cep,
-          dddTelefone: "41",
-          telefone: "99999999",
-          dddCelular: "41",
-          celular: "999999999",
+          dddTelefone: numerosContato.telefone.ddd,
+          telefone: numerosContato.telefone.numero,
+          dddCelular: numerosContato.celular.ddd,
+          celular: numerosContato.celular.numero,
           email: dados.emailtitular,
           altura: 0,
           peso: 0,
@@ -2966,6 +3023,19 @@ app.get('/teste001', async (req, res) => {
     }
   });
 })
+
+app.get('/api/vencimentos', async (req, res) => {
+  const db = await mysql.createPool(config);
+  try {
+    const rows = await db.query("SELECT * FROM datasVencimento");
+    console.log(rows); // Verifique o resultado no console
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao resgatar vencimentos do BD", err);
+    res.status(500).json({ error: "Erro ao buscar vencimentos" });
+  }
+});
+
 
 app.get('/testecodigodsgrupo', async (req, res) => {
   const { idEntidade, idPagamento } = req.query;

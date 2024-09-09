@@ -821,7 +821,7 @@ const divEscolhaVencimento = `
 
 const dataVencimentoEscolha = document.getElementById('dataVencimentoEscolha');
 
-$('input[name="formaPagamento"]').on('change', function() {
+/* $('input[name="formaPagamento"]').on('change', function() {
   console.log('mudou')
   var formaPagamentoSelecionada = $(this).val();
   console.log(formaPagamentoSelecionada)
@@ -833,7 +833,7 @@ $('input[name="formaPagamento"]').on('change', function() {
   if (formaPagamentoSelecionada === '1') {
     dataVencimentoEscolha.innerHTML = '';
   }
-});
+}); */
 
 function funcaoParaCartao() {
   $('#modalCartaoCredito').modal('show');
