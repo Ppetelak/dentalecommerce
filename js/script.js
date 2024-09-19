@@ -550,6 +550,22 @@ function handlePossuiDependentesChange() {
             </div>
         </div>
         <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="telefonedependente">Telefone</label>
+                <input type="tel" class="form-control required" id="telefonedependente" name="telefonedependente"
+                    placeholder="Telefone" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="celulardependente">Celular</label>
+                <input type="tel" class="form-control required" id="celulardependente" name="celulardependente"
+                    placeholder="Telefone" required>
+            </div>
+          </div>
+        </div>
+        <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="sexodependente">Sexo:</label>

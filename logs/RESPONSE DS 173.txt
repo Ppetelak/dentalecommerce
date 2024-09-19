@@ -1,0 +1,18 @@
+[2024-09-11T21:56:22.151Z] Response Completo: [
+  "Grupo de Código 3LTFC7W7R5 não é referente ao convênio informado."
+]
+[2024-09-12T13:20:23.037Z] Response Completo: [
+  "Plano de Código undefined não foi encontrado.",
+  "Convênio de Código undefined não foi encontrado.",
+  "Produtor de Código undefined não foi encontrado.",
+  "Corretora de Código undefined não foi encontrado."
+]
+[2024-09-12T20:01:32.974Z] Response Completo: [
+  "Grupo de Código 12H7KBBDTC não é referente ao convênio informado."
+]
+[2024-09-12T20:31:28.299Z] Response Completo: [
+  "Grupo de Código T6VAVWEUD3 não é referente ao convênio informado."
+]
+[2024-09-12T20:40:53.956Z] Response Completo: [
+  "Grupo de Código T6VAVWEUD3 não é referente ao convênio informado."
+]

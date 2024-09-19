@@ -25,6 +25,75 @@ $(document).ready(function() {
         }
         });
     });
+    $("#reenviarProposta").click(function(event) {
+    
+        event.preventDefault();
+    
+        const idImplantacao = $(this).data("id");
+    
+        console.log(`clicou em reenviar proposta para DS de id: ${idImplantacao}`)
+    
+        // Exibe a mensagem "Enviando email, aguarde..."
+        alert("Enviando Proposta");
+    
+        // Faz a requisição Ajax
+        $.ajax({
+            type: "GET",
+            url: `/reenviarPropostaDS/${idImplantacao}`,
+            success: function(data) {
+                alert("Proposta enviada com sucesso");
+                location.reload();
+            },
+            error: function(error) {
+                alert("Erro ao enviar Proposta");
+                console.log(error);
+                location.reload();
+            }
+            });
+        });
+        let isEditing = false; // Estado de edição
+        const editButton = $('#editButton');
+        
+        // Função para alternar entre visualizar e editar
+        editButton.on('click', function() {
+          isEditing = !isEditing;
+  
+          if (isEditing) {
+            editButton.text('Salvar');
+            $('.editable').each(function() {
+              const value = $(this).text();
+              const key = $(this).data('key');
+              $(this).html(`<input type="text" class="form-control" data-key="${key}" value="${value}">`);
+            });
+          } else {
+            editButton.text('Editar');
+            $('.editable').each(function() {
+              const inputValue = $(this).find('input').val();
+              $(this).html(inputValue);
+            });
+            
+            // Aqui você pode enviar os dados editados para o servidor via AJAX
+            const updatedData = {};
+            $('.editable input').each(function() {
+              const key = $(this).data('key');
+              const value = $(this).val();
+              updatedData[key] = value;
+            });
+            
+            // Exemplo de envio via AJAX
+            $.ajax({
+              url: '/salvarDados', // Endpoint para salvar os dados
+              method: 'POST',
+              data: updatedData,
+              success: function(response) {
+                alert('Dados salvos com sucesso!');
+              },
+              error: function(error) {
+                alert('Erro ao salvar os dados.');
+              }
+            });
+          }
+        });
 });
 
 function getCookieValue(name) {

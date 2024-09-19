@@ -1,0 +1,822 @@
+[2024-09-12T13:40:34.506Z] Response Completo: {
+  "ajuste": 0,
+  "anexoList": [],
+  "angariador": null,
+  "beneficiarioList": [
+    {
+      "altura": 0,
+      "bairro": "Sítio Cercado",
+      "carencia": null,
+      "celular": "27744053",
+      "cep": "81920060",
+      "cns": null,
+      "codigo": "6FSPARFS3R",
+      "complemento": "",
+      "cpf": "94733422334",
+      "dataInicioOrigem": null,
+      "dataNascimento": "12/12/2000",
+      "dataPagamentoOrigem": null,
+      "dataVigencia": "26/02/2024",
+      "dddCelular": "66",
+      "dddTelefone": "66",
+      "declaracaoSaudeList": [],
+      "dnv": "string",
+      "email": "ti.sistemas.pxtecnologia@gmail.com",
+      "emailSecundario": null,
+      "endereco": "Rua Doutor José de Almeida Pimpão",
+      "estadoCivil": {
+        "id": 1,
+        "nome": "Casado"
+      },
+      "etiquetaList": [],
+      "id": 2326291,
+      "imc": 0,
+      "linkCarteiraProvisoria": "",
+      "marcaOptica": "",
+      "marcaOpticaOpcional": "",
+      "mensalidade": 0,
+      "municipio": "Curitiba",
+      "nome": "Fabiana Isabela Carolina Nogueira",
+      "nomeMae": "Sabrina Kamilly",
+      "nomeOperadoraOrigem": null,
+      "numero": "370",
+      "orgaoEmissor": "pr",
+      "parentesco": {
+        "id": 1,
+        "nome": "Titular"
+      },
+      "peso": 0,
+      "pis": "string",
+      "rg": "277148182",
+      "sexo": {
+        "id": 1,
+        "nome": "Masculino"
+      },
+      "statusBeneficiario": {
+        "id": 7,
+        "nome": "Produzido"
+      },
+      "telefone": "27744053",
+      "tipoBeneficiario": {
+        "id": 1,
+        "nome": "Titular"
+      },
+      "uf": "PR"
+    }
+  ],
+  "codigo": "H4EDJ1RJFW",
+  "convenio": {
+    "codigo": "LRYT12JW8T",
+    "diaVigencia": 10,
+    "estipulante": {
+      "codigo": "XY86KUJ42E",
+      "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=EL15735892678564YH5N43P69.jpg&tamanho=200&opcao=pad",
+      "nome": "MOUNT HERMON ADMINISTRADORA DE BENEFÍCIOS LTDA",
+      "numeroAns": "421677"
+    },
+    "filialList": [
+      {
+        "codigo": "BETRHPTL2K",
+        "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+      }
+    ],
+    "nome": "Dental Uni",
+    "produto": {
+      "anexoList": [],
+      "codigo": "KS6KL1THKL",
+      "linkManualUsuario": "https://play.google.com/store/apps/details?id=com.dentaluni.app&pcampaignid=web_share",
+      "linkRedeCredenciada": "https://www.planosdentaluni.com.br/",
+      "nome": "Coletivo por Adesão - DENTAL UNI",
+      "opcionalList": [],
+      "operadora": {
+        "id": 77,
+        "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=OL14885545849577H4CA1L54N.jpg&tamanho=200&opcao=pad",
+        "nome": "Dental Uni",
+        "numeroAns": "304484",
+        "site": null
+      }
+    },
+    "tipoTaxaCadastroApi": {
+      "id": 1,
+      "nome": "Valor por Contrato"
+    },
+    "valorTaxaCadastro": 0
+  },
+  "corretora": {
+    "bairro": "CENTRO",
+    "canal": 1,
+    "celular": "",
+    "cep": "80010010",
+    "codigo": "S62MXENV8X",
+    "complemento": "806",
+    "contaBancaria": null,
+    "corretor": 0,
+    "dataInclusao": "18/11/2019",
+    "dataNascimento": null,
+    "dddCelular": "",
+    "dddTelefone": "41",
+    "email": "almir@classeadministradora.com.brx",
+    "endereco": "RUA MARECHAL DEODORO",
+    "filial": {
+      "codigo": "BETRHPTL2K",
+      "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+    },
+    "grupoProdutor": {
+      "codigo": "LN7ZPS3BEB",
+      "nome": "CORRETORA PJ CASA"
+    },
+    "id": 42231,
+    "login": "espaco",
+    "municipio": "CURITIBA",
+    "nome": "ESPAÇO CORRETOR LTDA",
+    "numero": "826",
+    "numeroDocumento": "16585286000154",
+    "produtor": null,
+    "senha": "Espaco1234",
+    "sexo": null,
+    "telefone": "38881000",
+    "uf": "PR"
+  },
+  "cpfResponsavel": "94733422334",
+  "dataAssinatura": "26/02/2024",
+  "dataInclusao": "12/09/2024",
+  "diaVencimento": 1,
+  "entidade": null,
+  "filial": {
+    "codigo": "BETRHPTL2K",
+    "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+  },
+  "formaAjuste": null,
+  "gerente": null,
+  "grupo": {
+    "codigo": "12H7KBBDTC",
+    "nome": "ABRAER Boleto 3x "
+  },
+  "id": 1835455,
+  "matricula": null,
+  "nomeResponsavel": "Fabiana Isabela Carolina Nogueira",
+  "nomeTitular": "Fabiana Isabela Carolina Nogueira",
+  "numeroProposta": "202409127002",
+  "observacao": "O TITULAR É O MESMO TITULAR FINANCEIRO \n\n        Forma de Pagamento selecionada: [object Object] \n\n        Entidade Vinculada: ABRAER \n\n        Profissão Titular do Plano: Estudante \n\n        ",
+  "opcionalList": [],
+  "pendenciaList": [],
+  "plano": {
+    "abrangencia": {
+      "id": 3,
+      "nome": "Nacional"
+    },
+    "acomodacaoApi": {
+      "id": 4,
+      "nome": "Odontológico"
+    },
+    "codigo": "KUS41MB4WJ",
+    "nome": "PLANO AMPLO",
+    "produto": {
+      "anexoList": [],
+      "codigo": "KS6KL1THKL",
+      "linkManualUsuario": "https://play.google.com/store/apps/details?id=com.dentaluni.app&pcampaignid=web_share",
+      "linkRedeCredenciada": "https://www.planosdentaluni.com.br/",
+      "nome": "Coletivo por Adesão - DENTAL UNI",
+      "opcionalList": [],
+      "operadora": {
+        "id": 77,
+        "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=OL14885545849577H4CA1L54N.jpg&tamanho=200&opcao=pad",
+        "nome": "Dental Uni",
+        "numeroAns": "304484",
+        "site": null
+      }
+    },
+    "registroAns": "464766111",
+    "statusPlanoApi": {
+      "id": 1,
+      "nome": "Aberto"
+    },
+    "valorTotal": 0
+  },
+  "prazoAjuste": 0,
+  "produtor": {
+    "bairro": "",
+    "canal": 0,
+    "celular": "",
+    "cep": "",
+    "codigo": "B9AAV3C5DB",
+    "complemento": "",
+    "contaBancaria": null,
+    "corretor": 0,
+    "dataInclusao": "27/11/2019",
+    "dataNascimento": null,
+    "dddCelular": "",
+    "dddTelefone": "27",
+    "email": "contel.sul@gmail.com",
+    "endereco": "",
+    "filial": {
+      "codigo": "BETRHPTL2K",
+      "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+    },
+    "grupoProdutor": {
+      "codigo": "3S48S6KL2Z",
+      "nome": "CONSULTOR"
+    },
+    "id": 42985,
+    "login": "",
+    "municipio": "",
+    "nome": "ALESSANDRO DE OLIVEIRA CRUZ",
+    "numero": "",
+    "numeroDocumento": "11400540747",
+    "produtor": {
+      "bairro": "CENTRO",
+      "canal": 1,
+      "celular": "",
+      "cep": "80010010",
+      "codigo": "S62MXENV8X",
+      "complemento": "806",
+      "contaBancaria": null,
+      "corretor": 0,
+      "dataInclusao": "18/11/2019",
+      "dataNascimento": null,
+      "dddCelular": "",
+      "dddTelefone": "41",
+      "email": "almir@classeadministradora.com.brx",
+      "endereco": "RUA MARECHAL DEODORO",
+      "filial": {
+        "codigo": "BETRHPTL2K",
+        "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+      },
+      "grupoProdutor": {
+        "codigo": "LN7ZPS3BEB",
+        "nome": "CORRETORA PJ CASA"
+      },
+      "id": 42231,
+      "login": "espaco",
+      "municipio": "CURITIBA",
+      "nome": "ESPAÇO CORRETOR LTDA",
+      "numero": "826",
+      "numeroDocumento": "16585286000154",
+      "produtor": null,
+      "senha": "Espaco1234",
+      "sexo": null,
+      "telefone": "38881000",
+      "uf": "PR"
+    },
+    "senha": "",
+    "sexo": null,
+    "telefone": "997829488",
+    "uf": ""
+  },
+  "saldoDevedor": 0,
+  "statusContrato": {
+    "id": 6,
+    "nome": "Produzido"
+  },
+  "supervisor": null,
+  "valor": 135.88
+}
+[2024-09-12T13:53:49.884Z] Response Completo: [
+  "O beneficiário Fabiana Isabela Carolina Nogueira: Campo UF obrigatório."
+]
+[2024-09-12T13:57:09.868Z] Response Completo: {
+  "ajuste": 0,
+  "anexoList": [],
+  "angariador": null,
+  "beneficiarioList": [
+    {
+      "altura": 0,
+      "bairro": "Sítio Cercado",
+      "carencia": null,
+      "celular": "27744053",
+      "cep": "81920060",
+      "cns": null,
+      "codigo": "HA9YMVMSTS",
+      "complemento": "",
+      "cpf": "94733422334",
+      "dataInicioOrigem": null,
+      "dataNascimento": "12/12/2000",
+      "dataPagamentoOrigem": null,
+      "dataVigencia": "26/02/2024",
+      "dddCelular": "66",
+      "dddTelefone": "66",
+      "declaracaoSaudeList": [],
+      "dnv": "string",
+      "email": "ti.sistemas.pxtecnologia@gmail.com",
+      "emailSecundario": null,
+      "endereco": "Rua Doutor José de Almeida Pimpão",
+      "estadoCivil": {
+        "id": 1,
+        "nome": "Casado"
+      },
+      "etiquetaList": [],
+      "id": 2326309,
+      "imc": 0,
+      "linkCarteiraProvisoria": "",
+      "marcaOptica": "",
+      "marcaOpticaOpcional": "",
+      "mensalidade": 0,
+      "municipio": "Curitiba",
+      "nome": "Fabiana Isabela Carolina Nogueira",
+      "nomeMae": "Sabrina Kamilly",
+      "nomeOperadoraOrigem": null,
+      "numero": "370",
+      "orgaoEmissor": "pr",
+      "parentesco": {
+        "id": 1,
+        "nome": "Titular"
+      },
+      "peso": 0,
+      "pis": "string",
+      "rg": "277148182",
+      "sexo": {
+        "id": 1,
+        "nome": "Masculino"
+      },
+      "statusBeneficiario": {
+        "id": 7,
+        "nome": "Produzido"
+      },
+      "telefone": "27744053",
+      "tipoBeneficiario": {
+        "id": 1,
+        "nome": "Titular"
+      },
+      "uf": "PR"
+    }
+  ],
+  "codigo": "WHU38WNTX9",
+  "convenio": {
+    "codigo": "LRYT12JW8T",
+    "diaVigencia": 10,
+    "estipulante": {
+      "codigo": "XY86KUJ42E",
+      "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=EL15735892678564YH5N43P69.jpg&tamanho=200&opcao=pad",
+      "nome": "MOUNT HERMON ADMINISTRADORA DE BENEFÍCIOS LTDA",
+      "numeroAns": "421677"
+    },
+    "filialList": [
+      {
+        "codigo": "BETRHPTL2K",
+        "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+      }
+    ],
+    "nome": "Dental Uni",
+    "produto": {
+      "anexoList": [],
+      "codigo": "KS6KL1THKL",
+      "linkManualUsuario": "https://play.google.com/store/apps/details?id=com.dentaluni.app&pcampaignid=web_share",
+      "linkRedeCredenciada": "https://www.planosdentaluni.com.br/",
+      "nome": "Coletivo por Adesão - DENTAL UNI",
+      "opcionalList": [],
+      "operadora": {
+        "id": 77,
+        "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=OL14885545849577H4CA1L54N.jpg&tamanho=200&opcao=pad",
+        "nome": "Dental Uni",
+        "numeroAns": "304484",
+        "site": null
+      }
+    },
+    "tipoTaxaCadastroApi": {
+      "id": 1,
+      "nome": "Valor por Contrato"
+    },
+    "valorTaxaCadastro": 0
+  },
+  "corretora": {
+    "bairro": "CENTRO",
+    "canal": 1,
+    "celular": "",
+    "cep": "80010010",
+    "codigo": "S62MXENV8X",
+    "complemento": "806",
+    "contaBancaria": null,
+    "corretor": 0,
+    "dataInclusao": "18/11/2019",
+    "dataNascimento": null,
+    "dddCelular": "",
+    "dddTelefone": "41",
+    "email": "almir@classeadministradora.com.brx",
+    "endereco": "RUA MARECHAL DEODORO",
+    "filial": {
+      "codigo": "BETRHPTL2K",
+      "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+    },
+    "grupoProdutor": {
+      "codigo": "LN7ZPS3BEB",
+      "nome": "CORRETORA PJ CASA"
+    },
+    "id": 42231,
+    "login": "espaco",
+    "municipio": "CURITIBA",
+    "nome": "ESPAÇO CORRETOR LTDA",
+    "numero": "826",
+    "numeroDocumento": "16585286000154",
+    "produtor": null,
+    "senha": "Espaco1234",
+    "sexo": null,
+    "telefone": "38881000",
+    "uf": "PR"
+  },
+  "cpfResponsavel": "94733422334",
+  "dataAssinatura": "01/01/2024",
+  "dataInclusao": "12/09/2024",
+  "diaVencimento": 1,
+  "entidade": null,
+  "filial": {
+    "codigo": "BETRHPTL2K",
+    "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+  },
+  "formaAjuste": null,
+  "gerente": null,
+  "grupo": {
+    "codigo": "12H7KBBDTC",
+    "nome": "ABRAER Boleto 3x "
+  },
+  "id": 1835471,
+  "matricula": null,
+  "nomeResponsavel": "Fabiana Isabela Carolina Nogueira",
+  "nomeTitular": "Fabiana Isabela Carolina Nogueira",
+  "numeroProposta": "202409127002",
+  "observacao": "O TITULAR É O MESMO TITULAR FINANCEIRO \n\n        Forma de Pagamento selecionada: [object Object] \n\n        Entidade Vinculada: ABRAER \n\n        Profissão Titular do Plano: Estudante \n\n        ",
+  "opcionalList": [],
+  "pendenciaList": [],
+  "plano": {
+    "abrangencia": {
+      "id": 3,
+      "nome": "Nacional"
+    },
+    "acomodacaoApi": {
+      "id": 4,
+      "nome": "Odontológico"
+    },
+    "codigo": "KUS41MB4WJ",
+    "nome": "PLANO AMPLO",
+    "produto": {
+      "anexoList": [],
+      "codigo": "KS6KL1THKL",
+      "linkManualUsuario": "https://play.google.com/store/apps/details?id=com.dentaluni.app&pcampaignid=web_share",
+      "linkRedeCredenciada": "https://www.planosdentaluni.com.br/",
+      "nome": "Coletivo por Adesão - DENTAL UNI",
+      "opcionalList": [],
+      "operadora": {
+        "id": 77,
+        "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=OL14885545849577H4CA1L54N.jpg&tamanho=200&opcao=pad",
+        "nome": "Dental Uni",
+        "numeroAns": "304484",
+        "site": null
+      }
+    },
+    "registroAns": "464766111",
+    "statusPlanoApi": {
+      "id": 1,
+      "nome": "Aberto"
+    },
+    "valorTotal": 0
+  },
+  "prazoAjuste": 0,
+  "produtor": {
+    "bairro": "",
+    "canal": 0,
+    "celular": "",
+    "cep": "",
+    "codigo": "B9AAV3C5DB",
+    "complemento": "",
+    "contaBancaria": null,
+    "corretor": 0,
+    "dataInclusao": "27/11/2019",
+    "dataNascimento": null,
+    "dddCelular": "",
+    "dddTelefone": "27",
+    "email": "contel.sul@gmail.com",
+    "endereco": "",
+    "filial": {
+      "codigo": "BETRHPTL2K",
+      "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+    },
+    "grupoProdutor": {
+      "codigo": "3S48S6KL2Z",
+      "nome": "CONSULTOR"
+    },
+    "id": 42985,
+    "login": "",
+    "municipio": "",
+    "nome": "ALESSANDRO DE OLIVEIRA CRUZ",
+    "numero": "",
+    "numeroDocumento": "11400540747",
+    "produtor": {
+      "bairro": "CENTRO",
+      "canal": 1,
+      "celular": "",
+      "cep": "80010010",
+      "codigo": "S62MXENV8X",
+      "complemento": "806",
+      "contaBancaria": null,
+      "corretor": 0,
+      "dataInclusao": "18/11/2019",
+      "dataNascimento": null,
+      "dddCelular": "",
+      "dddTelefone": "41",
+      "email": "almir@classeadministradora.com.brx",
+      "endereco": "RUA MARECHAL DEODORO",
+      "filial": {
+        "codigo": "BETRHPTL2K",
+        "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+      },
+      "grupoProdutor": {
+        "codigo": "LN7ZPS3BEB",
+        "nome": "CORRETORA PJ CASA"
+      },
+      "id": 42231,
+      "login": "espaco",
+      "municipio": "CURITIBA",
+      "nome": "ESPAÇO CORRETOR LTDA",
+      "numero": "826",
+      "numeroDocumento": "16585286000154",
+      "produtor": null,
+      "senha": "Espaco1234",
+      "sexo": null,
+      "telefone": "38881000",
+      "uf": "PR"
+    },
+    "senha": "",
+    "sexo": null,
+    "telefone": "997829488",
+    "uf": ""
+  },
+  "saldoDevedor": 0,
+  "statusContrato": {
+    "id": 6,
+    "nome": "Produzido"
+  },
+  "supervisor": null,
+  "valor": 135.88
+}
+[2024-09-12T18:06:48.378Z] Response Completo: {
+  "ajuste": 0,
+  "anexoList": [],
+  "angariador": null,
+  "beneficiarioList": [
+    {
+      "altura": 0,
+      "bairro": "Sítio Cercado",
+      "carencia": null,
+      "celular": "27744053",
+      "cep": "81920060",
+      "cns": null,
+      "codigo": "8936TUNJA1",
+      "complemento": "",
+      "cpf": "94733422334",
+      "dataInicioOrigem": null,
+      "dataNascimento": "12/12/2000",
+      "dataPagamentoOrigem": null,
+      "dataVigencia": "26/02/2024",
+      "dddCelular": "66",
+      "dddTelefone": "66",
+      "declaracaoSaudeList": [],
+      "dnv": "string",
+      "email": "ti.sistemas.pxtecnologia@gmail.com",
+      "emailSecundario": null,
+      "endereco": "Rua Doutor José de Almeida Pimpão",
+      "estadoCivil": {
+        "id": 1,
+        "nome": "Casado"
+      },
+      "etiquetaList": [],
+      "id": 2326596,
+      "imc": 0,
+      "linkCarteiraProvisoria": "",
+      "marcaOptica": "",
+      "marcaOpticaOpcional": "",
+      "mensalidade": 0,
+      "municipio": "Curitiba",
+      "nome": "Fabiana Isabela Carolina Nogueira",
+      "nomeMae": "Sabrina Kamilly",
+      "nomeOperadoraOrigem": null,
+      "numero": "370",
+      "orgaoEmissor": "pr",
+      "parentesco": {
+        "id": 1,
+        "nome": "Titular"
+      },
+      "peso": 0,
+      "pis": "string",
+      "rg": "277148182",
+      "sexo": {
+        "id": 1,
+        "nome": "Masculino"
+      },
+      "statusBeneficiario": {
+        "id": 7,
+        "nome": "Produzido"
+      },
+      "telefone": "27744053",
+      "tipoBeneficiario": {
+        "id": 1,
+        "nome": "Titular"
+      },
+      "uf": "PR"
+    }
+  ],
+  "codigo": "MA1ES77DEN",
+  "convenio": {
+    "codigo": "LRYT12JW8T",
+    "diaVigencia": 10,
+    "estipulante": {
+      "codigo": "XY86KUJ42E",
+      "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=EL15735892678564YH5N43P69.jpg&tamanho=200&opcao=pad",
+      "nome": "MOUNT HERMON ADMINISTRADORA DE BENEFÍCIOS LTDA",
+      "numeroAns": "421677"
+    },
+    "filialList": [
+      {
+        "codigo": "BETRHPTL2K",
+        "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+      }
+    ],
+    "nome": "Dental Uni",
+    "produto": {
+      "anexoList": [],
+      "codigo": "KS6KL1THKL",
+      "linkManualUsuario": "https://play.google.com/store/apps/details?id=com.dentaluni.app&pcampaignid=web_share",
+      "linkRedeCredenciada": "https://www.planosdentaluni.com.br/",
+      "nome": "Coletivo por Adesão - DENTAL UNI",
+      "opcionalList": [],
+      "operadora": {
+        "id": 77,
+        "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=OL14885545849577H4CA1L54N.jpg&tamanho=200&opcao=pad",
+        "nome": "Dental Uni",
+        "numeroAns": "304484",
+        "site": null
+      }
+    },
+    "tipoTaxaCadastroApi": {
+      "id": 1,
+      "nome": "Valor por Contrato"
+    },
+    "valorTaxaCadastro": 0
+  },
+  "corretora": {
+    "bairro": "CENTRO",
+    "canal": 1,
+    "celular": "",
+    "cep": "80010010",
+    "codigo": "S62MXENV8X",
+    "complemento": "806",
+    "contaBancaria": null,
+    "corretor": 0,
+    "dataInclusao": "18/11/2019",
+    "dataNascimento": null,
+    "dddCelular": "",
+    "dddTelefone": "41",
+    "email": "almir@classeadministradora.com.brx",
+    "endereco": "RUA MARECHAL DEODORO",
+    "filial": {
+      "codigo": "BETRHPTL2K",
+      "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+    },
+    "grupoProdutor": {
+      "codigo": "LN7ZPS3BEB",
+      "nome": "CORRETORA PJ CASA"
+    },
+    "id": 42231,
+    "login": "espaco",
+    "municipio": "CURITIBA",
+    "nome": "ESPAÇO CORRETOR LTDA",
+    "numero": "826",
+    "numeroDocumento": "16585286000154",
+    "produtor": null,
+    "senha": "Espaco1234",
+    "sexo": null,
+    "telefone": "38881000",
+    "uf": "PR"
+  },
+  "cpfResponsavel": "94733422334",
+  "dataAssinatura": "01/01/2024",
+  "dataInclusao": "12/09/2024",
+  "diaVencimento": 1,
+  "entidade": null,
+  "filial": {
+    "codigo": "BETRHPTL2K",
+    "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+  },
+  "formaAjuste": null,
+  "gerente": null,
+  "grupo": {
+    "codigo": "12H7KBBDTC",
+    "nome": "ABRAER Boleto 3x "
+  },
+  "id": 1835691,
+  "matricula": null,
+  "nomeResponsavel": "Fabiana Isabela Carolina Nogueira",
+  "nomeTitular": "Fabiana Isabela Carolina Nogueira",
+  "numeroProposta": "202409127002",
+  "observacao": "O TITULAR É O MESMO TITULAR FINANCEIRO \n\n        Forma de Pagamento selecionada: [object Object] \n\n        Entidade Vinculada: ABRAER \n\n        Profissão Titular do Plano: Estudante \n\n        ",
+  "opcionalList": [],
+  "pendenciaList": [],
+  "plano": {
+    "abrangencia": {
+      "id": 3,
+      "nome": "Nacional"
+    },
+    "acomodacaoApi": {
+      "id": 4,
+      "nome": "Odontológico"
+    },
+    "codigo": "KUS41MB4WJ",
+    "nome": "PLANO AMPLO",
+    "produto": {
+      "anexoList": [],
+      "codigo": "KS6KL1THKL",
+      "linkManualUsuario": "https://play.google.com/store/apps/details?id=com.dentaluni.app&pcampaignid=web_share",
+      "linkRedeCredenciada": "https://www.planosdentaluni.com.br/",
+      "nome": "Coletivo por Adesão - DENTAL UNI",
+      "opcionalList": [],
+      "operadora": {
+        "id": 77,
+        "linkLogo": "https://www.digitalsaude.com.br/imagem?arquivo=OL14885545849577H4CA1L54N.jpg&tamanho=200&opcao=pad",
+        "nome": "Dental Uni",
+        "numeroAns": "304484",
+        "site": null
+      }
+    },
+    "registroAns": "464766111",
+    "statusPlanoApi": {
+      "id": 1,
+      "nome": "Aberto"
+    },
+    "valorTotal": 0
+  },
+  "prazoAjuste": 0,
+  "produtor": {
+    "bairro": "",
+    "canal": 0,
+    "celular": "",
+    "cep": "",
+    "codigo": "B9AAV3C5DB",
+    "complemento": "",
+    "contaBancaria": null,
+    "corretor": 0,
+    "dataInclusao": "27/11/2019",
+    "dataNascimento": null,
+    "dddCelular": "",
+    "dddTelefone": "27",
+    "email": "contel.sul@gmail.com",
+    "endereco": "",
+    "filial": {
+      "codigo": "BETRHPTL2K",
+      "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+    },
+    "grupoProdutor": {
+      "codigo": "3S48S6KL2Z",
+      "nome": "CONSULTOR"
+    },
+    "id": 42985,
+    "login": "",
+    "municipio": "",
+    "nome": "ALESSANDRO DE OLIVEIRA CRUZ",
+    "numero": "",
+    "numeroDocumento": "11400540747",
+    "produtor": {
+      "bairro": "CENTRO",
+      "canal": 1,
+      "celular": "",
+      "cep": "80010010",
+      "codigo": "S62MXENV8X",
+      "complemento": "806",
+      "contaBancaria": null,
+      "corretor": 0,
+      "dataInclusao": "18/11/2019",
+      "dataNascimento": null,
+      "dddCelular": "",
+      "dddTelefone": "41",
+      "email": "almir@classeadministradora.com.brx",
+      "endereco": "RUA MARECHAL DEODORO",
+      "filial": {
+        "codigo": "BETRHPTL2K",
+        "nome": "Matriz - Mount Hermon Administradora de Benefícios LTDA"
+      },
+      "grupoProdutor": {
+        "codigo": "LN7ZPS3BEB",
+        "nome": "CORRETORA PJ CASA"
+      },
+      "id": 42231,
+      "login": "espaco",
+      "municipio": "CURITIBA",
+      "nome": "ESPAÇO CORRETOR LTDA",
+      "numero": "826",
+      "numeroDocumento": "16585286000154",
+      "produtor": null,
+      "senha": "Espaco1234",
+      "sexo": null,
+      "telefone": "38881000",
+      "uf": "PR"
+    },
+    "senha": "",
+    "sexo": null,
+    "telefone": "997829488",
+    "uf": ""
+  },
+  "saldoDevedor": 0,
+  "statusContrato": {
+    "id": 6,
+    "nome": "Produzido"
+  },
+  "supervisor": null,
+  "valor": 135.88
+}

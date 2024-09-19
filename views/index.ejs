@@ -73,8 +73,8 @@
                         return menorParcela.toFixed(2);
                     }
         
-                    // Ordene os planos do mais barato para o mais caro
-                    planos.sort((a, b) => calcularValorMensal(a) - calcularValorMensal(b));
+                    // Ordene os planos pela propriedade 'ordem'
+                    planos.sort((a, b) => a.ordem - b.ordem);
         
                     // Renderize os planos na ordem desejada
                     planos.forEach(plano => {
@@ -91,7 +91,7 @@
                                 <ul class="planoDescricao">
                                     ${plano.descricao.split('\n').map(linha => `<li>${linha}</li>`).join('')}
                                 </ul>
-
+        
                                 <p class="ANSbox">
                                     ANS - nº <span class="planoANS">${plano.ans}</span>
                                 </p>
@@ -114,6 +114,7 @@
                 </script>
             </div>
         </section>
+        
         
         
 

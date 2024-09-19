@@ -1,0 +1,2 @@
+[2024-09-11T21:38:00.426Z] Erro ao enviar proposta: Request failed with status code 422
+[2024-09-11T21:38:01.151Z] Erro desconhecido ao enviar a proposta.: ["[ diaVencimento ]:  Can not convert java.lang.String into java.lang.Integer"]

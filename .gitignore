@@ -1,4 +1,6 @@
 database.js
+ssh.js
+.env
 node_modules/
 formulario/
 arquivospdf/

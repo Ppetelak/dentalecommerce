@@ -34,6 +34,7 @@
         <div class="card-header">
           <h5 class="card-title">Informações do Titular e Implantação</h5>
         </div>
+        <!-- <button id="editButton" class="btn btn-primary mb-3">Editar</button> -->
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
@@ -61,8 +62,8 @@
               <p><strong>Celular Titular:</strong>
                 <%= implantacao.telefonetitular %>
               </p>
-              <p><strong>Profissisão Titular:</strong>
-                <%= implantacao.profissaotitular %>
+              <p><strong>Profissisão Titular/Entidade:</strong>
+                <%= implantacao.profissaotitular %> / <%= implantacao.nomeEntidade %>
               </p>
               <p><strong>Titular é o responsável financeiro?:</strong>
                 <%= implantacao.titularresponsavelfinanceiro %>
@@ -73,16 +74,16 @@
                 <%= implantacao.numeroProposta %>
               </p>
               <p><strong>FORMA DE PAGAMENTO SELECIONADA:</strong>
-                <%= implantacao.formaPagamento %>
+                <%= formaPagamento.descricao %>
               </p>
               <p><strong>Nome Titular:</strong>
-                <%= implantacao.nomecompleto %>
+                <span class="editable" data-key="nomecompleto"><%= implantacao.nomecompleto %></span>
               </p>
               <p><strong>Data de Nascimento Titular:</strong>
                 <%= moment(implantacao.datadenascimento).format('DD/MM/YYYY') %>
               </p>
               <p><strong>Nome Mãe Titular:</strong>
-                <%= implantacao.nomemaetitular %>
+                <span class="editable" data-key="nomemaetitular"><%= implantacao.nomemaetitular %></span>
               </p>
               <p><strong>Sexo Titular:</strong>
                 <%= implantacao.sexotitular %>
@@ -281,6 +282,7 @@
           <div class="row acoes">
             <a href="/assinar/<%= implantacao.id %>/<%= implantacao.numeroProposta %>/<%= implantacao.cpffinanceiro %>/<%= implantacao.identidade %>" target="_blank"><button class="btn btn-success">Ver contrato</button></a>
             <a><button class="btn btn-success" id="reenviarEmail" data-id="<%= implantacao.id %>">Reenviar email</button></a>
+            <a><button class="btn btn-success" id="reenviarProposta" data-id="<%= implantacao.id %>">Reenviar Contrato ao DS</button></a>
           </div>
         </div>
       </div>

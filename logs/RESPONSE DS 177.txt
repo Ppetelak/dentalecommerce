@@ -1,0 +1,27 @@
+[2024-09-16T23:26:08.734Z] Response Completo: [
+  "O beneficiário Pablo Teste Uploads de arquivos 3 de CPF nº 72396567640 já esta cadastrado no sistema como Produzido na proposta de nº 202409163247 com o nome de Pablo Teste Uploads de arquivos 3. Atenção: Não use o CPF do titular para cadastrar o dependente."
+]
+[2024-09-17T13:32:49.034Z] Response Completo: [
+  "Grupo de Código KUS41MB4WJ não foi encontrado."
+]
+[2024-09-17T17:45:41.941Z] Response Completo: [
+  "Grupo de Código KUS41MB4WJ não foi encontrado."
+]
+[2024-09-17T17:46:36.767Z] Response Completo: [
+  "Grupo de Código KUS41MB4WJ não foi encontrado."
+]
+[2024-09-17T18:09:52.264Z] Response Completo: [
+  "Grupo de Código KUS41MB4WJ não foi encontrado."
+]
+[2024-09-17T19:44:42.874Z] Response Completo: [
+  "Grupo de Código KUS41MB4WJ não foi encontrado."
+]
+[2024-09-17T19:45:56.387Z] Response Completo: [
+  "Grupo de Código A37CYHBA3M não é referente ao convênio informado."
+]
+[2024-09-17T21:14:38.203Z] Response Completo: [
+  "Plano de Código KS6KL1THKL não foi encontrado."
+]
+[2024-09-18T11:59:45.332Z] Response Completo: [
+  "Plano de Código KS6KL1THKL não foi encontrado."
+]
