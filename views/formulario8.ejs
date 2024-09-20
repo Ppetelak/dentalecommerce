@@ -43,7 +43,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch('/api/vencimentos')
                     .then(response => response.json())
                     .then(vencimentos => {
-                        const now = new Date();
+                        const simulatedDate = new Date(2024, 10, 4, 16);
+                        const now = simulatedDate;
+                        //const now = new Date();
                         const currentDay = now.getDate();
                         const currentHour = now.getHours();
 
@@ -62,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (isWeekend(vencimento.pagamento2 - 1, now.getMonth())) {
                                 return false;
                             }
-                            if (currentDay > vencimento.pagamento2) {
+                            if (currentDay >= vencimento.pagamento2) {
                                 return false;
                             }
                             if (currentDay >= vencimento.pagamento1 && currentDay <= vencimento.pagamento2) {
@@ -79,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         dataVencimentoContainer.innerHTML = `
                             <div id="dataVencimentoEscolha" class="mb-3">
                                 <label class="form-label">Escolha os melhores dias para o primeiro pagamento</label>
-                                <select class="form-select">
+                                <select class="form-select" name="dataVencimento">
                                     ${optionsHTML}
                                 </select>
                             </div>

@@ -381,7 +381,7 @@ async function gerarSalvarPDFProposta(
                   <span style="background: white; color: black; padding: 10px; border-radius: 5px;">${numeroProposta}</span>
                 </div>
                 <div style="width: 50%; padding: 10px; display: flex; flex-direction: column;">
-                  Data Vigência <br>
+                  Data Criação <br>
                   <span style="background: white; color: black; padding: 10px; border-radius: 5px;">${dataVigencia}</span>
                 </div>
               </div>
@@ -1101,8 +1101,7 @@ app.post("/testeFormulario", async (req, res) => {
     var dadosFormaPagamento = await pegarDadosFormaDePagamento(dados.formaPagamento);
     var nomeFormaPagamento = dadosFormaPagamento.parametrizacao
     var numerosContato = await separarDDDNumero (telefonetitularfinanceiro, celulartitularfinanceiro)
-    let dataVigencia = await pegarDataVigencia(dados.dataVencimento);
-
+    let dataVigencia = await pegarDataVigencia(dados.dataVencimento || new Date().getDate());
 
     const numeroProposta = await generateUniqueProposalNumber();
     const dadosImplantacao = [
@@ -2859,7 +2858,7 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
   try {
     const [dados] = await db.query(queryImplantacao, [idImplantacao]);
     const dependentes = await db.query(queryDependentes, [idImplantacao]);
-    const dataVigencia = await pegarDataVigencia(dados.dataVencimento);
+    let dataVigencia = await pegarDataVigencia(dados.dataVencimento || new Date().getDate());
 
     if (!dados) {
       return res.status(404).json({ error: 'Implantação não encontrada.' });
