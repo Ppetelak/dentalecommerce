@@ -388,32 +388,23 @@
                 <div class="col-12">
                     <h6> FORMA DE PAGAMENTO </h6>
                     <div class="row">
-                        
-                        <% if(implantacao.formaPagamento === 1) { %>
-                            <div class="col-4">
-                                <p> Forma de Pagamento: <span> Pago á vista via boleto, PIX ou cartão de crédito. </span> </p>
-                            </div>
-                            <div class="col-4">
-                                <p>Valor total: <span> R$ <%= plano.pgtoAnualAvista %> </span></p>
-                            </div>
-                        <%  } else if (implantacao.formaPagamento === 2) { %>
-                            <div class="col-4">
-                                <p> Forma de Pagamento <span> Pago em 12x de R$ <%= (plano.pgtoAnualCartao / 12).toFixed(2) %> no cartão de crédito. </span> </p>
-                            </div>
-                            <div class="col-4">
-                                <p>Valor total: <span> R$ <%= plano.pgtoAnualCartao %> </span></p>
-                            </div>
-                        <%  } else { %>
-                            <div class="col-4">
-                                <p> Forma de Pagamento <span> Pago em 3x de R$ <%= (plano.pgtoAnualCartao3x / 3).toFixed(2) %> no cartão de crédito. </span> </p>
-                            </div>
-                            <div class="col-4">
-                                <p>Valor total: <span> R$ <%= plano.pgtoAnualCartao3x %> </span></p>
-                            </div>
-                        <% } %>  
-                            <div class="col-4">                            
-                                <p> Mês de reajuste: <span> <%= plano.reajuste %> </span></p>
-                            </div>
+                        <div class="col-4">
+                            <p> Forma de Pagamento: 
+                                <span>
+                                    <%= formaPagamento.descricao %>
+                                </span> 
+                            </p>
+                        </div>
+                        <div class="col-4"></div>
+                            <p> Valor total: 
+                                <span>
+                                    R$ <%= formaPagamento.valor_total_pgto.toFixed(2) %>
+                                </span> 
+                            </p>
+                        </div>
+                        <div class="col-4">                            
+                            <p> Mês de reajuste: <span> <%= plano.reajuste %> </span></p>
+                        </div>
                     </div>
                 </div>
             </div>

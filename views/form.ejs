@@ -101,6 +101,18 @@
                 value="<%= planoSelecionado.idoperadora %>"
                 name="idOperadora"
               />
+              <input
+                type="hidden"
+                id="operadora"
+                name="operadora"
+                value="<%= operadora %>"
+              />
+              <input 
+                type="hidden"
+                id="nomePlano"
+                name="nomePlano"
+                value="<%= planoSelecionado.nome_do_plano %>"
+              />
               <div class="col-12">
                 <% if (planoSelecionado) { %>
                 <div class="row">

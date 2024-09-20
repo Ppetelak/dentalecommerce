@@ -158,7 +158,6 @@ async function pegarDataVigencia(vencimento) {
 
 
 async function enviarAnexosParaDSContrato(numeroProposta) {
-  console.log("entrou na função de enviar os anexos");
   const db = await mysql.createPool(config);
   const query = "SELECT * FROM anexos_implantacoes WHERE id_implantacao = ?";
   const token = "X43ADVSEXM";
@@ -212,7 +211,6 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
         linkAnexo: anexo.caminho_arquivo,
       };
       enviarMensagemDiscord(`Enviado um anexo de link: ${data.linkAnexo} para a proposta de número: ${numeroProposta}`, 'erro')
-      console.log("Enviando anexo:", data);
 
       try {
         const response = await axios.post(apiUrl, data, configDS);
@@ -224,7 +222,6 @@ async function enviarAnexosParaDSContrato(numeroProposta) {
             `Anexo de nome "${data.nomeArquivo}" anexado ao contrato com sucesso`
           );
           enviarMensagemDiscord(`MENSAGEM: Anexo enviado com sucesso ${response.data}`, 'erro')
-          console.log("Anexo enviado com sucesso:", response.data);
           logger.info("SUCESS: Anexo enviado com sucesso");
         } else {
           await sendStatus(
@@ -405,7 +402,6 @@ async function gerarSalvarPDFProposta(
         </footer>
       `;
 
-      console.log("Generating PDF");
       const pdf = await page.pdf({
         format: "A4",
         displayHeaderFooter: true,
@@ -633,7 +629,6 @@ async function salvarAnexos(idImplantacao, anexos) {
   // Esperar que todas as inserções sejam concluídas antes de retornar
   try {
     await Promise.all(promises);
-    console.log("Todos os anexos foram inseridos com sucesso.");
   } catch (error) {
     console.error("Erro ao inserir anexos:", error);
     throw error; // Lançar o erro novamente para tratamento externo, se necessário
@@ -699,7 +694,6 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
 
   //const data = JSON.stringify(jsonModeloDS);
   const data = jsonModeloDS;
-  console.log(JSON.stringify(data));
 
   const configDS = {
     headers: {
@@ -714,7 +708,6 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
   try {
     const response = await axios.post(apiUrl, data, configDS);
     const codigoImplantacaoDS = response.data.codigo;
-    console.log(codigoImplantacaoDS)
     enviarMensagemDiscord(`Response do DS para chamada de API para envio da Proposta RESPOSTA ${response.data}`, 'erro')
     logToFile(`RESPONSE DS ${idImplantacao}`, `Response Completo: ${JSON.stringify(response.data, null, 2)}`);
     sendCodigoPropostaIdProposta(codigoImplantacaoDS, idImplantacao);
@@ -843,9 +836,7 @@ async function enviarMensagemDiscord(mensagem, tipo) {
   if (tipo === "erro"){
     let canalId = '1277658591041556553';
     try {
-      console.log(`Mensagem para discord: ${mensagem}`);
       await axios.post('https://bot.midiaideal.com/mensagem-ecommerce', { mensagem, canalId });
-      console.log('Mensagem enviada com sucesso');
     } catch (error) {
       console.error("Erro ao enviar mensagem erro:", error);
     }
@@ -853,9 +844,7 @@ async function enviarMensagemDiscord(mensagem, tipo) {
   if (tipo === "financeiro-cartao"){
     let canalId = '1277658424020303966';
     try {
-      console.log(`Mensagem para discord: ${mensagem}`);
       await axios.post('https://bot.midiaideal.com/mensagem-ecommerce', { mensagem , canalId});
-      console.log('Mensagem enviada com sucesso');
     } catch (error) {
       console.error("Erro ao enviar mensagem erro:", error);
     }
@@ -863,9 +852,7 @@ async function enviarMensagemDiscord(mensagem, tipo) {
   if (tipo === "financeiro-boleto"){
     let canalId = '1285973619234705481';
     try {
-      console.log(`Mensagem para discord: ${mensagem}`);
       await axios.post('https://bot.midiaideal.com/mensagem-ecommerce', { mensagem , canalId});
-      console.log('Mensagem enviada com sucesso');
     } catch (error) {
       console.error("Erro ao enviar mensagem erro:", error);
     }
@@ -873,9 +860,7 @@ async function enviarMensagemDiscord(mensagem, tipo) {
   if(tipo === "implantacao") {
     let canalId = '1277658485647085590';
     try {
-      console.log(`Mensagem para discord: ${mensagem}`);
       await axios.post('https://bot.midiaideal.com/mensagem-ecommerce', { mensagem , canalId});
-      console.log('Mensagem enviada com sucesso');
     } catch (error) {
       console.error("Erro ao enviar mensagem erro:", error);
     }
@@ -884,11 +869,6 @@ async function enviarMensagemDiscord(mensagem, tipo) {
 
 async function pegarCodigoDSGrupo(idFormaPagamento, idEntidade, idOperadora) {
   const db = await mysql.createPool(config);
-  console.log({
-    idFormaPagamento: idFormaPagamento,
-    idEntidade: idEntidade,
-    idOperadora: idOperadora
-  })
 
   try {
     const resultFormaPagamento = await db.query(
@@ -902,19 +882,12 @@ async function pegarCodigoDSGrupo(idFormaPagamento, idEntidade, idOperadora) {
 
     const formaDePagamento = resultFormaPagamento[0].parametrizacao;
 
-    console.log(formaDePagamento)
-
     const resultCodigo = await db.query(
       `SELECT codigo_ds FROM entidades_parametros WHERE id_entidade = ? AND forma_pagamento = ? AND operadora = ?`,
       [idEntidade, formaDePagamento, idOperadora]
     );
 
     let codigoDsEntidade = resultCodigo.codigo_ds || null;
-
-    console.log({
-      resultCodigo: resultCodigo,
-      idOperadora: idOperadora
-    });
 
     if (codigoDsEntidade === null && idOperadora === '1'){
         return "9M3VXV1VH7";
@@ -949,19 +922,16 @@ app.post("/upload", upload.array("file"), (req, res) => {
     modifiedName: file.filename,
     filepath: path.join(appUrl, "uploads", file.filename),
   }));
-  console.log({ filepaths });
   res.json({ filepaths });
 });
 
 app.get("/rotaTeste", (req, res) => {
-  console.log('Rota puxou certo')
   res.send('Está on e puxando a rota')
 })
 
 /* ROTA PARA REMOVER ARQUIVOS QUE FORAM FEITOS UPLOAD PELO FORMULÁRIO */
 app.post("/remove", (req, res) => {
   const { removefile } = req.body;
-  console.log("chamou a rota de remover");
   const filepath = path.join("uploads", removefile);
 
   fs.unlink(filepath, (err) => {
@@ -1056,6 +1026,7 @@ app.post("/formulario", async (req, res) => {
   const db = await mysql.createPool(config);
   const planoId = req.body.planoSelecionado;
   const query = "SELECT * FROM planos WHERE id = ?";
+
   const queryProfissoes = "SELECT * FROM profissoes";
   const queryFormasPagamento = "SELECT * FROM formas_pagamento WHERE id_plano = ?";
   db.query(query, [planoId], (err, result) => {
@@ -1077,279 +1048,23 @@ app.post("/formulario", async (req, res) => {
             console.error("Erro ao resgatar formas de pagamento do BD");
           }
           const planoSelecionado = result[0];
+          let operadora = '';
+          if (result.idoperadora === 1) {
+            operadora = 'Dental Uni'
+          } else {
+            operadora = 'Odontogroup'
+          }
           res.render("form", {
             planoSelecionado: planoSelecionado,
             profissoes: resultProfissoes,
             pagamentos: resultPagamentos,
+            operadora: operadora
           });
         })        
       })
     }
   });
 });
-
-/* app.post("/testeFormularioDS", async (req, res) => {
-  const dados = req.body.inputs;
-  const dependentes = req.body.dependentes;
-  const anexos = req.body.anexos;
-  const numeroProposta = await generateUniqueProposalNumber();
-  const dadosImplantacao = {
-    planoSelecionado: dados.planoSelecionado,
-    nomecompleto: dados.nomecompleto,
-    datadenascimento: dados.datadenascimento,
-    cpftitular: dados.cpftitular,
-    nomemaetitular: dados.nomemaetitular,
-    rgtitular: dados.rgtitular,
-    orgaoexpedidor: dados.orgaoexpedidor,
-    dataexpedicaorgtitular: dados.dataexpedicaorgtitular,
-    sexotitular: dados.sexotitular,
-    estadociviltitular: dados.estadociviltitular,
-    telefonetitular: dados.telefonetitular,
-    celulartitular: dados.celulartitular,
-    emailtitular: dados.emailtitular,
-    profissaotitular: dados.profissaotitular,
-    titularresponsavelfinanceiro: dados.titularresponsavelfinanceiro,
-    cpffinanceiro: dados.cpffinanceiro || dados.cpftitular,
-    nomefinanceiro: dados.nomefinanceiro || dados.nomecompleto,
-    datadenascimentofinanceiro:
-      dados.datadenascimentofinanceiro || dados.datadenascimento,
-    telefonetitularfinanceiro:
-      dados.telefonetitularfinanceiro || dados.telefonetitular,
-    emailtitularfinanceiro: dados.emailtitularfinanceiro || dados.emailtitular,
-    cep: dados.cep,
-    enderecoresidencial: dados.enderecoresidencial,
-    numeroendereco: dados.numeroendereco,
-    complementoendereco: dados.complementoendereco,
-    bairro: dados.bairro,
-    cidade: dados.cidade,
-    cpfcorretor: dados.cpfcorretor,
-    nomecorretor: dados.nomecorretor,
-    corretora: dados.corretora,
-    celularcorretor: dados.celularcorretor,
-    formaPagamento: dados.formaPagamento,
-    aceitoTermos: dados.aceitoTermos,
-    aceitoPrestacaoServicos: dados.aceitoPrestacaoServicos,
-    numeroProposta: numeroProposta,
-    planoSelecionado: dados.planoSelecionado,
-  };
-
-  console.log(dadosImplantacao);
-
-  const jsonModeloDS = {
-    numeroProposta: `${numeroProposta}`,
-    dataAssinatura: "26/02/2024",
-    diaVencimento: 1,
-    cpfResponsavel: dados.cpffinanceiro
-      ? dados.cpffinanceiro
-      : dados.cpftitular,
-    nomeResponsavel: dados.nomefinanceiro
-      ? dados.nomefinanceiro
-      : dados.nomecompleto,
-    observacao: `teste`,
-    plano: {
-      codigo: "VMR5GRUEPJ",
-    },
-    convenio: {
-      codigo: "LRYT12JW8T",
-    },
-    produtor: {
-      codigo: "E17NJPUZM2",
-    },
-    corretora: {
-      codigo: "S62MXENV8X",
-    },
-    grupo: {
-      codigo: "V2CAVAD6U2",
-    },
-    filial: {
-      codigo: "BETRHPTL2K",
-    },
-    beneficiarioList: [
-      {
-        nome: dados.nomecompleto,
-        dataNascimento: formatarDataDs(dados.datadenascimento),
-        rg: dados.rgtitular,
-        orgaoEmissor: dados.orgaoexpedidor,
-        cpf: dados.cpftitular,
-        dnv: "string",
-        pis: "string",
-        nomeMae: dados.nomemaetitular,
-        endereco: dados.enderecoresidencial,
-        numero: dados.numeroendereco,
-        complemento: dados.complementoendereco,
-        bairro: dados.bairro,
-        municipio: dados.cidade,
-        uf: dados.estado,
-        cep: dados.cep,
-        dddTelefone: "41",
-        telefone: "992414553",
-        dddCelular: "41",
-        celular: "999665588",
-        email: dados.emailtitular,
-        altura: 0,
-        peso: 0,
-        imc: 0,
-        dataVigencia: "26/02/2024",
-        mensalidade: 0,
-        estadoCivil: {
-          id:
-            dados.estadociviltitular === "Casado"
-              ? 1
-              : dados.estadociviltitular === "Divorciado"
-              ? 2
-              : dados.estadociviltitular === "Separado"
-              ? 3
-              : dados.estadociviltitular === "Solteiro"
-              ? 4
-              : dados.estadociviltitular === "Viúvo"
-              ? 5
-              : "",
-          nome: dados.estadociviltitular,
-        },
-        tipoBeneficiario: {
-          id: 1,
-          nome: "Titular",
-        },
-        sexo: {
-          id: dados.sexotitular === "Masculino" ? 1 : 2,
-          nome: dados.sexotitular,
-        },
-        parentesco: {
-          id: 1,
-          nome: "Titular",
-        },
-        statusBeneficiario: {
-          id: 2,
-          nome: "Ativo",
-        },
-      },
-    ],
-  };
-
-  adicionarDependentes();
-
-  async function adicionarDependentes() {
-    dependentes.forEach((dependente) => {
-      //insertData(qInsDependentes, [resultImplantacao.insertId, dependente]);
-      const dependenteObj = {
-        nome: dependente.nomecompletodependente,
-        dataNascimento: formatarDataDs(dependente.nascimentodependente),
-        rg: "null",
-        orgaoEmissor: "null",
-        cpf: dependente.cpfdependente,
-        dnv: "string",
-        pis: "string",
-        nomeMae: dependente.nomemaedependente,
-        endereco: dados.enderecoresidencial,
-        numero: dados.numeroendereco,
-        complemento: dados.complementoendereco,
-        bairro: dados.bairro,
-        municipio: dados.cidade,
-        uf: dados.estado,
-        cep: dados.cep,
-        dddTelefone: "41",
-        telefone: "999998888",
-        dddCelular: "41",
-        celular: "999998888",
-        email: "dependente@dependente.com.br",
-        altura: 0,
-        peso: 0,
-        imc: 0,
-        dataVigencia: "26/02/2024",
-        mensalidade: 0,
-        estadoCivil: {
-          id:
-            dependente.estadocivildependente === "Casado"
-              ? 1
-              : dependente.estadocivildependente === "Divorciado"
-              ? 2
-              : dependente.estadocivildependente === "Separado"
-              ? 3
-              : dependente.estadocivildependente === "Solteiro"
-              ? 4
-              : dependente.estadocivildependente === "Viúvo"
-              ? 5
-              : "",
-          nome: dependente.estadocivildependente,
-        },
-        tipoBeneficiario: {
-          id: 2,
-          nome: "Dependente",
-        },
-        sexo: {
-          id: dependente.sexodependente === "Masculino" ? 1 : 2,
-          nome: dependente.sexodependente,
-        },
-        parentesco: {
-          id:
-            dependente.grauparentescodependente === "Agregado"
-              ? 2
-              : dependente.grauparentescodependente === "Companheiro"
-              ? 3
-              : dependente.grauparentescodependente === "Cônjuge"
-              ? 4
-              : dependente.grauparentescodependente === "Filho(a)"
-              ? 5
-              : dependente.grauparentescodependente === "Filho Adotivo"
-              ? 6
-              : dependente.grauparentescodependente === "Irmão(a)"
-              ? 7
-              : dependente.grauparentescodependente === "Mãe"
-              ? 8
-              : dependente.grauparentescodependente === "Pai"
-              ? 9
-              : dependente.grauparentescodependente === "Neto(a)"
-              ? 10
-              : dependente.grauparentescodependente === "Sobrinho(a)"
-              ? 11
-              : dependente.grauparentescodependente === "Sogro"
-              ? 12
-              : dependente.grauparentescodependente === "Enteado"
-              ? 13
-              : dependente.grauparentescodependente === "Tutelado"
-              ? 14
-              : dependente.grauparentescodependente === "Sogra"
-              ? 15
-              : dependente.grauparentescodependente === "Genro"
-              ? 16
-              : dependente.grauparentescodependente === "Nora"
-              ? 17
-              : dependente.grauparentescodependente === "Cunhado(a)"
-              ? 18
-              : dependente.grauparentescodependente === "Primo(a)"
-              ? 19
-              : dependente.grauparentescodependente === "Avô"
-              ? 20
-              : dependente.grauparentescodependente === "Avó"
-              ? 21
-              : dependente.grauparentescodependente === "Tio"
-              ? 22
-              : dependente.grauparentescodependente === "Tia"
-              ? 23
-              : dependente.grauparentescodependente === "Bisneto"
-              ? 24
-              : dependente.grauparentescodependente === "Madrasta"
-              ? 25
-              : 26,
-          nome: dependente.grauparentescodependente,
-        },
-        statusBeneficiario: {
-          id: 2,
-          nome: "Ativo",
-        },
-      };
-      jsonModeloDS.beneficiarioList.push(dependenteObj);
-    });
-  }
-
-  await enviarPropostaDigitalSaude(jsonModeloDS);
-
-  console.log(jsonModeloDS);
-
-  console.log("Foi");
-  res.send("Sucesso na rota, se páh na implantação também");
-}); */
-
 
 app.post("/testeFormulario", async (req, res) => {
   const db = await mysql.createPool(config);
@@ -1387,6 +1102,7 @@ app.post("/testeFormulario", async (req, res) => {
     var nomeFormaPagamento = dadosFormaPagamento.parametrizacao
     var numerosContato = await separarDDDNumero (telefonetitularfinanceiro, celulartitularfinanceiro)
     let dataVigencia = await pegarDataVigencia(dados.dataVencimento);
+
 
     const numeroProposta = await generateUniqueProposalNumber();
     const dadosImplantacao = [
@@ -1436,7 +1152,9 @@ app.post("/testeFormulario", async (req, res) => {
       dados.numeroConvenio,
       dados.idCorretor,
       dados.codigoCorretora,
-
+      dados.idOperadora,
+      dados.operadora,
+      dados.nomePlano
     ];
 
     console.log({
@@ -1446,6 +1164,7 @@ app.post("/testeFormulario", async (req, res) => {
       nomeEntidade: nomeEntidade,
       nomeFormaPagamento: nomeFormaPagamento,
       numeroProposta: numeroProposta,
+      dadosFormadePagamento: dadosFormaPagamento
     })
 
     async function obsDigitalSaude() {
@@ -1567,7 +1286,6 @@ app.post("/testeFormulario", async (req, res) => {
       ],
     };
     /* INSERÇÃO DE DADOS AO BANCO DE DADOS DAS INFORMAÇÕES SOBRE A IMPLANTAÇÃO */
-    console.log(dadosImplantacao);
 
     await db
       .query(qInsImplantacao, dadosImplantacao)
@@ -1717,8 +1435,14 @@ app.post("/testeFormulario", async (req, res) => {
           await enviarMensagemDiscord(
             `
             NOVA PROPOSTA RECEBIDA DE Nº: ${numeroProposta}
-            TItular: ${dados.nomecompleto},
+            Titular: ${dados.nomecompleto},
             Titular Financeiro: ${dados.titularresponsavelfinanceiro}
+            Operadora: ${dados.operadora}
+            Plano: ${dados.nomePlano}
+            Entidade: ${nomeEntidade}
+            Valor total proposta: Valor total: ${(dadosFormaPagamento.valor_total_pgto) * (Number(dados.nDependentes))}
+            Número de dependentes: ${dados.nDependentes}
+
             `,
             'implantacao'
           )
@@ -1740,7 +1464,11 @@ app.post("/testeFormulario", async (req, res) => {
             CPF: ${cpffinanceiro}
             Endereço: ${dados.enderecoresidencial}, Nº ${dados.numeroendereco}, Bairro: ${dados.bairro}, Cidade: ${dados.cidade}, Estado: ${dados.estado}, CEP: ${dados.cep}
             --- Forma de Pagamento ---
-            ${nomeFormaPagamento}
+            Forma de Pagamento Digital Saúde:${dadosFormaPagamento.parametrizacao}
+            Descrição: ${dadosFormaPagamento.descricao}
+            Valor Parcela Mínima: ${(dadosFormaPagamento.valor_parcela_minima) * (Number(dados.nDependentes))}
+            Valor total: ${(dadosFormaPagamento.valor_total_pgto) * (Number(dados.nDependentes))}
+
 
             `,
             tipoFinanceiro
@@ -1933,8 +1661,6 @@ app.get("/buscar-corretor", async (req, res) => {
       idCorretor: codigoCorretor,
     };
 
-    console.log(responseData);
-
     res.json(responseData);
   } catch (err) {
     console.error("Erro ao consultar a API:", err);
@@ -1990,7 +1716,6 @@ app.get("/enviar-email/:id", verificaAutenticacao, async (req, res) => {
         return res.status(500).send("Erro ao pegar dados do beneficiário");
       }
 
-      console.log(result);
       let implantacao = result[0];
 
       try {
@@ -2052,6 +1777,7 @@ app.get(
     const queryAssinatura =
       "SELECT * FROM assinatura_implantacao WHERE id_implantacao = ?";
     var view;
+    const queryFormasPagamento = "SELECT *FROM formas_pagamento WHERE id=?"
 
     db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
       if (err) {
@@ -2062,7 +1788,6 @@ app.get(
           stack: err.stack,
           timestamp: new Date().toISOString(),
         });
-        console.log("Erro ao buscar implantação no BD", err);
         res.status(500).send("Erro ao buscar implantação no BD");
         return;
       }
@@ -2185,8 +1910,6 @@ app.get(
                       const plano = resultPlano[0];
                       var tipoContrato = plano.tipoContrato;
 
-                      console.log(tipoContrato)
-
                       if (tipoContrato === "OdontoGroup") {
                         view = "contratoOdontoGroup";
                       } else if (tipoContrato === "DentalUni") {
@@ -2197,24 +1920,28 @@ app.get(
                         view = "contrato";
                       }
 
-                      console.log(view)
-
                       const implantacao = resultImplantacoes[0];
                       implantacao.datadenascimento = format(
                         new Date(implantacao.datadenascimento),
                         "dd/MM/yyyy"
                       );
 
-                      res.render(view, {
-                        implantacao: implantacao,
-                        plano: resultPlano[0],
-                        dataFormatada: dataFormatada,
-                        entidade: resultEntidade[0],
-                        dependentes: dependentes,
-                        documentos: resultDocumentos,
-                        assinaturaBase64: assinaturaBase64,
-                        dadosAssinatura: resultAssinatura[0],
-                      });
+                      db.query(queryFormasPagamento, [implantacao.formaPagamento], (err, resultFormasPagamento) => {
+                        if(err) {
+                          console.log(err)
+                        }
+                        res.render(view, {
+                          implantacao: implantacao,
+                          plano: resultPlano[0],
+                          dataFormatada: dataFormatada,
+                          entidade: resultEntidade[0],
+                          dependentes: dependentes,
+                          documentos: resultDocumentos,
+                          assinaturaBase64: assinaturaBase64,
+                          dadosAssinatura: resultAssinatura[0],
+                          formaPagamento: resultFormasPagamento[0]
+                        });
+                      })
                     }
                   );
                 }
@@ -2410,7 +2137,6 @@ app.get("/visualizaImplantacao/:id", verificaAutenticacao, async (req, res) => {
 
   db.query(queryImplantacoes, [idImplantacao], (err, resultImplantacoes) => {
     if (err) {
-      console.log("Erro ao buscar implantação no BD", err);
       res.status(500).send("Erro ao buscar implantação no BD");
       return;
     }
@@ -2533,7 +2259,6 @@ app.get("/planos", verificaAutenticacao, async (req, res) => {
 app.post('/planos/:idPlano/forma-pagamento', async (req, res) => {
   const db = await mysql.createPool(config);
   const { idPlano } = req.params;
-  console.log(idPlano)
   const { paymentDescription, paymentType, minParcelValue, totalPaymentValue } = req.body;
 
   try {
@@ -2550,7 +2275,6 @@ app.post('/planos/:idPlano/forma-pagamento', async (req, res) => {
 });
 
 app.put('/planos/:idPlano/forma-pagamento/:idForma', async (req, res) => {
-  console.log('entrou na rota de atualização da forma de pagamento do plano');
   const db = await mysql.createPool(config);
   const { idPlano, idForma } = req.params;
   const { paymentDescription, paymentType, minParcelValue, totalPaymentValue } = req.body;
@@ -2589,7 +2313,6 @@ app.delete('/planos/:idPlano/forma-pagamento/:idForma', async (req, res) => {
 app.get('/planos/:idPlano/formas-pagamento', async (req, res) => {
   const db = await mysql.createPool(config);
   const { idPlano }  = req.params;
-  console.log('entrou aqui com o id do Plano:' + idPlano)
   try {
       const query = `
           SELECT * FROM formas_pagamento WHERE id_plano = ?
@@ -2881,7 +2604,6 @@ app.get("/generate-pdf", async (req, res) => {
 
 
   try {
-    console.log("Launching browser");
     const browser = await puppeteer.launch({
       headless: true, // Mude para true para produção
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -2889,10 +2611,8 @@ app.get("/generate-pdf", async (req, res) => {
     const page = await browser.newPage();
 
     const url = link;
-    console.log(`Navigating to URL: ${url}`);
     await page.goto(url, { waitUntil: "networkidle2", timeout: 180000 });
 
-    console.log("Waiting for CSS to load");
     await page.waitForSelector("body"); // Aguarde um elemento específico que garante que os estilos foram aplicados
 
     // Aguarde até que o conteúdo da página esteja completamente carregado
@@ -2964,7 +2684,6 @@ app.get("/generate-pdf", async (req, res) => {
       </footer>
     `;
 
-    console.log("Generating PDF");
     const pdf = await page.pdf({
       format: "A4",
       displayHeaderFooter: true,
@@ -2974,11 +2693,9 @@ app.get("/generate-pdf", async (req, res) => {
     });
 
     await browser.close();
-    console.log("PDF generated");
 
     const filePath = path.join(__dirname, "arquivospdf", "modeloProposta2.pdf");
     fs.writeFileSync(filePath, pdf);
-    console.log(`PDF saved to ${filePath}`);
 
     res.contentType("application/pdf");
     res.send(pdf);
@@ -3044,21 +2761,11 @@ app.post('/cadastrar-entidade-parametro', verificaAutenticacao, async (req, res)
 // Rota para editar parâmetros
 app.put('/editar-entidade-parametro/:id', verificaAutenticacao, async (req, res) => {
   const db = await mysql.createPool(config);
-  console.log('chegou aqui')
   const { id } = req.params;
   const { id_entidade_edit, nome_entidade_edit, forma_pagamento_edit, codigo_ds_edit, id_operadora_edit} = req.body;
   const query = 'UPDATE entidades_parametros SET id_entidade = ?,forma_pagamento = ?, nome_entidade = ?, codigo_ds = ?, operadora = ? WHERE id = ?';
-  console.log({
-    id_entidade_edit, 
-    forma_pagamento_edit, 
-    nome_entidade_edit, 
-    codigo_ds_edit, 
-    id_operadora_edit,
-    id
-  })
   db.query(query, [id_entidade_edit, forma_pagamento_edit, nome_entidade_edit, codigo_ds_edit, id_operadora_edit, id], (err, result) => {
     if (err) {
-      console.log(err);
       throw err;
     }
     res.json({ success: true });
@@ -3082,7 +2789,6 @@ app.get('/api/vencimentos', async (req, res) => {
   const db = await mysql.createPool(config);
   try {
     const rows = await db.query("SELECT * FROM datasVencimento");
-    console.log(rows); // Verifique o resultado no console
     res.json(rows);
   } catch (err) {
     console.error("Erro ao resgatar vencimentos do BD", err);
@@ -3130,7 +2836,6 @@ app.get('/teste001', async (req, res) => {
               if(err) {
                 console.error('Erro ao buscar datas de vencimento')
               }
-              console.log(resultVencimentos);
               res.render("formulario8", {
                 planoSelecionado: planoSelecionado,
                 profissoes: resultProfissoes,
@@ -3368,7 +3073,7 @@ app.get('/testecodigodsgrupo', async (req, res) => {
   const { idEntidade, idPagamento } = req.query;
   try {
     let result = await pegarCodigoDSGrupo(idPagamento, idEntidade);
-    console.log(result)
+
     res.send({
       'Código DS referente aos parametros ': result
     });
