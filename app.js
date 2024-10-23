@@ -800,7 +800,7 @@ async function checkProposalExists(proposalNumber) {
   });
 }
 
-const pool = mysql.createPool(config);
+//const pool = mysql.createPool(config);
 
 async function sendStatus(idImplantacao, idStatus, mensagem) {
   const db = await mysql.createPool(config);
@@ -832,7 +832,7 @@ async function rollbackAndRespond(res, message) {
   });
 }
 
-async function enviarMensagemDiscord(mensagem, tipo) {
+/* async function enviarMensagemDiscord(mensagem, tipo) {
   if (tipo === "erro"){
     let canalId = '1277658591041556553';
     try {
@@ -865,7 +865,43 @@ async function enviarMensagemDiscord(mensagem, tipo) {
       console.error("Erro ao enviar mensagem erro:", error);
     }
   }  
+} */
+
+async function enviarMensagemDiscord(mensagem, tipo) {
+  // Substitua pelos URLs dos seus webhooks do Discord
+  const webhooks = {
+    "erro": "https://discord.com/api/webhooks/1296523170911879249/iiaZa4nUaKbcVLTsWW_eVfHqdrmov_1Insyo-jVAqw8A7e4adDpwfjun9mHkMt5XTS9W",
+    "financeiro-cartao": "https://discord.com/api/webhooks/1298408611772502076/YNj2oyJkKUubEmoe1Pgip-_ggfq9LNLNEq4xAc9Oyj0XQs0axfVzN9XTJvSdEiJVDYwY",
+    "financeiro-boleto": "https://discord.com/api/webhooks/1298408918447292447/VnT2HYWrQQi-s3KYzlOYGDEs22WmqxONw4DBT00pz9__f8uWYycMdAGTRq4YmRjtuvGM",
+    "implantacao": "https://discord.com/api/webhooks/1298409070134427729/e3diAH-17_fweQYGseskT01COWwqz49MB_KvoPeOyQ11emn8EbjwW9oE7tQd2l3sW9gn"
+  };
+
+  const webhookUrl = webhooks[tipo];
+
+  if (!webhookUrl) {
+    console.error("Tipo de mensagem desconhecido:", tipo);
+    return;
+  }
+
+  let mensagemComData = `${mensagem} - Data: ${formatarDataDs(new Date())}`;
+
+  if (tipo === "erro") {
+    const timestamp = new Date().toISOString();
+    mensagemComData = `🚨 **ERRO DETECTADO ECOMMERCE DENTAL**\n**Timestamp:** ${timestamp}\n**Mensagem**: ${mensagem}`;
+  }
+
+  try {
+    await axios.post(webhookUrl, {
+      content: mensagemComData
+    });
+  } catch (error) {
+    console.error(`Erro ao enviar mensagem para o tipo ${tipo}:`, error);
+  }
 }
+
+// Exemplo de uso
+/* enviarMensagemDiscord("Teste de mensagem", "erro");
+enviarMensagemDiscord('Teste de mensagem de Implantação', "implantacao") */
 
 async function pegarCodigoDSGrupo(idFormaPagamento, idEntidade, idOperadora) {
   const db = await mysql.createPool(config);
@@ -887,7 +923,14 @@ async function pegarCodigoDSGrupo(idFormaPagamento, idEntidade, idOperadora) {
       [idEntidade, formaDePagamento, idOperadora]
     );
 
-    let codigoDsEntidade = resultCodigo.codigo_ds || null;
+    let codigoDsEntidade = resultCodigo[0].codigo_ds || null;
+
+
+    console.log({
+      "ID Entidade: " : idEntidade,
+      "Forma de Pagamento: ": formaDePagamento,
+      "ID Operadora: ":idOperadora,
+      "Código do Grupo: " : codigoDsEntidade})
 
     if (codigoDsEntidade === null && idOperadora === '1'){
         return "9M3VXV1VH7";
@@ -1156,15 +1199,6 @@ app.post("/testeFormulario", async (req, res) => {
       dados.nomePlano
     ];
 
-    console.log({
-      dadosinput: dados,
-      dependentes: dependentes,
-      anexos: anexos,
-      nomeEntidade: nomeEntidade,
-      nomeFormaPagamento: nomeFormaPagamento,
-      numeroProposta: numeroProposta,
-      dadosFormadePagamento: dadosFormaPagamento
-    })
 
     async function obsDigitalSaude() {
       if (dados.titularresponsavelfinanceiro === "Sim") {
@@ -1196,7 +1230,7 @@ app.post("/testeFormulario", async (req, res) => {
 
     const jsonModeloDS = {
       numeroProposta: `${numeroProposta}`,
-      dataAssinatura: "26/02/2024",
+      dataAssinatura: `${formatarDataDs(new Date())}`,
       diaVencimento: `${dados.dataVencimento? dados.dataVencimento : 1 }`,
       cpfResponsavel: dados.cpffinanceiro
         ? dados.cpffinanceiro
@@ -1430,17 +1464,20 @@ app.post("/testeFormulario", async (req, res) => {
           })
         );
 
+        const valorParcelaMinima = (dadosFormaPagamento.valor_parcela_minima * Number(dados.nDependentes)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const valorTotal = (dadosFormaPagamento.valor_total_pgto * Number(dados.nDependentes)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
         try {
           await enviarMensagemDiscord(
             `
-            NOVA PROPOSTA RECEBIDA DE Nº: ${numeroProposta}
-            Titular: ${dados.nomecompleto},
-            Titular Financeiro: ${dados.titularresponsavelfinanceiro}
-            Operadora: ${dados.operadora}
-            Plano: ${dados.nomePlano}
-            Entidade: ${nomeEntidade}
-            Valor total proposta: Valor total: ${(dadosFormaPagamento.valor_total_pgto) * (Number(dados.nDependentes))}
-            Número de dependentes: ${dados.nDependentes}
+            **NOVA PROPOSTA RECEBIDA DE Nº: ${numeroProposta}** \n
+            **Titular:** ${dados.nomecompleto},
+            **Titular Financeiro:** ${dados.titularresponsavelfinanceiro}
+            **Operadora:** ${dados.operadora}
+            **Plano:** ${dados.nomePlano}
+            **Entidade:** ${nomeEntidade}
+            **Valor total proposta: Valor total:** ${valorTotal}
+            **Número de dependentes:** ${dados.nDependentes}
 
             `,
             'implantacao'
@@ -1458,15 +1495,15 @@ app.post("/testeFormulario", async (req, res) => {
           }
           await enviarMensagemDiscord(
             `
-            NOVA PROPOSTA RECEBIDA DE Nº: ${numeroProposta}
-            TItular Financeiro: ${nomefinanceiro}
-            CPF: ${cpffinanceiro}
-            Endereço: ${dados.enderecoresidencial}, Nº ${dados.numeroendereco}, Bairro: ${dados.bairro}, Cidade: ${dados.cidade}, Estado: ${dados.estado}, CEP: ${dados.cep}
-            --- Forma de Pagamento ---
-            Forma de Pagamento Digital Saúde:${dadosFormaPagamento.parametrizacao}
-            Descrição: ${dadosFormaPagamento.descricao}
-            Valor Parcela Mínima: ${(dadosFormaPagamento.valor_parcela_minima) * (Number(dados.nDependentes))}
-            Valor total: ${(dadosFormaPagamento.valor_total_pgto) * (Number(dados.nDependentes))}
+            NOVA PROPOSTA RECEBIDA DE Nº: ${numeroProposta} \n
+            **Titular Financeiro:** ${nomefinanceiro}
+            **CPF:** ${cpffinanceiro}
+            **Endereço:** ${dados.enderecoresidencial}, Nº ${dados.numeroendereco}, Bairro: ${dados.bairro}, Cidade: ${dados.cidade}, Estado: ${dados.estado}, CEP: ${dados.cep} \n
+            **--- Forma de Pagamento ---**
+            **Forma de Pagamento Digital Saúde:** ${dadosFormaPagamento.parametrizacao}
+            **Descrição:** ${dadosFormaPagamento.descricao}
+            **Valor Parcela Mínima:** ${valorParcelaMinima}
+            **Valor total:** ${valorTotal}
 
 
             `,
@@ -2877,7 +2914,7 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
 
     const jsonModeloDS = {
       numeroProposta: `${dados.numeroProposta}`,
-      dataAssinatura: "01/01/2024",
+      dataAssinatura: formatarData(new Date()),
       diaVencimento: dados.dataVencimento || 1,
       cpfResponsavel: dados.cpffinanceiro || dados.cpftitular,
       nomeResponsavel: dados.nomefinanceiro || dados.nomecompleto,
