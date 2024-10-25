@@ -702,8 +702,8 @@ async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
       senhaApi: senhaApi,
     },
   };
-/* 
-  logToFile(idImplantacao, `Enviando proposta: ${data}`); */
+
+  logToFile(idImplantacao, `Enviando proposta: ${data}`);
 
   try {
     const response = await axios.post(apiUrl, data, configDS);
@@ -1557,6 +1557,7 @@ app.post("/testeFormulario", async (req, res) => {
 
         try {
           await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
+          console.log(jsonModeloDS);
         } catch (error) {
           // Tratamento de erro adicional, se necessário
           enviarMensagemDiscord(
