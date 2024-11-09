@@ -123,12 +123,12 @@ if (!fs.existsSync(logDirectory)) {
   fs.mkdirSync(logDirectory);
 }
 
-function logToFile(message) {
+function logToFile(idIplantacao, message) {
   const filename = 'error_log'; // Nome fixo para o arquivo de log
   const logDirectory = './logs'; // Diretório fixo para os arquivos de log
 
   const timestamp = new Date().toISOString();
-  const logMessage = `[${timestamp}] ${message}\n`;
+  const logMessage = `[${timestamp}] ${idIplantacao + "mensagem: " + message}\n`;
   const logFilepath = path.join(logDirectory, `${filename}.txt`);
 
   // Certifique-se de que o diretório de logs existe
@@ -138,6 +138,7 @@ function logToFile(message) {
 
   fs.appendFileSync(logFilepath, logMessage, 'utf8');
 }
+
 
 
 /* --------------------------------------- FUNÇÕES ÚTEIS --------------------------------- */
