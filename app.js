@@ -133,17 +133,13 @@ function logToFile(filename, message) {
 
 /* --------------------------------------- FUNÇÕES ÚTEIS --------------------------------- */
 
-async function pegarDataVigencia(vencimento) {
-  const hoje = new Date();
-  const ano = hoje.getFullYear();
-  const mesAtual = hoje.getMonth(); // Janeiro é 0, Dezembro é 11
-  const diaHoje = hoje.getDate();
+async function pegarDataVigencia(dataRecebida) {
+  // Converte a data recebida de string para objeto Date
+  const [ano, mes, dia] = dataRecebida.split('-').map(Number); // Separa ano, mês e dia
+  const dataVigencia = new Date(ano, mes - 1, dia); // Subtrai 1 do mês, pois o objeto Date considera meses de 0 a 11
 
-  // Se o vencimento já passou neste mês, ajusta para o próximo mês
-  const mesVigencia = diaHoje > vencimento ? mesAtual + 1 : mesAtual;
-
-  // Ajusta o mês e a data para o próximo ano, se o mês for dezembro
-  const dataVigencia = new Date(ano, mesVigencia, vencimento);
+  // Adiciona um mês à data
+  dataVigencia.setMonth(dataVigencia.getMonth() + 1);
 
   // Função para formatar a data no formato dd/MM/yyyy
   const formatarData = (data) => {
@@ -155,6 +151,7 @@ async function pegarDataVigencia(vencimento) {
 
   return formatarData(dataVigencia);
 }
+
 
 
 async function enviarAnexosParaDSContrato(numeroProposta) {
