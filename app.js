@@ -1206,7 +1206,7 @@ app.post("/testeFormulario", async (req, res) => {
     const jsonModeloDS = {
       numeroProposta: `${numeroProposta}`,
       dataAssinatura: `${formatarDataDs(new Date())}`,
-      diaVencimento: `${dados.dataVencimento? dados.dataVencimento : 1 }`,
+      diaVencimento: `${dados.dataVencimento ? dados.dataVencimento.split('-')[2] : 1}`,
       cpfResponsavel: dados.cpffinanceiro
         ? dados.cpffinanceiro
         : dados.cpftitular,
@@ -2931,7 +2931,7 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
     const jsonModeloDS = {
       numeroProposta: `${dados.numeroProposta}`,
       dataAssinatura: formatarData(new Date()),
-      diaVencimento: dados.dataVencimento || 1,
+      diaVencimento: `${dados.dataVencimento ? dados.dataVencimento.split('-')[2] : 1}`,
       cpfResponsavel: dados.cpffinanceiro || dados.cpftitular,
       nomeResponsavel: dados.nomefinanceiro || dados.nomecompleto,
       observacao: obsDigitalSaude,
