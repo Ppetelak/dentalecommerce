@@ -123,13 +123,22 @@ if (!fs.existsSync(logDirectory)) {
   fs.mkdirSync(logDirectory);
 }
 
-function logToFile(filename, message) {
+function logToFile(message) {
+  const filename = 'error_log'; // Nome fixo para o arquivo de log
+  const logDirectory = './logs'; // Diretório fixo para os arquivos de log
+
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] ${message}\n`;
   const logFilepath = path.join(logDirectory, `${filename}.txt`);
-  
+
+  // Certifique-se de que o diretório de logs existe
+  if (!fs.existsSync(logDirectory)) {
+    fs.mkdirSync(logDirectory);
+  }
+
   fs.appendFileSync(logFilepath, logMessage, 'utf8');
 }
+
 
 /* --------------------------------------- FUNÇÕES ÚTEIS --------------------------------- */
 
@@ -682,6 +691,7 @@ async function sendCodigoPropostaIdProposta(codigoPropostaDs, idImplantacao) {
     enviarMensagemDiscord(`Erro ao cadastrar código de proposta gerado no DS: ${err}`, 'erro')
   }
 }
+
 
 async function enviarPropostaDigitalSaude(jsonModeloDS, idImplantacao) {
   //const db = await mysql.createPool(config);
