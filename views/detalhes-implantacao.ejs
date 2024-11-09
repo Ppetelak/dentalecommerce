@@ -283,6 +283,7 @@
             <a href="/assinar/<%= implantacao.id %>/<%= implantacao.numeroProposta %>/<%= implantacao.cpffinanceiro %>/<%= implantacao.identidade %>" target="_blank"><button class="btn btn-success">Ver contrato</button></a>
             <a><button class="btn btn-success" id="reenviarEmail" data-id="<%= implantacao.id %>">Reenviar email</button></a>
             <a><button class="btn btn-success" id="reenviarProposta" data-id="<%= implantacao.id %>">Reenviar Contrato ao DS</button></a>
+            <button class="btn btn-primary" id="editarBD">Editar BD</button>
           </div>
         </div>
       </div>
@@ -329,7 +330,80 @@
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Editar Dados da Implantação</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Aqui os dados da implantação serão carregados -->
+          <div id="modalContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary" id="salvarAlteracoes">Salvar Alterações</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 <script src="/js/scriptImplantacoes.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 </html>
+<script>
+  $(document).ready(function() {
+    $('#editarBD').click(function() {
+        const implantacaoId = "<%= implantacao.id %>"; // Obtenha o ID atual da implantação
+
+        // Solicitação ao backend para buscar os dados
+        $.ajax({
+            url: `/api/implantacao/${implantacaoId}`,
+            method: 'GET',
+            success: function(data) {
+                let contentHtml = '<form id="editForm">';
+
+                // Itera sobre os dados da implantação e cria inputs dinamicamente
+                Object.keys(data).forEach(key => {
+                    contentHtml += `
+                        <div class="form-group">
+                            <label for="${key}">${key}</label>
+                            <input type="text" class="form-control" id="${key}" name="${key}" value="${data[key]}">
+                        </div>`;
+                });
+
+                contentHtml += '</form>';
+                $('#modalContent').html(contentHtml);
+
+                // Abre o modal
+                $('#editModal').modal('show');
+            },
+            error: function(error) {
+                alert('Erro ao carregar dados da implantação.');
+            }
+        });
+    });
+
+    // Salva as alterações ao clicar em "Salvar Alterações"
+    $('#salvarAlteracoes').click(function() {
+        const formData = $('#editForm').serialize(); // Serializa os dados do formulário
+
+        $.ajax({
+            url: `/api/implantacao/<%= implantacao.id %>`,
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                alert('Alterações salvas com sucesso!');
+                $('#editModal').modal('hide');
+                location.reload(); // Atualiza a página para exibir os dados atualizados
+            },
+            error: function(error) {
+                alert('Erro ao salvar alterações.');
+            }
+        });
+    });
+});
+
+</script>

@@ -903,45 +903,23 @@ async function enviarMensagemDiscord(mensagem, tipo) {
 /* enviarMensagemDiscord("Teste de mensagem", "erro");
 enviarMensagemDiscord('Teste de mensagem de Implantação', "implantacao") */
 
-async function pegarCodigoDSGrupo(idFormaPagamento, idEntidade, idOperadora) {
-  const db = await mysql.createPool(config);
+async function pegarCodigoDSGrupo(idOperadora) {
 
-  try {
-    const resultFormaPagamento = await db.query(
-      `SELECT parametrizacao FROM formas_pagamento WHERE id = ?`,
-      [idFormaPagamento]
-    );
-
-    if (resultFormaPagamento.length === 0) {
-      throw new Error("Forma de pagamento não encontrada");
-    }
-
-    const formaDePagamento = resultFormaPagamento[0].parametrizacao;
-
-    const resultCodigo = await db.query(
-      `SELECT codigo_ds FROM entidades_parametros WHERE id_entidade = ? AND forma_pagamento = ? AND operadora = ?`,
-      [idEntidade, formaDePagamento, idOperadora]
-    );
-
-    let codigoDsEntidade = resultCodigo[0].codigo_ds || null;
-
-
-    console.log({
-      "ID Entidade: " : idEntidade,
-      "Forma de Pagamento: ": formaDePagamento,
-      "ID Operadora: ":idOperadora,
-      "Código do Grupo: " : codigoDsEntidade})
-
-    if (codigoDsEntidade === null && idOperadora === '1'){
-        return "9M3VXV1VH7";
-    } else if (codigoDsEntidade === null && idOperadora === '2') {
-      return "A37CYHBA3M";
-    } else {
-      return codigoDsEntidade;
-    }
-  } catch (error) {
-    console.error("Erro ao pegar código DS do grupo:", error);
-    throw error;
+  /* 
+    IDS das operadoras dentro do sistema ecommerce
+    Dental Uni = 1
+    OdontoGroup = 2
+    Porto = 3 
+  */
+  let codigoDsEntidade = '';
+  if (idOperadora === '1'){ 
+      return "9M3VXV1VH7";
+  } else if (idOperadora === '2') {
+    return "A37CYHBA3M";
+  } else if (idOperadora === '3') {
+    return "0000000" //inserir código da Porto
+  } else {
+    console.log('Nenhum código encontrado')
   }
 }
 
@@ -1252,7 +1230,7 @@ app.post("/testeFormulario", async (req, res) => {
         codigo: `${dados.codigoCorretora}`,
       },
       grupo: {
-        codigo: `${await pegarCodigoDSGrupo(dados.formaPagamento, dados.idEntidade, dados.idOperadora)}`,
+        codigo: `${await pegarCodigoDSGrupo(dados.idOperadora)}`,
       },
       filial: {
         codigo: "BETRHPTL2K",
@@ -1556,6 +1534,10 @@ app.post("/testeFormulario", async (req, res) => {
         // ENVIAR PROPOSTA DIGITAL SAÚDE
 
         try {
+          /* await enviarMensagemDiscord(`JSON modelo sendo enviado para o Digital Saúde \n
+            ${jsonModeloDS}\n
+            Dados recebidos pelo formulário: \n
+            ${dados}`, 'erro') */
           await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
           console.log(jsonModeloDS);
         } catch (error) {
@@ -2843,6 +2825,42 @@ app.get('/testeMensagem', async (req, res) => {
 
 })
 
+// Rota para buscar dados da implantação
+app.get('/api/implantacao/:id', async (req, res) => {
+  const db = await mysql.createPool(config);
+  const implantacaoId = req.params.id;
+  const query = 'SELECT * FROM implantacoes WHERE id = ?';
+
+  db.query(query, [implantacaoId], (error, results) => {
+      if (error) {
+          res.status(500).json({ error: 'Erro ao buscar dados da implantação' });
+      } else {
+          res.json(results[0]); // Retorna o primeiro resultado, assumindo que ID é único
+      }
+  });
+});
+
+// Rota para salvar alterações nos dados da implantação
+app.post('/api/implantacao/:id', async (req, res) => {
+  const db = await mysql.createPool(config);
+  const implantacaoId = req.params.id;
+  const novosDados = req.body;
+
+  // Cria uma query de atualização dinâmica
+  const campos = Object.keys(novosDados).map(campo => `${campo} = ?`).join(', ');
+  const valores = Object.values(novosDados);
+
+  const query = `UPDATE implantacoes SET ${campos} WHERE id = ?`;
+  db.query(query, [...valores, implantacaoId], (error, results) => {
+      if (error) {
+          res.status(500).json({ error: 'Erro ao atualizar dados da implantação' });
+      } else {
+          res.json({ success: 'Dados atualizados com sucesso' });
+      }
+  });
+});
+
+
 app.get('/teste001', async (req, res) => {
   const db = await mysql.createPool(config);
   const planoId = 1
@@ -2924,7 +2942,7 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
       convenio: { codigo: `${dados.numeroConvenio}` },
       produtor: { codigo: `${dados.idCorretor}` },
       corretora: { codigo: `${dados.codigoCorretora}` },
-      grupo: { codigo: await pegarCodigoDSGrupo(dados.formaPagamento, dados.identidade, dados.idOperadora) },
+      grupo: { codigo: await pegarCodigoDSGrupo(dados.idOperadora) },
       filial: { codigo: "BETRHPTL2K" },
       beneficiarioList: [
         {
@@ -3100,23 +3118,6 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
 
   } catch (erro) {
     console.error(erro);
-  }
-});
-
-
-
-
-app.get('/testecodigodsgrupo', async (req, res) => {
-  const { idEntidade, idPagamento } = req.query;
-  try {
-    let result = await pegarCodigoDSGrupo(idPagamento, idEntidade);
-
-    res.send({
-      'Código DS referente aos parametros ': result
-    });
-  } catch (error) {
-    console.error('Erro ao obter o código DS:', error);
-    res.status(500).send('Erro ao obter o código DS');
   }
 });
 

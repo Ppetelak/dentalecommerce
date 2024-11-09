@@ -27,6 +27,16 @@ body {
     justify-content: center;
 }
 
+.modal-backdrop {
+    background-color: #ffffff; /* Fundo preto com 80% de opacidade */
+}
+
+/* Estilo opcional para o conteúdo do modal */
+.modal-content {
+    border-radius: 8px;
+    background-color: #fefefe;
+}
+
 .col-12 {
     padding: 0px;
 }
