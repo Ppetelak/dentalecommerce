@@ -951,6 +951,7 @@ app.post("/upload", upload.array("file"), (req, res) => {
     modifiedName: file.filename,
     filepath: path.join(appUrl, "uploads", file.filename),
   }));
+  console.log(filepaths)
   res.json({ filepaths });
 });
 
@@ -1101,6 +1102,8 @@ app.post("/testeFormulario", async (req, res) => {
     const dados = req.body.inputs;
     const dependentes = req.body.dependentes;
     const anexos = req.body.anexos;
+
+    console.log(anexos);
 
     var cpffinanceiro = dados.cpffinanceiro
       ? dados.cpffinanceiro
@@ -1486,10 +1489,11 @@ app.post("/testeFormulario", async (req, res) => {
             **CPF:** ${cpffinanceiro}
             **Endereço:** ${dados.enderecoresidencial}, Nº ${dados.numeroendereco}, Bairro: ${dados.bairro}, Cidade: ${dados.cidade}, Estado: ${dados.estado}, CEP: ${dados.cep} \n
             **--- Forma de Pagamento ---**
-            **Forma de Pagamento Digital Saúde:** ${dadosFormaPagamento.parametrizacao}
-            **Descrição:** ${dadosFormaPagamento.descricao}
-            **Valor Parcela Mínima:** ${valorParcelaMinima}
-            **Valor total:** ${valorTotal}
+            **Forma de Pagamento Digital Saúde:** ${dadosFormaPagamento.parametrizacao}\n
+            **Descrição:** ${dadosFormaPagamento.descricao}\n
+            **Data Vencimento:** ${dados.dataVencimento} \n
+            **Valor Parcela Mínima:** ${valorParcelaMinima} \n
+            **Valor total:** ${valorTotal} \n
 
 
             `,
@@ -1547,7 +1551,7 @@ app.post("/testeFormulario", async (req, res) => {
             Dados recebidos pelo formulário: \n
             ${dados}`, 'erro') */
           await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
-          console.log(jsonModeloDS);
+          //console.log(jsonModeloDS);
         } catch (error) {
           // Tratamento de erro adicional, se necessário
           enviarMensagemDiscord(

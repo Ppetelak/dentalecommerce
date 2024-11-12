@@ -1,14 +1,39 @@
 let etapaAtual = 1;
-var quantidadeDependentes = 0;
+var quantidadeDependentes = 1;
+var valorPagarAtualizado = 0
+
+var cpfValido = false;
 
 let anexosObjeto = {};
 
 var fileInput = document.querySelector('.file-input');
 fileInput.removeAttribute('multiple');
 
+var valorPagarAtualizado = 0;
+
+
 let valorAnual = document.querySelector("#valorAnualBD").value;
-let valorAnualCartao = document.querySelector("#valorAnualCartaoBD").value;
-let valorAnualCartao3Vezes = document.querySelector("#valorAnualCartao3VezesBD").value;
+
+function validaSeCpfEstaValido() {
+  // Supondo que `cpfValido` seja uma variável que indique a validade de um CPF
+  if (cpfValido === false) {
+    // Seleciona todos os botões de próxima etapa
+    const botoesProximos = document.querySelectorAll('.btnproximo');
+    botoesProximos.forEach(function (botao) {
+      botao.disabled = true; // Desativa o botão se o CPF for inválido
+    });
+    exibirAlerta("Verifique os campos de CPF preenchidos nessa etapa.");
+    console.log(cpfValido);
+  } else {
+    // Se o CPF for válido, ativa os botões de próxima etapa
+    const botoesProximos = document.querySelectorAll('.btnproximo');
+    botoesProximos.forEach(function (botao) {
+      botao.disabled = false; // Ativa o botão se o CPF for válido
+    });
+    console.log(cpfValido);
+  }
+}
+
 
 document.getElementById('profissaotitular').addEventListener('change', function() {
   var selectedOption = this.options[this.selectedIndex];
@@ -17,9 +42,11 @@ document.getElementById('profissaotitular').addEventListener('change', function(
 });
 
 function validarFormulario(etapa) {
+
   let form = document.getElementById(`formEtapa${etapa}`);
   let stage = document.getElementById(`number-${etapa}`)
   let stageNext = document.getElementById(`number-${etapa + 1}`)
+
 
   const attachmentRequiredElements = form.querySelectorAll('.attachment-required');
   if (attachmentRequiredElements.length > 0) {
@@ -36,6 +63,15 @@ function validarFormulario(etapa) {
           exibirAlerta('É necessário pelo menos um anexo.');
           return false;
       }
+  }
+
+  if (etapa === 4) {
+    const corretoraSelect = document.getElementById("corretora");
+    if (corretoraSelect.selectedIndex === 0 || corretoraSelect.value === "") {
+      exibirAlerta("Por favor, selecione um produtor válido antes de avançar para a próxima etapa.");
+      corretoraSelect.focus();
+      return false;
+    }
   }
 
   if(etapa === 8) {
@@ -198,14 +234,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
           // Limpar opções existentes
           corretoraSelect.innerHTML = "";
-          corretoraSelect.setAttribute("required", true);
+          //corretoraSelect.setAttribute("required", true);
 
           if (data.nomeProdutores && data.nomeProdutores.length > 0) {
             // Adicionar uma opção padrão
             const defaultOption = document.createElement("option");
             defaultOption.disabled = true;
             defaultOption.selected = true;
-            defaultOption.required = true;
             defaultOption.text = "Selecione um produtor";
             corretoraSelect.add(defaultOption);
 
@@ -634,15 +669,12 @@ function handlePossuiDependentesChange() {
   var spanQtdDependentes = document.querySelector("#qtdDependentes");
   spanQtdDependentes.textContent = quantidadeDependentes;
   var botao = document.querySelector("#add-dependente");
-  var spanValorAnual = document.querySelectorAll(".valorAnual");
-  var spanValorAnaulCartao = document.querySelectorAll(".valorAnualCartao");
-  var spanValorAnualCartao3Vezes = document.querySelectorAll(".valorAnualCartao3Vezes");
+  var spanValorAnual = document.querySelector(".valorAnual");
+
 
   if (selecionado === "Sim") {
     var multiplicador = quantidadeDependentes + 1;
     atualizarValores(spanValorAnual, valorAnual, multiplicador);
-    atualizarValores(spanValorAnaulCartao, valorAnualCartao, multiplicador);
-    atualizarValores(spanValorAnualCartao3Vezes, valorAnualCartao3Vezes, multiplicador);
     existeSim.innerHTML = divPrimeiroDependente;
     botao.style.display = "block";
     nDependentes.value = 1;
@@ -652,8 +684,12 @@ function handlePossuiDependentesChange() {
     nDependentes.value = 0;
     var multiplicador = 1;
     atualizarValores(spanValorAnual, valorAnual, multiplicador);
-    atualizarValores(spanValorAnaulCartao, valorAnualCartao, multiplicador);
-    atualizarValores(spanValorAnualCartao3Vezes, valorAnualCartao3Vezes, multiplicador);
+
+    var btnProximo = document.querySelector(".btnproximo2");
+    console.log(btnProximo)
+    if (btnProximo && btnProximo.disabled) {
+        btnProximo.disabled = false;
+    }
 
     for (var i = 1; i < dependentes.length; i++) {
       dependentes[i].remove();
@@ -661,11 +697,32 @@ function handlePossuiDependentesChange() {
   }
 }
 
-function atualizarValores(spans, valorInicial, multiplicador) {
-  spans.forEach(function(span) { 
-    var valorAtualizado = valorInicial * multiplicador; 
-    span.textContent = valorAtualizado.toFixed(2); 
-  });
+function atualizaValoresFormaPagamento (valorPagarAtualizado) {
+  var valoresAVista = document.querySelectorAll('.ValorAVista10off');
+  valoresAVista.forEach(total => {
+    total.textContent = ` R$ ${(valorPagarAtualizado * 0.9).toFixed(2)}`;
+  })
+  var totais = document.querySelectorAll(".valoresTotais");
+  totais.forEach(total => {
+    total.textContent = `R$ ${valorPagarAtualizado}`
+  })
+  document.querySelector('#valorCartaoParcelado').textContent = ` R$ ${(valorPagarAtualizado /12).toFixed(2)}`;
+  document.querySelector('#valorPagamentoBoleto3x').textContent = ` R$ ${(valorPagarAtualizado /3).toFixed(2)}`
+}
+
+function atualizarValores(elemento, valorBase, multiplicador) {
+  if (elemento) {
+    console.log('entrou na função de atualizar valores com os seguinte valores: ',
+      {
+        'elemento': elemento,
+        "valorBase": valorBase,
+        "multiplicador": multiplicador
+      }
+    )
+    valorPagarAtualizado = (valorBase * multiplicador).toFixed(2);
+    atualizaValoresFormaPagamento (valorPagarAtualizado)
+    elemento.textContent = `${(valorBase * multiplicador).toFixed(2)}`;
+  }
 }
 
 function atualizarDataIdDependentes() {
@@ -673,14 +730,10 @@ function atualizarDataIdDependentes() {
   quantidadeDependentes = dependentes.length;
   var spanQtdDependentes = document.querySelector("#qtdDependentes");
   spanQtdDependentes.textContent = quantidadeDependentes;
-  var spanValorAnual = document.querySelectorAll(".valorAnual");
-  var spanValorAnaulCartao = document.querySelectorAll(".valorAnualCartao");
-  var spanValorAnualCartao3Vezes = document.querySelectorAll(".valorAnualCartao3Vezes");
+  var spanValorAnual = document.querySelector(".valorAnual");
 
   var multiplicador = quantidadeDependentes + 1;
   atualizarValores(spanValorAnual, valorAnual, multiplicador);
-  atualizarValores(spanValorAnaulCartao, valorAnualCartao, multiplicador);
-  atualizarValores(spanValorAnualCartao3Vezes, valorAnualCartao3Vezes, multiplicador);
 
   dependentes.forEach(function (dependente, index) {
     dependente.dataset.id = "dependente-" + (index + 1);
@@ -744,10 +797,15 @@ function validarCPF(inputElement) {
     ? validFeedback.nextElementSibling
     : validFeedback.nextSibling;
 
+  // Seleciona o botão .btnproximo dentro do mesmo contexto (formulário ou seção) do campo CPF
+  var btnProximo = cpfCampo.closest("form, .form-section").querySelector(".btnproximo");
+
   // Verifica se o CPF tem 11 dígitos ou se todos os dígitos são iguais
   if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
     invalidFeedback.style.display = "inline";
     validFeedback.style.display = "none";
+    if (btnProximo) btnProximo.disabled = true; // Desativa o botão
+    exibirAlerta("CPF inválido. Por favor, insira um CPF válido.");
     return;
   }
 
@@ -774,13 +832,17 @@ function validarCPF(inputElement) {
   ) {
     invalidFeedback.style.display = "inline";
     validFeedback.style.display = "none";
+    if (btnProximo) btnProximo.disabled = true; // Desativa o botão
+    exibirAlerta("CPF inválido. Por favor, insira um CPF válido.");
     return;
   }
 
-  // CPF válido
+  // CPF é válido
   invalidFeedback.style.display = "none";
   validFeedback.style.display = "inline";
+  if (btnProximo) btnProximo.disabled = false; // Habilita o botão
 }
+
 
 function showMessageError(mensagem) {
   var errorMessageDiv = document.createElement("div");
@@ -793,8 +855,6 @@ function showMessageError(mensagem) {
   var errorContainer = document.getElementById("error-container");
   errorContainer.appendChild(errorMessageDiv);
 }
-
-
 
 function showErrorMessage() {
   var errorMessageDiv = document.createElement("div");
@@ -973,6 +1033,10 @@ function exibirAlerta(mensagem) {
       // Oculta o alerta quando o botão de fechar é clicado
       document.getElementById("customAlert").style.display = "none";
   })
+
+  setTimeout(function() {
+    document.getElementById("customAlert").style.display = "none";
+  }, 5000);
 }
 
 function bytesToSize(bytes) {

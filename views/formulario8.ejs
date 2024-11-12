@@ -11,15 +11,19 @@
                    class="custom-control-input" 
                    value="<%= pagamento.id %>" 
                    data-id-tipo="<%= pagamento.parametrizacao %>" 
+                   data-valor-total="<%= pagamento.valor_total_pgto %>"
                    required>
                    
             <label class="custom-control-label" for="formaPagamentoId-<%= pagamento.id %>">
                 <%= pagamento.descricao %>
                 <% if (pagamento.parametrizacao === 'À vista') { %>
-                    <strong> Valor Total Pago:</strong> R$ <%= pagamento.valor_total_pgto %>
-                <% } else { %>
-                    <strong> Valor Mensal:</strong> R$ <%= pagamento.valor_parcela_minima %>
-                    <strong> Valor Total Pago:</strong> R$ <%= pagamento.valor_total_pgto %>
+                    <strong> Valor Total Pago:</strong><span class="ValorAVista10off">  </span>
+                <% } else if (pagamento.parametrizacao === 'Cartão Parcelado') { %>
+                    <strong> Valor Mensal:</strong><span id="valorCartaoParcelado"> </span>
+                    <strong> Valor Total Pago:</strong><span class="valoresTotais"> </span>
+                <% } else if (pagamento.parametrizacao === 'Boleto 3x') { %>
+                    <strong> Valor Parcela (3x):</strong> <span id="valorPagamentoBoleto3x"> </span>
+                    <strong> Valor Total Pago:</strong> <span class="valoresTotais"> </span>
                 <% } %>
             </label>
         </div>
@@ -27,6 +31,7 @@
     
     <div id="dataVencimentoContainer" class="mt-3"></div>
 </div>
+
 
 <!-- Modal para Tabela de Faixas de Vencimento -->
 <div class="modal fade" id="faixasVencimentoModal" tabindex="-1" aria-labelledby="faixasVencimentoModalLabel" aria-hidden="true">
@@ -108,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 dataVencimentoContainer.innerHTML = `
                     <div id="dataVencimentoEscolha" class="mb-3">
                         <label class="form-label">Escolha a data do primeiro pagamento</label>
-                        <input type="date" class="form-control" name="dataVencimento" 
+                        <input type="date" class="form-control" name="dataVencimento" required
                                min="${dataMinimaFormatada}" max="${dataMaximaFormatada}">
                         <small class="form-text text-muted mt-2">
                             Somente é possível selecionar datas com pelo menos dois dias úteis a partir do dia atual e até 30 dias no máximo.<br>

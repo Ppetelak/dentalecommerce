@@ -59,11 +59,6 @@
     <div class="uteis">
       <input
         type="hidden"
-        id="valorAnualBD"
-        value="<%= planoSelecionado.pgtoAnualAvista %>"
-      />
-      <input
-        type="hidden"
         id="valorAnualCartaoBD"
         value="<%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2) %>"
       />
@@ -126,29 +121,33 @@
                   <div class="col-4">
                     <h3>Valores</h3>
                     <p>
-                      <strong>Valor Anual á vista:</strong> R$
-                      <span class="valorAnual"
-                        ><%= planoSelecionado.pgtoAnualAvista %></span
-                      >
-                    </p>
-                    <p>
-                      <strong>Valor Mensal Plano Anual (12x):</strong> R$
-                      <span class="valorAnualCartao"
-                        ><%= (planoSelecionado.pgtoAnualCartao / 12).toFixed(2)
-                        %>
-                      </span>
-                    </p>
-                    <p>
-                      <strong>Valor Anual no cartão em (3x):</strong> R$
-                      <span class="valorAnualCartao3Vezes"
-                        ><%= (planoSelecionado.pgtoAnualCartao3x / 3).toFixed(2)
-                        %>
-                      </span>
+                      <strong>Valor Anual à vista:</strong> 
+                      <br>
+                      <% 
+                        // Filtra os pagamentos "À vista" e encontra o menor valor
+                        const valoresAVista = pagamentos
+                          .filter(pagamento => pagamento.parametrizacao === 'À vista')
+                          .map(pagamento => pagamento.valor_total_pgto);
+                          
+                        const menorValor = Math.min(...valoresAVista);
+                      %>
+                      
+                      <% if (valoresAVista.length > 0) { %>
+                        <input
+                          type="hidden"
+                          id="valorAnualBD"
+                          value="<%= menorValor %>"
+                        />
+                        R$ <span class="valorAnual"><%= menorValor %></span>
+                      <% } else { %>
+                        <span>Nenhum valor disponível</span>
+                      <% } %>
                     </p>
                   </div>
+                  
                   <div class="col-4">
                     <h3>Dependentes</h3>
-                    <span id="qtdDependentes"> 0</span> Dependentes adicionados
+                    <span id="qtdDependentes"> 0</span> Dependentes adicionados + Titular do Plano
                   </div>
                 </div>
                 <% } else { %>
@@ -257,7 +256,7 @@
                   Voltar
                 </button>
                 <button
-                  class="btn btn-primary float-end btnproximo"
+                  class="btn btn-primary float-end btnproximo btnproximo2"
                   type="button"
                   onclick="return validarFormulario(5)"
                 >
