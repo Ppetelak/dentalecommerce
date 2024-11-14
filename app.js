@@ -841,38 +841,8 @@ async function rollbackAndRespond(res, message) {
 }
 
 /* async function enviarMensagemDiscord(mensagem, tipo) {
-  if (tipo === "erro"){
-    let canalId = '1277658591041556553';
-    try {
-      await axios.post('https://bot.midiaideal.com/mensagem-ecommerce', { mensagem, canalId });
-    } catch (error) {
-      console.error("Erro ao enviar mensagem erro:", error);
-    }
-  }
-  if (tipo === "financeiro-cartao"){
-    let canalId = '1277658424020303966';
-    try {
-      await axios.post('https://bot.midiaideal.com/mensagem-ecommerce', { mensagem , canalId});
-    } catch (error) {
-      console.error("Erro ao enviar mensagem erro:", error);
-    }
-  }
-  if (tipo === "financeiro-boleto"){
-    let canalId = '1285973619234705481';
-    try {
-      await axios.post('https://bot.midiaideal.com/mensagem-ecommerce', { mensagem , canalId});
-    } catch (error) {
-      console.error("Erro ao enviar mensagem erro:", error);
-    }
-  }
-  if(tipo === "implantacao") {
-    let canalId = '1277658485647085590';
-    try {
-      await axios.post('https://bot.midiaideal.com/mensagem-ecommerce', { mensagem , canalId});
-    } catch (error) {
-      console.error("Erro ao enviar mensagem erro:", error);
-    }
-  }  
+  console.log(`Tipo Mensagem: ${tipo} \n
+    Mensagem: ${mensagem}`)
 } */
 
 async function enviarMensagemDiscord(mensagem, tipo) {
@@ -1133,7 +1103,7 @@ app.post("/testeFormulario", async (req, res) => {
     var dadosFormaPagamento = await pegarDadosFormaDePagamento(dados.formaPagamento);
     var nomeFormaPagamento = dadosFormaPagamento.parametrizacao
     var numerosContato = await separarDDDNumero (telefonetitularfinanceiro, celulartitularfinanceiro)
-    let dataVigencia = await pegarDataVigencia(dados.dataVencimento || new Date().getDate());
+    let dataVigencia = await pegarDataVigencia(new Date().toISOString().slice(0, 10));
 
     const numeroProposta = await generateUniqueProposalNumber();
     const dadosImplantacao = [
@@ -2926,7 +2896,7 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
   try {
     const [dados] = await db.query(queryImplantacao, [idImplantacao]);
     const dependentes = await db.query(queryDependentes, [idImplantacao]);
-    let dataVigencia = await pegarDataVigencia(dados.dataVencimento || new Date().getDate());
+    let dataVigencia = await pegarDataVigencia(new Date().toISOString().slice(0, 10));
 
     if (!dados) {
       return res.status(404).json({ error: 'Implantação não encontrada.' });
@@ -2945,7 +2915,7 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
 
     const jsonModeloDS = {
       numeroProposta: `${dados.numeroProposta}`,
-      dataAssinatura: formatarData(new Date()),
+      dataAssinatura: `${formatarDataDs(new Date())}`,
       diaVencimento: `${dados.dataVencimento ? dados.dataVencimento.split('-')[2] : 1}`,
       cpfResponsavel: dados.cpffinanceiro || dados.cpftitular,
       nomeResponsavel: dados.nomefinanceiro || dados.nomecompleto,
