@@ -1517,11 +1517,11 @@ app.post("/testeFormulario", async (req, res) => {
         // ENVIAR PROPOSTA DIGITAL SAÚDE
 
         try {
-          await enviarMensagemDiscord(`JSON modelo sendo enviado para o Digital Saúde \n
+          /* await enviarMensagemDiscord(`JSON modelo sendo enviado para o Digital Saúde \n
             ${jsonModeloDS}\n
             Dados recebidos pelo formulário: \n
-            ${dados}`, 'erro')
-          //await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
+            ${dados}`, 'erro') */
+          await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
           //console.log(jsonModeloDS);
         } catch (error) {
           // Tratamento de erro adicional, se necessário
