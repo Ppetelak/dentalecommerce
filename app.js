@@ -608,6 +608,7 @@ async function consultarIDProposta(numeroProposta) {
 }
 
 async function salvarAnexos(idImplantacao, anexos) {
+  console.log(anexos)
   const db = await mysql.createPool(config);
   const query =
     "INSERT INTO anexos_implantacoes (id_implantacao, nome_arquivo, caminho_arquivo) VALUES (?, ?, ?)";
@@ -919,7 +920,7 @@ app.post("/upload", upload.array("file"), (req, res) => {
   const filepaths = req.files.map((file) => ({
     originalName: req.locals.originalName,
     modifiedName: file.filename,
-    filepath: path.join(appUrl, "uploads", file.filename),
+    filepath: `${appUrl}/uploads/${file.filename}`,
   }));
   console.log(filepaths)
   res.json({ filepaths });
@@ -1516,11 +1517,11 @@ app.post("/testeFormulario", async (req, res) => {
         // ENVIAR PROPOSTA DIGITAL SAÚDE
 
         try {
-          /* await enviarMensagemDiscord(`JSON modelo sendo enviado para o Digital Saúde \n
+          await enviarMensagemDiscord(`JSON modelo sendo enviado para o Digital Saúde \n
             ${jsonModeloDS}\n
             Dados recebidos pelo formulário: \n
-            ${dados}`, 'erro') */
-          await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
+            ${dados}`, 'erro')
+          //await enviarPropostaDigitalSaude(jsonModeloDS, resultImplantacaoId);
           //console.log(jsonModeloDS);
         } catch (error) {
           // Tratamento de erro adicional, se necessário
@@ -1901,6 +1902,8 @@ app.get(
 
                       const dependentes = resultDependentes;
 
+                      const nDependentes = resultDependentes.length + 1;
+
                       dependentes.forEach((dependente) => {
                         dependente.nascimentodependente = format(
                           new Date(dependente.nascimentodependente),
@@ -1937,6 +1940,7 @@ app.get(
                           dataFormatada: dataFormatada,
                           entidade: resultEntidade[0],
                           dependentes: dependentes,
+                          nDependentes: nDependentes,
                           documentos: resultDocumentos,
                           assinaturaBase64: assinaturaBase64,
                           dadosAssinatura: resultAssinatura[0],
@@ -2909,9 +2913,33 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
     let dadosFormaPagamento =  await pegarDadosFormaDePagamento(dados.formaPagamento);
     let nomeFormaPagamento = dadosFormaPagamento.parametrizacao;
 
-    const obsDigitalSaude = dados.titularresponsavelfinanceiro === "Sim" ? 
-      `O TITULAR É O MESMO TITULAR FINANCEIRO\nForma de Pagamento selecionada: ${nomeFormaPagamento}` : 
-      `O TITULAR NÃO É O MESMO TITULAR FINANCEIRO\nCPF: ${dados.cpffinanceiro}\nNome: ${dados.nomefinanceiro}`;
+    async function obsDigitalSaude() {
+      if (dados.titularresponsavelfinanceiro === "Sim") {
+        return `O TITULAR É O MESMO TITULAR FINANCEIRO \n
+        Forma de Pagamento selecionada: ${nomeFormaPagamento} \n
+        Entidade Vinculada: ${nomeEntidade} \n
+        Profissão Titular do Plano: ${dados.profissaotitular} \n
+        `;
+      } else {
+        return `
+            O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
+            ----> Dados responsável Financeiro <---- \n
+            CPF: ${dados.cpffinanceiro} \n
+            Nome: ${dados.nomefinanceiro} \n
+            Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
+            Telefone: ${dados.telefonetitularfinanceiro} \n
+            Email: ${dados.emailtitularfinanceiro} \n
+            Sexo: ${dados.sexotitularfinanceiro} \n
+            Estado Civil: ${dados.estadociviltitularfinanceiro} \n
+            Grau de Parentesco: ${dados.grauparentesco} \n
+            Forma de Pagamento selecionada: ${nomeFormaPagamento} \n
+            Entidade Vinculada: ${nomeEntidade} \n
+            Profissão Titular do Plano: ${dados.profissaotitular} \n
+            `;
+      }
+    }
+
+    const observacoesDigitalSaude = await obsDigitalSaude();
 
     const jsonModeloDS = {
       numeroProposta: `${dados.numeroProposta}`,
@@ -2919,7 +2947,7 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
       diaVencimento: `${dados.dataVencimento ? dados.dataVencimento.split('-')[2] : 1}`,
       cpfResponsavel: dados.cpffinanceiro || dados.cpftitular,
       nomeResponsavel: dados.nomefinanceiro || dados.nomecompleto,
-      observacao: obsDigitalSaude,
+      observacao: observacoesDigitalSaude,
       plano: { codigo: `${dados.codigoPlanoDS}` },
       convenio: { codigo: `${dados.numeroConvenio}` },
       produtor: { codigo: `${dados.idCorretor}` },

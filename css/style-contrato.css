@@ -424,7 +424,7 @@ footer {
         border: 1px solid #0E3178 !important;
     }
 
-    .table-contratoGerais tr th:nth-child(1), .table-contratoGerais tr th:nth-child(2), .table-contratoGerais tr th:nth-child(3),.table-contratoGerais tr th:nth-child(4), .table-contratoGerais tr th:nth-child(5) {
+    .table-contratoGerais tr th:nth-child(1), .table-contratoGerais tr th:nth-child(2), .table-contratoGerais tr th:nth-child(3),.table-contratoGerais tr th:nth-child(4), .table-contratoGerais tr th:nth-child(5), .table-contratoGerais tr th:nth-child(6) {
         background: #0E3178 !important;
         color: #fff !important;
     }

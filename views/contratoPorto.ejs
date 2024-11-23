@@ -182,6 +182,7 @@
                                 <th> PLANO </th>
                                 <th> CÓDIGO <strong>ANS</strong> </th>
                                 <th> SEGMENTAÇÃO </th>
+                                <th> ABRANGÊNCIA GEOGRÁFICA</th>
                                 <th> ACOMODAÇÃO </th>
                                 <th> MECANISMO DE REGULAÇÃO </th>
                             </thead>
@@ -195,6 +196,9 @@
                                     </td>
                                     <td>
                                         ODONTOLÓGICO
+                                    </td>
+                                    <td>
+                                        <%= plano.abrangencia %>
                                     </td>
                                     <td>
                                         -
@@ -389,32 +393,111 @@
                 <div class="col-12">
                     <h6> FORMA DE PAGAMENTO </h6>
                     <div class="row">
-                        <% if(implantacao.formaPagamento === 1) { %>
-                            <div class="col-4">
-                                <p> Forma de Pagamento: <span> Pago á vista via boleto, PIX ou cartão de crédito. </span> </p>
-                            </div>
-                            <div class="col-4">
-                                <p>Valor total: <span> R$ <%= plano.pgtoAnualAvista %> </span></p>
-                            </div>
-                        <%  } else if (implantacao.formaPagamento === 2) { %>
-                            <div class="col-4">
-                                <p> Forma de Pagamento <span> Pago em 12x de R$ <%= (plano.pgtoAnualCartao / 12).toFixed(2) %> no cartão de crédito. </span> </p>
-                            </div>
-                            <div class="col-4">
-                                <p>Valor total: <span> R$ <%= plano.pgtoAnualCartao %> </span></p>
-                            </div>
-                        <%  } else { %>
-                            <div class="col-4">
-                                <p> Forma de Pagamento <span> Pago em 3x de R$ <%= (plano.pgtoAnualCartao3x / 3).toFixed(2) %> no cartão de crédito. </span> </p>
-                            </div>
-                            <div class="col-4">
-                                <p>Valor total: <span> R$ <%= plano.pgtoAnualCartao3x %> </span></p>
-                            </div>
-                        <% } %>  
-                            <div class="col-4">                            
-                                <p> Mês de reajuste: <span> <%= plano.reajuste %> </span></p>
-                            </div>
+                        <div class="col-4">
+                            <p> Forma de Pagamento: 
+                                <span>
+                                    <%= formaPagamento.descricao %>
+                                </span> 
+                            </p>
+                        </div>
+                        <div class="col-4"></div>
+                            <p> Valor total: 
+                                <span>
+                                    R$ <%= (formaPagamento.valor_total_pgto * nDependentes).toFixed(2) %>
+                                </span> 
+                            </p>
+                        </div>
+                        <div class="col-4">                            
+                            <p> Mês de reajuste: <span> <%= plano.reajuste %> </span></p>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="row dados">
+                <div class="col-12">
+                    <h6> VIGÊNCIA </h6>
+                    <table class="table table-contratoGerais">
+                        <thead>
+                            <th> PAGAMENTO* </th>
+                            <th> VIGÊNCIA** </th>
+                            <th> VENCIMENTO*** </th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    De 01 a 05
+                                </td>
+                                <td>
+                                    10
+                                </td>
+                                <td>
+                                    10
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 06 a 10
+                                </td>
+                                <td>
+                                    15
+                                </td>
+                                <td>
+                                    15
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 11 a 15
+                                </td>
+                                <td>
+                                    20
+                                </td>
+                                <td>
+                                    20
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 16 a 20
+                                </td>
+                                <td>
+                                    25
+                                </td>
+                                <td>
+                                    25
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 21 a 25
+                                </td>
+                                <td>
+                                    30
+                                </td>
+                                <td>
+                                    30
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    De 26 a 30/31
+                                </td>
+                                <td>
+                                    05 do mês subsequente
+                                </td>
+                                <td>
+                                    05 do mês subsequente
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <p style="text-align: justify;"><span>*Quando não for identificado o pagamento seja via boleto ou cartão de crédito até a data do vencimento inicialmente selecionado, o proponente titular ou responsável financeiro da proposta será notificado pela Administradora de Seguros e orientado sobre a adesão da proposta com nova data de vigência. A proposta também poderá sofrer alteração de vigência quando, a data selecionada para pagamento compreender um dia de feriado ou final de semana e para tanto o proponente titular ou responsável financeiro também serão notificados pela Administradora de Seguros com e-mail de boas-vindas informando o início da cobertura.<br>
+                        **Vigência significa início da cobertura e conforme indicado no parágrafo acima está sujeita a alterações. <br>
+                        ***Vencimento é o dia do pagamento a partir da segunda mensalidade, quando o seguro for contratado na opção parcelamento no boleto. </span></p>
+                    </div>
+                    <br>
                 </div>
             </div>
 
@@ -429,28 +512,28 @@
                         </p>
                         <ol>
                             <li>
-                                Este instrumento é a <strong>Proposta de Adesão </strong>, doravante denominada simplesmente <strong> "Proposta" </strong>, ao plano odontológico coletivo por adesão, doravante denominado simplesmente <strong>"benefício"</strong>, estipulado pela Mount Hermon <strong> Administradora de Benefícios </strong> Ltda., doravante denominada simplesmente “<strong> Administradora de Benefícios </strong>”, com a Dental Uni - Cooperativa Odontológica, doravante denominada simplesmente <strong> "seguradora" </strong>, e destinada à população que mantenha vínculo com a minha entidade de classe, doravante denominada simplesmente <strong> "Entidade" </strong>, indicada na página 1 desta <strong>Proposta</strong>.
+                                Este instrumento é a <strong>Proposta de Adesão </strong>, doravante denominada simplesmente <strong> "Proposta" </strong>, ao plano odontológico coletivo por adesão, doravante denominado simplesmente <strong>"seguro"</strong>, estipulado pela Mount Hermon <strong> Administradora de Seguros </strong> Ltda., doravante denominada simplesmente “<strong> Administradora de Seguros </strong>”, com a Dental Uni - Cooperativa Odontológica, doravante denominada simplesmente <strong> "seguradora" </strong>, e destinada à população que mantenha vínculo com a minha entidade de classe, doravante denominada simplesmente <strong> "Entidade" </strong>, indicada na página 1 desta <strong>Proposta</strong>.
                             </li>
                             <li>
-                                Mantenho vínculo com a Entidade indicada na página 1 desta <strong>Proposta</strong>, sendo que a documentação comprobatória desse vínculo está sendo entregue por mim ao angariador, no ato da assinatura desta, para que seja conferida pela <strong><strong> Administradora de Benefícios </strong></strong>, podendo ser recusada em razão da falta de minha elegibilidade. Em caso de recusa da adesão, a taxa de angariação será devolvida a mim pelo angariador que a recebeu. A <strong> Administradora de Benefícios </strong> e/ou a <strong>seguradora</strong> poderão, a qualquer tempo, requerer a atualização da documentação comprobatória do meu vínculo com a Entidade.
+                                Mantenho vínculo com a Entidade indicada na página 1 desta <strong>Proposta</strong>, sendo que a documentação comprobatória desse vínculo está sendo entregue por mim ao angariador, no ato da assinatura desta, para que seja conferida pela <strong><strong> Administradora de Seguros </strong></strong>, podendo ser recusada em razão da falta de minha elegibilidade. Em caso de recusa da adesão, a taxa de angariação será devolvida a mim pelo angariador que a recebeu. A <strong> Administradora de Seguros </strong> e/ou a <strong>seguradora</strong> poderão, a qualquer tempo, requerer a atualização da documentação comprobatória do meu vínculo com a Entidade.
                             </li>
                             <li>
-                                Serão aceitos como meus dependentes o (a) cônjuge; o (a) companheiro(a) que comprove união estável conforme Lei Civil; os (as) fi lhos (as); o (as) enteado (as); os (as) netos. De qualquer idade, desde que ainda sejam dependentes. Agregados que possuem grau de parentesco com o Titular até o 3° grau: pai; bisavôs (ós); ti os (as); mãe; bisnetos (as); sobrinhos (as); avôs (ós); irmão (ãs); sogro (a); cunhados (as). 
+                                Serão aceitos como meus dependentes o (a) cônjuge ou companheiro(a), desde que comprove esta condição legalmente; parentes consanguíneos até o terceiro grau de parentesco, inclusive os filhos adotivos menores de 12 (doze) anos, com aproveitamento das carências já cumpridas pelo Segurado Ativo Titular adotante, nos termos do art.12, VII, da Lei 9.656/98; parentes por afinidade até o segundo grau de parentesco; filhos inválidos de qualquer idade, mediante comprovação médica e legal da invalidez e dependência econômico-financeira; menores curatelados e tutelados, na forma da Lei e mediante comprovação legal pertinente. 
                             </li>
                             <li>
-                                A responsabilidade pelos documentos e informações fornecidos por mim e por meu(s) dependente(s) sobre toda e qualquer circunstância que possa influir na aceitação desta <strong>Proposta</strong>, na permanência e/ou no valor mensal do <strong>benefício</strong> é única e exclusivamente minha; Omissões ou dados errôneos acarretarão na perda de todos os meus direitos, bem como os do(s) meu(s) dependente(s), decorrentes do <strong>benefício</strong>.
+                                A responsabilidade pelos documentos e informações fornecidos por mim e por meu(s) dependente(s) sobre toda e qualquer circunstância que possa influir na aceitação desta <strong>Proposta</strong>, na permanência e/ou no valor mensal do <strong>seguro</strong> é única e exclusivamente minha; Omissões ou dados errôneos acarretarão na perda de todos os meus direitos, bem como os do(s) meu(s) dependente(s), decorrentes do <strong>seguro</strong>.
                             </li>
                             <li>
-                                Efetivada a análise dos documentos e das informações prestadas nesta <strong>Proposta</strong>, de acordo com a legislação vigente, será implantada pela <strong>seguradora</strong> e o <strong>benefício</strong> terá início na data indicada no campo “Início da vigência”, na página 1 da presente; tanto eu quanto meu(s) dependente(s) passaremos a ser denominados <strong> "beneficiários" </strong>.
+                                Efetivada a análise dos documentos e das informações prestadas nesta <strong>Proposta</strong>, de acordo com a legislação vigente, será implantada pela <strong>seguradora</strong> e o <strong>seguro</strong> terá início na data indicada no campo “Início da vigência”, na página 1 da presente; tanto eu quanto meu(s) dependente(s) passaremos a ser denominados <strong> "segurados" </strong>.
                             </li>
                             <li>
-                                Assim que eu assumir a condição de <strong>Beneficiário</strong> titular, ficam outorgados à <strong><strong> Administradora de Benefícios </strong></strong> amplos poderes para me representar, perante a <strong>seguradora</strong> e outros órgãos, em especial a <strong>ANS</strong>, no cumprimento e/ou nas alterações deste <strong>benefício</strong>, bem como na negociação dos reajustes dos valores mensais.
+                                Assim que eu assumir a condição de <strong>Beneficiário</strong> titular, ficam outorgados à <strong><strong> Administradora de Seguros </strong></strong> amplos poderes para me representar, perante a <strong>seguradora</strong> e outros órgãos, em especial a <strong>ANS</strong>, no cumprimento e/ou nas alterações deste <strong>seguro</strong>, bem como na negociação dos reajustes dos valores mensais.
                             </li>
                             <li>
-                                O contrato do plano odontológico coletivo por adesão firmado entre a <strong><strong> Administradora de Benefícios </strong></strong> e a <strong>seguradora</strong>, no qual passarei a integrar, vigorará pelo prazo mínimo de 12 (doze) meses, podendo ser renovado automaticamente, por prazo indeterminado, desde que não ocorra denúncia, por escrito, no prazo de 60 (sessenta) dias, de qualquer das partes, seja pela <strong><strong> Administradora de Benefícios </strong></strong> ou pela <strong>seguradora</strong>. A vigência do <strong>benefício</strong> indicada na página 1 desta <strong>Proposta</strong> não se confunde com a vigência do contrato do plano odontológico coletivo por adesão. Em caso de rescisão desse contrato do plano odontológico coletivo por adesão, a <strong><strong> Administradora de Benefícios </strong></strong> me fará a comunicação desse fato em prazo não inferior a 30 (trinta) dias.
+                                O contrato do plano odontológico coletivo por adesão firmado entre a <strong><strong> Administradora de Seguros </strong></strong> e a <strong>seguradora</strong>, no qual passarei a integrar, vigorará pelo prazo mínimo de 12 (doze) meses, podendo ser renovado automaticamente, por prazo indeterminado, desde que não ocorra denúncia, por escrito, no prazo de 60 (sessenta) dias, de qualquer das partes, seja pela <strong><strong> Administradora de Seguros </strong></strong> ou pela <strong>seguradora</strong>. A vigência do <strong>seguro</strong> indicada na página 1 desta <strong>Proposta</strong> não se confunde com a vigência do contrato do plano odontológico coletivo por adesão. Em caso de rescisão desse contrato do plano odontológico coletivo por adesão, a <strong><strong> Administradora de Seguros </strong></strong> me fará a comunicação desse fato em prazo não inferior a 30 (trinta) dias.
                             </li>
                             <li>
-                                Com antecedência mínima de 60 (sessenta) dias para o vencimento do período de cada 12 meses contratados, contados da primeira vigência, deverei denunciar à <strong><strong> Administradora de Benefícios </strong></strong>, por escrito, minha intenção em dar continuidade ou não no meu plano odontológico para o novo período anual. Não havendo minha manifestação de cancelamento, a <strong><strong> Administradora de Benefícios </strong></strong> procederá com renovação automática do meu plano odontológico e de meus dependentes, se houver. Receberei da <strong><strong> Administradora de Benefícios </strong></strong> informativo para quitação das mensalidades na mesma forma de pagamento em que foi aderido o contrato. Este será enviado em até 5 dias antes da renovação do mesmo produto com os valores atualizados, visto que o contrato prevê reajuste das mensalidades.
+                                Com antecedência mínima de 60 (sessenta) dias para o vencimento do período de cada 12 meses contratados, contados da primeira vigência, deverei denunciar à <strong><strong> Administradora de Seguros </strong></strong>, por escrito, minha intenção em dar continuidade ou não no meu plano odontológico para o novo período anual. Não havendo minha manifestação de cancelamento, a <strong><strong> Administradora de Seguros </strong></strong> procederá com renovação automática do meu plano odontológico e de meus dependentes, se houver. Receberei da <strong><strong> Administradora de Seguros </strong></strong> informativo para quitação das mensalidades na mesma forma de pagamento em que foi aderido o contrato. Este será enviado em até 5 dias antes da renovação do mesmo produto com os valores atualizados, visto que o contrato prevê reajuste das mensalidades.
                             </li>
                             <li>
                                 Alguns planos coletivos por adesão, podem possuir entre os seus mecanismos de regulação a coparticipação, que é a participação na despesa assistencial a ser paga pelo <strong>Beneficiário</strong> sempre que houver a realização de consultas, exames, procedimentos, respeitadas as resoluções e instruções normativas da <strong>ANS</strong> vigentes à época da estipulação do contrato do plano odontológico coletivo por adesão e conforme o quadro a seguir:
@@ -489,16 +572,16 @@
                             </table>
                         
                             <li>
-                                O <strong>benefício</strong> cobrirá as despesas com serviços médico-hospitalares relacionados no “Rol de Procedimentos e Eventos em Saúde”, instituído pela <strong>ANS</strong>, no tratamento das doenças codificadas na versão 11 da Classificação Estatística Internacional de Doenças e Problemas Relacionados à Saúde (CID-11), da Organização Mundial da Saúde (OMS), observadas as condições gerais deste <strong>benefício</strong>.
+                                O <strong>seguro</strong> cobrirá as despesas com serviços médico-hospitalares relacionados no “Rol de Procedimentos e Eventos em Saúde”, instituído pela <strong>ANS</strong>, no tratamento das doenças codificadas na versão 11 da Classificação Estatística Internacional de Doenças e Problemas Relacionados à Saúde (CID-11), da Organização Mundial da Saúde (OMS), observadas as condições gerais deste <strong>seguro</strong>.
                             </li>
                             <li>
-                                Além das coberturas referidas no item 9, este <strong>benefício</strong> pode oferecer, conforme as condições de cada plano, coberturas e/ou benefícios adicionais
+                                Além das coberturas referidas no item 9, este <strong>seguro</strong> pode oferecer, conforme as condições de cada plano, coberturas e/ou benefícios adicionais
                             </li>
                             <li>
-                                As coberturas excluídas do <strong>benefício</strong> são aquelas que não se incluem no “Rol de Procedimentos e Eventos em Saúde”, da <strong>ANS</strong>, nem nas coberturas adicionais eventualmente oferecidas por este <strong>benefício</strong>, bem como as despesas não cobertas citadas na Lei nº 9.656/98 e nas normas regulamentares da <strong>ANS</strong>.
+                                As coberturas excluídas do <strong>seguro</strong> são aquelas que não se incluem no “Rol de Procedimentos e Eventos em Saúde”, da <strong>ANS</strong>, nem nas coberturas adicionais eventualmente oferecidas por este <strong>seguro</strong>, bem como as despesas não cobertas citadas na Lei nº 9.656/98 e nas normas regulamentares da <strong>ANS</strong>.
                             </li>
                             <li>
-                                Os prazos de carência são os períodos nos quais nem eu nem meu(s) <strong>Beneficiário</strong>(s) dependente(s) teremos direito a determinadas coberturas, mesmo que em dia com o pagamento do <strong>benefício</strong>. Há prazos de carência para utilização do <strong>benefício</strong>, conforme tabela indicativa a seguir. Para efeitos de isenção de carências, devem-se observar as normas regulamentares da <strong>ANS</strong> e a legislação em vigor
+                                Os prazos de carência são os períodos nos quais nem eu nem meu(s) <strong>Beneficiário</strong>(s) dependente(s) teremos direito a determinadas coberturas, mesmo que em dia com o pagamento do <strong>seguro</strong>. Há prazos de carência para utilização do <strong>seguro</strong>, conforme tabela indicativa a seguir. Para efeitos de isenção de carências, devem-se observar as normas regulamentares da <strong>ANS</strong> e a legislação em vigor
                             </li>
 
                             <table class="table table-contratoGerais">
@@ -509,7 +592,7 @@
                                 <tbody>
                                     <tr>
                                         <td>
-                                            Urgência
+                                            Urgência/Emergência
                                         </td>
                                         <td>
                                             24 horas
@@ -517,15 +600,31 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            Diagnóstico e Ortodontia
+                                            Diagnóstico, Radiologia, Prevenção, Odontopediatria, e Dentística
                                         </td>
                                         <td>
-                                            30 dias
+                                            Zero
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Dentística, Prevenção, Radiologia, Cirurgia e Odontopediatria
+                                            Endodontia e Periodontia
+                                        </td>
+                                        <td>
+                                            Zero
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Cirurgia
+                                        </td>
+                                        <td>
+                                            Zero
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Prótese ROL
                                         </td>
                                         <td>
                                             60 dias
@@ -533,25 +632,17 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            Periodontia e Endodontia
+                                            Ortodontia, Prótese Extra ROL e Clareamento
                                         </td>
                                         <td>
-                                            90 Dias
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Prótese
-                                        </td>
-                                        <td>
-                                            180 Dias
+                                            120 dias
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                             </br>
                             <li>
-                                As características do <strong>benefício</strong> relativa a: (i) segmentação assistencial e (ii) abrangência geográfica estão definidas na página 1 desta <strong>Proposta</strong> e, a área de atuação dos planos no quadro a seguir:
+                                As características do <strong>seguro</strong> relativa a: (i) segmentação assistencial e (ii) abrangência geográfica estão definidas na página 1 desta <strong>Proposta</strong> e, a área de atuação dos planos no quadro a seguir:
                             </li>
 
                             <table class="table table-contratoGerais">
@@ -579,43 +670,43 @@
                                 </tbody>
                             </table>
                             <li>
-                                O pagamento do <strong>benefício</strong>, será no dia e forma indicada na página 1 desta <strong>Proposta</strong>, sendo que a falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao mês (0,033% ao dia) e à multa de 2% sobre o valor do débito em atraso, calculados proporcionalmente ao tempo de inadimplência e ainda, se for o caso, honorários advocatícios e reembolso de custas judiciais e outras despesas de cobrança. No período de inadimplência, poderá ocorrer a suspensão automática do <strong>benefício</strong>, cuja utilização somente será restabelecida a partir da quitação do(s) valor(es) pendente(s), acrescido(s) dos encargos supracitados, observada a possibilidade de cancelamento, conforme disposto no item 18 desta <strong>Proposta</strong>. No caso de inadimplência, a contar da data de seu vencimento, a <strong><strong> Administradora de Benefícios </strong></strong> adotará medidas para a cobrança dos valores em atraso, acarretando, inclusive, o envio das informações do <strong>Beneficiário</strong> titular, ou de seu responsável legal, aos órgãos de serviço de proteção ao crédito, mediante prévia comunicação, conforme determina o Código de Defesa do Consumidor
+                                O pagamento do <strong>seguro</strong>, será no dia e forma indicada na página 1 desta <strong>Proposta</strong>, sendo que a falta de pagamento na data do seu vencimento acarretará na cobrança de juros de 1% ao mês (0,033% ao dia) e à multa de 2% sobre o valor do débito em atraso, calculados proporcionalmente ao tempo de inadimplência e ainda, se for o caso, honorários advocatícios e reembolso de custas judiciais e outras despesas de cobrança. No período de inadimplência, poderá ocorrer a suspensão automática do <strong>seguro</strong>, cuja utilização somente será restabelecida a partir da quitação do(s) valor(es) pendente(s), acrescido(s) dos encargos supracitados, observada a possibilidade de cancelamento, conforme disposto no item 18 desta <strong>Proposta</strong>. No caso de inadimplência, a contar da data de seu vencimento, a <strong><strong> Administradora de Seguros </strong></strong> adotará medidas para a cobrança dos valores em atraso, acarretando, inclusive, o envio das informações do <strong>Beneficiário</strong> titular, ou de seu responsável legal, aos órgãos de serviço de proteção ao crédito, mediante prévia comunicação, conforme determina o Código de Defesa do Consumidor
                             </li>
                             <li>
-                                Independentemente da data da minha <strong>Proposta</strong>, o valor mensal do <strong>benefício</strong> poderá sofrer os seguintes reajustes:
+                                Independentemente da data da minha <strong>Proposta</strong>, o valor mensal do <strong>seguro</strong> poderá sofrer os seguintes reajustes:
                                 <br>
                                 <ul>
                                     <li>
-                                        (I) reajuste anual (financeiro e/ou por índice de sinistralidade), que ocorre quando há alteração de custos, utilização dos serviços médicos e uso de novas tecnologias, cuja periodicidade será <strong>anual </strong>, sempre no mês de aniversário do contrato celebrado entre a <strong>seguradora</strong> e a <strong>Administradora de Benefícios </strong>, independente da data de inclusão dos beneficiários no plano odontológico, nunca ocorrendo, porém, em periodicidade inferior a 12 (doze) meses, da última aplicação do reajuste anual; 
+                                        (I) reajuste anual (financeiro e/ou por índice de sinistralidade), que ocorre quando há alteração de custos, utilização dos serviços médicos e uso de novas tecnologias, cuja periodicidade será <strong>anual </strong>, sempre no mês de aniversário do contrato celebrado entre a <strong>seguradora</strong> e a <strong>Administradora de Seguros </strong>, independente da data de inclusão dos segurados no plano odontológico, nunca ocorrendo, porém, em periodicidade inferior a 12 (doze) meses, da última aplicação do reajuste anual; 
                                     </li>
                                     <li>
-                                        (II) reajuste(s) em outra(s) hipótese(s), que venha(m) a ser autorizado(s) pela <strong>ANS</strong>, contratado(s) entre a <strong><strong> Administradora de Benefícios </strong></strong> e a <strong>seguradora</strong>, além de previamente comunicado(s) ao <strong>Beneficiário</strong>
+                                        (II) reajuste(s) em outra(s) hipótese(s), que venha(m) a ser autorizado(s) pela <strong>ANS</strong>, contratado(s) entre a <strong><strong> Administradora de Seguros </strong></strong> e a <strong>seguradora</strong>, além de previamente comunicado(s) ao <strong>Beneficiário</strong>
                                     </li>
                                 </ul>
                             </li>
                             <li>
-                                Devo solicitar e informar expressamente à <strong>Administradora de Benefícios</strong> toda e qualquer alteração cadastral, tal como a eventual perda de elegibilidade. As informações relativas à alteração de e-mail, telefones celulares e demais dados deverão ser comunicados imediatamente à <strong>Administradora de Benefícios</strong>, visando o relacionamento e notificações a serem encaminhadas.
+                                Devo solicitar e informar expressamente à <strong>Administradora de Seguros</strong> toda e qualquer alteração cadastral, tal como a eventual perda de elegibilidade. As informações relativas à alteração de e-mail, telefones celulares e demais dados deverão ser comunicados imediatamente à <strong>Administradora de Seguros</strong>, visando o relacionamento e notificações a serem encaminhadas.
                             </li>
                             <li>
-                                Poderei solicitar o cancelamento do <strong>benefício</strong> à <strong>Administradora de Benefícios</strong>, de acordo com os normativos da legislação em vigor. O <strong>benefício</strong> poderá ser cancelado unilateralmente, conforme as regras e prazos previstos em contrato, nas seguintes situações (i) por uma das pessoas jurídicas contratantes (seguradora, <strong>Administradora de Benefícios</strong> ou Entidade); (ii) em caso de perda da elegibilidade, se constatada fraude no uso do plano ou nas informações prestadas na contratação; (iii) pela falta de pagamento do valor mensal do <strong>benefício</strong> até o último dia da vigência referente ao mês não pago, mediante comunicado prévio, que será enviado através de e-mail, aplicativo de whatsapp constante na base de dados da <strong>Administradora de Benefícios</strong>. No caso de cancelamento do <strong>benefício</strong>, haverá minha exclusão e a de meu(s) <strong>beneficiário</strong>(s) dependente(s), sem prejuízo da cobrança do(s) valor(es) não pago(s), incluídos juros e multa.
+                                Poderei solicitar o cancelamento do <strong>seguro</strong> à <strong>Administradora de Seguros</strong>, de acordo com os normativos da legislação em vigor. O <strong>seguro</strong> poderá ser cancelado unilateralmente, conforme as regras e prazos previstos em contrato, nas seguintes situações (i) por uma das pessoas jurídicas contratantes (seguradora, <strong>Administradora de Seguros</strong> ou Entidade); (ii) em caso de perda da elegibilidade, se constatada fraude no uso do plano ou nas informações prestadas na contratação; (iii) pela falta de pagamento do valor mensal do <strong>seguro</strong> até o último dia da vigência referente ao mês não pago, mediante comunicado prévio, que será enviado através de e-mail, aplicativo de whatsapp constante na base de dados da <strong>Administradora de Seguros</strong>. No caso de cancelamento do <strong>seguro</strong>, haverá minha exclusão e a de meu(s) <strong>segurado</strong>(s) dependente(s), sem prejuízo da cobrança do(s) valor(es) não pago(s), incluídos juros e multa.
                             </li>
                             <li>
-                                No caso de cancelamento do <strong>benefício</strong>, devolverei imediatamente à <strong><strong> Administradora de Benefícios </strong></strong> os cartões de identificação do(s) <strong>Beneficiário</strong>(s), assumindo todas as responsabilidades civis, criminais e financeiras por toda e qualquer utilização indevida do <strong>benefício</strong>, incluindo a utilização por terceiros, com ou sem o meu conhecimento.
+                                No caso de cancelamento do <strong>seguro</strong>, devolverei imediatamente à <strong><strong> Administradora de Seguros </strong></strong> os cartões de identificação do(s) <strong>Beneficiário</strong>(s), assumindo todas as responsabilidades civis, criminais e financeiras por toda e qualquer utilização indevida do <strong>seguro</strong>, incluindo a utilização por terceiros, com ou sem o meu conhecimento.
                             </li>
                             <li>
-                                Não haverá nenhuma continuidade deste <strong>benefício</strong> nas hipóteses previstas nos artigos 30 e 31 da Lei nº 9.656/98, que cuidam da continuidade assistencial em casos de demissão e aposentadoria em contratos coletivos empresariais, hipóteses essas totalmente diversas das que se aplicam a este <strong>benefício</strong>.
+                                Não haverá nenhuma continuidade deste <strong>seguro</strong> nas hipóteses previstas nos artigos 30 e 31 da Lei nº 9.656/98, que cuidam da continuidade assistencial em casos de demissão e aposentadoria em contratos coletivos empresariais, hipóteses essas totalmente diversas das que se aplicam a este <strong>seguro</strong>.
                             </li>
                             <li>
-                                Poderei postular nova adesão ao <strong>benefício</strong>, após ser feita nova análise e aceitação das condições de minha elegibilidade e após ter quitado eventuais débitos anteriores. A nova adesão estará sujeita ao cumprimento de novos prazos de carências parciais ou totais, de acordo com os normativos da legislação em vigor.
+                                Poderei postular nova adesão ao <strong>seguro</strong>, após ser feita nova análise e aceitação das condições de minha elegibilidade e após ter quitado eventuais débitos anteriores. A nova adesão estará sujeita ao cumprimento de novos prazos de carências parciais ou totais, de acordo com os normativos da legislação em vigor.
                             </li>
                             <li>
-                                Poderei desistir desta <strong>Proposta</strong>, sem nenhum ônus, desde que tal decisão seja comunicada por escrito à <strong><strong> Administradora de Benefícios </strong></strong> no prazo máximo de 7 (sete) dias, contados a partir da data de minha assinatura neste instrumento, autorizando a cobrança do valor do <strong>benefício</strong>, caso esse prazo não seja observado
+                                Poderei desistir desta <strong>Proposta</strong>, sem nenhum ônus, desde que tal decisão seja comunicada por escrito à <strong><strong> Administradora de Seguros </strong></strong> no prazo máximo de 7 (sete) dias, contados a partir da data de minha assinatura neste instrumento, autorizando a cobrança do valor do <strong>seguro</strong>, caso esse prazo não seja observado
                             </li>
                             <li>
-                                A minha manifestação de vontade, ao aceitar esta <strong>Proposta</strong>, não poderá ser questionada pelo mero fato de ter sido assinada por meio eletrônico e, para todos os fins de direito, esta <strong>Proposta</strong> equivale a um documento particular. Declaro, ainda, aceitar como válido o meio tecnológico adotado pela <strong><strong> Administradora de Benefícios </strong></strong> para a celebração desta <strong>Proposta</strong>, uma vez que garanti das a autoria e integridade do documento em forma eletrônica, nos termos da legislação em vigor.
+                                A minha manifestação de vontade, ao aceitar esta <strong>Proposta</strong>, não poderá ser questionada pelo mero fato de ter sido assinada por meio eletrônico e, para todos os fins de direito, esta <strong>Proposta</strong> equivale a um documento particular. Declaro, ainda, aceitar como válido o meio tecnológico adotado pela <strong><strong> Administradora de Seguros </strong></strong> para a celebração desta <strong>Proposta</strong>, uma vez que garanti das a autoria e integridade do documento em forma eletrônica, nos termos da legislação em vigor.
                             </li>
                             <li>
-                                O tratamento de meus dados pessoais e dados pessoais sensíveis do(s) <strong>Beneficiário</strong>(s) dependente(s) pela <strong><strong> Administradora de Benefícios </strong></strong> e <strong>seguradora</strong>, para os fins do preenchimento da <strong>Proposta</strong> e regular prestação dos serviços de assistência à saúde contratados, visa atender as exigências de garantia assistencial obrigatória estabelecidas na Instrução Normativa - IN Nº 8, de 30 de março de 2022 da Agência Nacional de Saúde Suplementar - <strong>ANS</strong>, e será realizado independentemente do meu consentimento e do(s) <strong>Beneficiário</strong>(s) dependente(s) de dados manifestado no ato da contratação, sempre de modo a resguardar os direitos fundamentais de liberdade, privacidade e livre desenvolvimento da pessoa natural, em observância à Lei Federal nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD)” 
+                                O tratamento de meus dados pessoais e dados pessoais sensíveis do(s) <strong>Beneficiário</strong>(s) dependente(s) pela <strong><strong> Administradora de Seguros </strong></strong> e <strong>seguradora</strong>, para os fins do preenchimento da <strong>Proposta</strong> e regular prestação dos serviços de assistência à saúde contratados, visa atender as exigências de garantia assistencial obrigatória estabelecidas na Instrução Normativa - IN Nº 8, de 30 de março de 2022 da Agência Nacional de Saúde Suplementar - <strong>ANS</strong>, e será realizado independentemente do meu consentimento e do(s) <strong>Beneficiário</strong>(s) dependente(s) de dados manifestado no ato da contratação, sempre de modo a resguardar os direitos fundamentais de liberdade, privacidade e livre desenvolvimento da pessoa natural, em observância à Lei Federal nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD)” 
                             </li>
                             <li>
                                 O Foro para dirimir quaisquer questões oriundas da presente <strong>Proposta</strong> é o do meu domicílio.
@@ -670,7 +761,7 @@
                             saúde contratado por uma empresa ou órgão público (coletivo empresarial); associação
                             profissional, sindicato ou entidade assemelhada (coletivo por adesão). Nos planos coletivos
                             é um representante dessas pessoas jurídicas contratantes, com a participação ou não de uma
-                            <strong><strong> Administradora de Benefícios </strong></strong>, que negocia e define as características do plano a ser
+                            <strong><strong> Administradora de Seguros </strong></strong>, que negocia e define as características do plano a ser
                             contratado. Assim, é importante que o <strong>Beneficiário</strong> antes de vincular-se a um plano coletivo,
                             em especial o por adesão, avalie a compatibilidade entre os seus interesses e os interesses
                             da pessoa jurídica contratante.
@@ -709,7 +800,7 @@
                                             <strong>Beneficiário</strong> ingresse no plano em até trinta dias da celebração do contrato
                                             firmado entre a pessoa jurídica contratante e a seguradora de plano de saúde.
                                             A cada aniversário do contrato será permitida a adesão de novos
-                                            beneficiários sem o cumprimento de carência, desde que: (1) os mesmos tenham
+                                            segurados sem o cumprimento de carência, desde que: (1) os mesmos tenham
                                             se vinculado à pessoa jurídica contratante após os 30 dias da celebração do
                                             contrato e (2) tenham formalizado a proposta de adesão até 30 dias da data
                                             de aniversário do contrato.
@@ -805,7 +896,7 @@
                                     Alterações na rede de prestadores de serviço devem ser informadas pela seguradora,
                                     inclusive as inclusões. No caso de redimensionamento por redução de prestador
                                     hospitalar, a alteração necessita ser autorizada pela <strong>ANS</strong> antes da comunicação aos
-                                    beneficiários. Esta comunicação deve observar 30 dias de antecedência no caso de
+                                    segurados. Esta comunicação deve observar 30 dias de antecedência no caso de
                                     substituição de prestador hospitalar para que a equivalência seja analisada pela
                                     <strong>ANS</strong>.
                                 </td>
@@ -850,7 +941,7 @@
                             Perda da condição de <strong>Beneficiário</strong> nos planos coletivos
                         </h1>
                         <p>
-                            Nos planos coletivos os beneficiários titulares e seus dependentes podem ser excluídos do
+                            Nos planos coletivos os segurados titulares e seus dependentes podem ser excluídos do
                             plano de saúde, que continua vigente, quando perdem o vínculo com a pessoa jurídica
                             contratante, ou seja, com o sindicato, associação profissional ou congênere, órgão público
                             ou empresa.
@@ -863,7 +954,7 @@
                             Nos planos coletivos empresariais em que há participação financeira do <strong>Beneficiário</strong> no
                             pagamento da mensalidade, regular é não vinculada à coparticipação em eventos, é assegurado
                             ao mesmo o direito de permanência neste plano coletivo no caso de demissão sem justa causa
-                            ou aposentadoria. No caso de morte do titular demitido ou aposentado em gozo de <strong>benefício</strong>
+                            ou aposentadoria. No caso de morte do titular demitido ou aposentado em gozo de <strong>seguro</strong>
                             decorrente dos artigos 30 e 31, é assegurada a permanência do grupo familiar. <br>
                             O <strong>Beneficiário</strong> tem um prazo máximo de 30 dias, após seu desligamento, para se manifestar
                             junto à empresa/órgão público, com a qual mantinha vínculo empregatício ou estatutário,
@@ -880,13 +971,13 @@
                             empresarial
                         </h1>
                         <p>
-                            Os beneficiários de planos coletivos empresariais que tiverem o <strong>benefício</strong> de plano de saúde
+                            Os segurados de planos coletivos empresariais que tiverem o <strong>seguro</strong> de plano de saúde
                             extinto, terão o direito de se vincular a um plano da mesma seguradora com contratação
                             individual ou familiar, sem a necessidade de cumprimento de novos prazos de carência. Essa
                             prerrogativa não se aplica aos planos de autogestões. <br>
                             A condição para exercer esse direito é que a seguradora comercialize plano individual ou
                             familiar. <br>
-                            O <strong>Beneficiário</strong> tem um prazo máximo de 30 dias, após a extinção do <strong>benefício</strong>, para contratar,
+                            O <strong>Beneficiário</strong> tem um prazo máximo de 30 dias, após a extinção do <strong>seguro</strong>, para contratar,
                             junto à seguradora, o plano individual ou familiar. <br>
                             Este direito não existe caso tenha havido apenas a troca de seguradora por parte do
                             contratante (órgão público ou empresa)
@@ -926,15 +1017,15 @@
                         </p>
 
                         <h1>
-                            <strong><strong> Administradora de Benefícios </strong></strong>
+                            <strong><strong> Administradora de Seguros </strong></strong>
                         </h1>
                         <p>
-                            Quando houver participação <strong><strong> Administradora de Benefícios </strong></strong> na contratação de plano coletivo
+                            Quando houver participação <strong><strong> Administradora de Seguros </strong></strong> na contratação de plano coletivo
                             empresarial, a verificação do número de participantes para fins de carência ou CPT
                             considerará a totalidade de participantes eventualmente já vinculados ao plano estipulado. <br>
                             Se a contratação for de plano coletivo por adesão, para fins de carência considerar-se-á
                             como data de celebração do contrato coletivo a data do ingresso da pessoa jurídica
-                            contratante ao contrato estipulado pela <strong><strong> Administradora de Benefícios </strong></strong>
+                            contratante ao contrato estipulado pela <strong><strong> Administradora de Seguros </strong></strong>
                         </p>
                         <div class="rodape">
                             <div class="rodapeManual">
@@ -1127,7 +1218,7 @@
                         <h6> ADITIVO DE REDUÇÃO DE CARÊNCIA </h6>
                         <div class="row">
                             <p>
-                                Este Aditivo de Redução de Carências é parte integrante da Proposta acima referida e visa conceder prazos de carência reduzidos, contados a partir do início de vigência do benefício, aos proponentes elegíveis a essa redução.
+                                Este Aditivo de Redução de Carências é parte integrante da Proposta acima referida e visa conceder prazos de carência reduzidos, contados a partir do início de vigência do seguro, aos proponentes elegíveis a essa redução.
                             </p>
     
                             <table class="table table-contratoGerais">

@@ -182,6 +182,7 @@
                                 <th> PLANO </th>
                                 <th> CÓDIGO <strong>ANS</strong> </th>
                                 <th> SEGMENTAÇÃO </th>
+                                <th> ABRANGÊNCIA GEOGRÁFICA </th>
                                 <th> ACOMODAÇÃO </th>
                                 <th> MECANISMO DE REGULAÇÃO </th>
                             </thead>
@@ -195,6 +196,9 @@
                                     </td>
                                     <td>
                                         ODONTOLÓGICO
+                                    </td>
+                                    <td>
+                                        <%= plano.abrangencia %>
                                     </td>
                                     <td>
                                         -
@@ -399,7 +403,7 @@
                         <div class="col-4"></div>
                             <p> Valor total: 
                                 <span>
-                                    R$ <%= formaPagamento.valor_total_pgto.toFixed(2) %>
+                                    R$ <%= (formaPagamento.valor_total_pgto * nDependentes).toFixed(2) %>
                                 </span> 
                             </p>
                         </div>
@@ -415,9 +419,9 @@
                     <h6> VIGÊNCIA </h6>
                     <table class="table table-contratoGerais">
                         <thead>
-                            <th> PAGAMENTO </th>
-                            <th> VIGÊNCIA </th>
-                            <th> VENCIMENTO </th>
+                            <th> PAGAMENTO* </th>
+                            <th> VIGÊNCIA** </th>
+                            <th> VENCIMENTO*** </th>
                         </thead>
                         <tbody>
                             <tr>
@@ -469,10 +473,10 @@
                                     De 21 a 25
                                 </td>
                                 <td>
-                                    25
+                                    30
                                 </td>
                                 <td>
-                                    25
+                                    30
                                 </td>
                             </tr>
                             <tr>
@@ -489,7 +493,7 @@
                         </tbody>
                     </table>
                     <div class="row">
-                        <p><span>*Quando não for identificado o pagamento seja via boleto ou cartão de crédito até a data do vencimento inicialmente selecionado, o proponente titular ou responsável financeiro da proposta será notificado pela Administradora de Benefícios e orientado sobre a adesão da proposta com nova data de vigência. A proposta também poderá sofrer alteração de vigência quando, a data selecionada para pagamento compreender um dia de feriado ou final de semana e para tanto o proponente titular ou responsável financeiro também serão notificados pela Administradora de Benefícios com e-mail de boas-vindas informando o início da cobertura.<br>
+                        <p style="text-align: justify;"><span>*Quando não for identificado o pagamento seja via boleto ou cartão de crédito até a data do vencimento inicialmente selecionado, o proponente titular ou responsável financeiro da proposta será notificado pela Administradora de Benefícios e orientado sobre a adesão da proposta com nova data de vigência. A proposta também poderá sofrer alteração de vigência quando, a data selecionada para pagamento compreender um dia de feriado ou final de semana e para tanto o proponente titular ou responsável financeiro também serão notificados pela Administradora de Benefícios com e-mail de boas-vindas informando o início da cobertura.<br>
                         **Vigência significa início da cobertura e conforme indicado no parágrafo acima está sujeita a alterações. <br>
                         ***Vencimento é o dia do pagamento a partir da segunda mensalidade, quando o benefício for contratado na opção parcelamento no boleto. </span></p>
                     </div>
@@ -686,7 +690,7 @@
                                             <%= plano.nome_do_plano %>
                                         </td>
                                         <td>
-                                            <%= plano.ANS %>
+                                            <%= plano.ans %>
                                         </td>
                                         <td>
                                             ODONTOLÓGICO
@@ -1234,6 +1238,71 @@
                                 </td>
                             </tr>
                         </table>
+                    </div>
+                    <div class="rodape">
+                        <div class="rodapeManual">
+                            <p>
+                                Para informar-se sobre estes e outros detalhes da contratação de planos de saúde, o
+                                <strong>Beneficiário</strong> deve contatar a operadora. Permanecendo dúvidas, pode consultar a <strong>ANS</strong>
+                                pelo site www.ANS.gov.br ou pelo Disque ANS (0800-701-9656).
+                            </p>
+                            <p>
+                                ESTE MANUAL NÃO SUBSTITUI O CONTRATO
+                            </p>
+                        </div>
+                        <div class="rodapeAns">
+                            <p>
+                                O Manual de Orientação para Contratação de Planos de Saúde é uma exigência da
+                                Resolução Normativa 195/2009, da Agência Nacional de Saúde Suplementar
+                            </p>
+                            <div class="row">
+                                <img src="/img/ANSlogo.png">
+                                <img src="/img/ministerio-da-saude.png">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <p>
+                                    Agência Nacional de Saúde Suplementar </br>
+                                    Av. Augusto Severo, 84 - Glória - CEP: 20021-040</br>
+                                    Rio de Janeiro - RJ
+                                </p>
+                            </div>
+                            <div class="col-6">
+                                <p>
+                                    Disque-ANS: 0800 701 9656 </br>
+                                    www.ANS.gov.br </br>
+                                    ouvidoria@ANS.gov.br
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="
+                        width: 100%;
+                        display: flex;
+                        flex-direction: row;">
+                        <div style="
+                            width: 50%;
+                            display: flex;
+                            flex-direction: column;
+                            ">
+                            <%= plano.siteOperadora %> | Tel: <%= plano.telefoneOperadora %>
+                        </div>
+                        <div style="
+                            width: 50%;
+                            display: flex;
+                            flex-direction: column;
+                            color: #0E3178;
+                            font-weight: 900;
+                            font-size: 12px;
+                            text-align: end;"
+                            >
+                            <div style="font-family: 'Times New Roman', Times, serif; background-color: black;padding: 2px; color: white; display: inline-block; width: fit-content">
+                                <div style="border: 1px solid white">
+                                  <strong>ANS</strong> Nº <%= plano.ansOperadora %>
+                                </div>
+                              </div>
+                        </div>
                     </div>
                 </div>
             </div>
