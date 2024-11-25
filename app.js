@@ -896,7 +896,7 @@ async function pegarCodigoDSGrupo(idOperadora) {
   } else if (idOperadora === '2') {
     return "A37CYHBA3M";
   } else if (idOperadora === '3') {
-    return "0000000" //inserir código da Porto
+    return "LNCUR4B7ES" //inserir código da Porto
   } else {
     console.log('Nenhum código encontrado')
   }
