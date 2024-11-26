@@ -3151,8 +3151,8 @@ app.post("/error404", (res, req) => {
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
-  enviarMensagemDiscord(__dirname, 'erro');
-	enviarMensagemDiscord(process.cwd(), 'erro');
+  //enviarMensagemDiscord(__dirname, 'erro');
+	//enviarMensagemDiscord(process.cwd(), 'erro');
 });
 
 app.use((req, res, next) => {
