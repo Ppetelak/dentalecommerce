@@ -31,6 +31,7 @@ const { default: id } = require("date-fns/locale/id");
 const port = process.env.PORT || 5586;
 const appUrl = process.env.APP_URL || "http://localhost:5586";
 const pastaInterna = process.env.PASTA_INTERNA || "dentalEcommerce"
+const caminhoViewEmailEnviado = process.env.caminhoViewEmailEnviado || (__dirname, `../dentalecommerce/views/emailTemplate.ejs`);
 
 /* Verificar se usuário está logado */
 const verificaAutenticacao = (req, res, next) => {
@@ -481,7 +482,7 @@ async function sendContractEmail(
 
       logger.info("Renderizando o template do email");
       const html = await ejs.renderFile(
-        path.join(__dirname, `../views/emailTemplate.ejs`),
+        path.join(caminhoViewEmailEnviado),
         {
           nomeTitularFinanceiro,
           linkAleatorio,
@@ -1459,10 +1460,9 @@ app.post("/testeFormulario", async (req, res) => {
             **Titular Financeiro:** ${nomefinanceiro}
             **CPF:** ${cpffinanceiro}
             **Endereço:** ${dados.enderecoresidencial}, Nº ${dados.numeroendereco}, Bairro: ${dados.bairro}, Cidade: ${dados.cidade}, Estado: ${dados.estado}, CEP: ${dados.cep} \n
-            **--- Forma de Pagamento ---**
-            **Forma de Pagamento Digital Saúde:** ${dadosFormaPagamento.parametrizacao}\n
-            **Descrição:** ${dadosFormaPagamento.descricao}\n
-            **Data Vencimento:** ${dados.dataVencimento} \n
+            **--- Forma de Pagamento ---** \n
+            **Descrição Forma de Pagamento** ${dadosFormaPagamento.descricao}\n
+            **Data Vencimento:** ${formatarDataDs(dados.dataVencimento)} \n
             **Valor Parcela Mínima:** ${valorParcelaMinima} \n
             **Valor total:** ${valorTotal} \n
 
@@ -3151,6 +3151,8 @@ app.post("/error404", (res, req) => {
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
+  enviarMensagemDiscord(__dirname, 'erro');
+	enviarMensagemDiscord(process.cwd(), 'erro');
 });
 
 app.use((req, res, next) => {
