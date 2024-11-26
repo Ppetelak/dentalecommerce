@@ -106,7 +106,7 @@ function pegaDados() {
   var dependentes = [];
   var inputs = {};
 
-  if(quantidadeDependentes > 0){
+  if(quantidadeDependentes > 1){
     for(i = 1; i <= quantidadeDependentes; i++){
       let divDependente = document.querySelector(`[data-id="dependente-${i}"]`);
       let dependente = {};

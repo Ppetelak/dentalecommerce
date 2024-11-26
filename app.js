@@ -481,7 +481,7 @@ async function sendContractEmail(
 
       logger.info("Renderizando o template do email");
       const html = await ejs.renderFile(
-        path.join(__dirname, `../${pastaInterna}/views/emailTemplate.ejs`),
+        path.join(__dirname, `../views/emailTemplate.ejs`),
         {
           nomeTitularFinanceiro,
           linkAleatorio,
