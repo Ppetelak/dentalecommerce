@@ -399,12 +399,20 @@
                                 </span> 
                             </p>
                         </div>
-                        <div class="col-4"></div>
-                            <p> Valor total: 
-                                <span>
-                                    R$ <%= (formaPagamento.valor_total_pgto * nDependentes).toFixed(2) %>
-                                </span> 
-                            </p>
+                        <div class="col-4">
+                        <% if (formaPagamento.parametrizacao === 'À vista') { %>
+                                <p> Valor total: 
+                                    <span>
+                                        R$ <%= ((formaPagamento.valor_total_pgto * nDependentes)* 0.9).toFixed(2) %>
+                                    </span> 
+                                </p>
+                        <% } else { %>
+                                <p> Valor total: 
+                                    <span>
+                                        R$ <%= (formaPagamento.valor_total_pgto * nDependentes).toFixed(2) %>
+                                    </span> 
+                                </p>
+                        <% } %>
                         </div>
                         <div class="col-4">                            
                             <p> Mês de reajuste: <span> <%= plano.reajuste %> </span></p>
