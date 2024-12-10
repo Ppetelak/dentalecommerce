@@ -1,6 +1,10 @@
 let etapaAtual = 1;
 var quantidadeDependentes = 1;
-var valorPagarAtualizado = 0
+let valorUnitario = parseFloat(document.getElementById("valorAnualBD").value);
+console.log(valorUnitario);
+let valorPagarAtualizado = parseFloat(document.getElementById("valorAnualBD").value);
+
+console.log(valorPagarAtualizado);
 
 var cpfValido = false;
 
@@ -9,10 +13,9 @@ let anexosObjeto = {};
 var fileInput = document.querySelector('.file-input');
 fileInput.removeAttribute('multiple');
 
-var valorPagarAtualizado = 0;
-
 
 let valorAnual = document.querySelector("#valorAnualBD").value;
+
 
 function validaSeCpfEstaValido() {
   // Supondo que `cpfValido` seja uma variável que indique a validade de um CPF
@@ -669,12 +672,11 @@ function handlePossuiDependentesChange() {
   var spanQtdDependentes = document.querySelector("#qtdDependentes");
   spanQtdDependentes.textContent = quantidadeDependentes;
   var botao = document.querySelector("#add-dependente");
-  var spanValorAnual = document.querySelector(".valorAnual");
 
 
   if (selecionado === "Sim") {
     var multiplicador = quantidadeDependentes + 1;
-    atualizarValores(spanValorAnual, valorAnual, multiplicador);
+    atualizarValores(multiplicador);
     existeSim.innerHTML = divPrimeiroDependente;
     botao.style.display = "block";
     nDependentes.value = 1;
@@ -683,7 +685,7 @@ function handlePossuiDependentesChange() {
     botao.style.display = "none";
     nDependentes.value = 0;
     var multiplicador = 1;
-    atualizarValores(spanValorAnual, valorAnual, multiplicador);
+    atualizarValores(multiplicador);
 
     var btnProximo = document.querySelector(".btnproximo2");
     console.log(btnProximo)
@@ -697,7 +699,7 @@ function handlePossuiDependentesChange() {
   }
 }
 
-function atualizaValoresFormaPagamento (valorPagarAtualizado) {
+function atualizaValoresFormaPagamento () {
   var valoresAVista = document.querySelectorAll('.ValorAVista10off');
   valoresAVista.forEach(total => {
     total.textContent = ` R$ ${(valorPagarAtualizado * 0.9).toFixed(2)}`;
@@ -706,23 +708,28 @@ function atualizaValoresFormaPagamento (valorPagarAtualizado) {
   totais.forEach(total => {
     total.textContent = `R$ ${valorPagarAtualizado}`
   })
+  console.log (`Valor na função atualizaValoresFormaPagamento(): ${valorPagarAtualizado}`)
+  document.querySelector('#valorAnual').textContent = ` R$ ${valorPagarAtualizado}`;
   document.querySelector('#valorCartaoParcelado').textContent = ` R$ ${(valorPagarAtualizado /12).toFixed(2)}`;
   document.querySelector('#valorPagamentoBoleto3x').textContent = ` R$ ${(valorPagarAtualizado /3).toFixed(2)}`
 }
 
-function atualizarValores(elemento, valorBase, multiplicador) {
-  if (elemento) {
-    console.log('entrou na função de atualizar valores com os seguinte valores: ',
-      {
-        'elemento': elemento,
-        "valorBase": valorBase,
-        "multiplicador": multiplicador
-      }
-    )
-    valorPagarAtualizado = (valorBase * multiplicador).toFixed(2);
-    atualizaValoresFormaPagamento (valorPagarAtualizado)
-    elemento.textContent = `${(valorBase * multiplicador).toFixed(2)}`;
-  }
+setInterval(atualizaValoresFormaPagamento, 1000);
+
+function atualizarValores(multiplicador) {
+  /* valorPagarAtualizado = parseFloat(valorUnitario);
+  console.log( {
+    'quando': 'antes de multiplicar',
+    'valor anual': valorPagarAtualizado,
+    'multiplicador': multiplicador
+  }) */
+  valorPagarAtualizado = parseFloat(valorUnitario * multiplicador);
+  console.log({
+    'quando': 'depois de multiplicar',
+    'valor anual': valorPagarAtualizado,
+    'multiplicador': multiplicador
+  })
+
 }
 
 function atualizarDataIdDependentes() {
@@ -730,10 +737,9 @@ function atualizarDataIdDependentes() {
   quantidadeDependentes = dependentes.length;
   var spanQtdDependentes = document.querySelector("#qtdDependentes");
   spanQtdDependentes.textContent = quantidadeDependentes;
-  var spanValorAnual = document.querySelector(".valorAnual");
 
   var multiplicador = quantidadeDependentes + 1;
-  atualizarValores(spanValorAnual, valorAnual, multiplicador);
+  atualizarValores(multiplicador);
 
   dependentes.forEach(function (dependente, index) {
     dependente.dataset.id = "dependente-" + (index + 1);
@@ -897,31 +903,10 @@ const divEscolhaVencimento = `
 
 const dataVencimentoEscolha = document.getElementById('dataVencimentoEscolha');
 
-/* $('input[name="formaPagamento"]').on('change', function() {
-  console.log('mudou')
-  var formaPagamentoSelecionada = $(this).val();
-  console.log(formaPagamentoSelecionada)
-  console.log(dataVencimentoEscolha)
-  if (formaPagamentoSelecionada === '2' || formaPagamentoSelecionada === '3') {
-    dataVencimentoEscolha.innerHTML = divEscolhaVencimento;
-    //funcaoParaCartao();
-  }
-  if (formaPagamentoSelecionada === '1') {
-    dataVencimentoEscolha.innerHTML = '';
-  }
-}); */
 
 function funcaoParaCartao() {
   $('#modalCartaoCredito').modal('show');
 }
-
-/* function validarPagamento () {
-  $('#modalCartaoCredito').hide()
-  $('.modal-backdrop').hide()
-  $('.confirmacaoPgtoCartao').show()
-  $('input[name="formaPagamento"]').prop('disabled', true);
-
-} */
 
 function upload(etapa) {
 

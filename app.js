@@ -1050,11 +1050,13 @@ app.post("/formulario", async (req, res) => {
             console.error("Erro ao resgatar formas de pagamento do BD");
           }
           const planoSelecionado = result[0];
-          let operadora = '';
-          if (result.idoperadora === 1) {
+          let operadora;
+          if (planoSelecionado.idoperadora === 1) {
             operadora = 'Dental Uni'
-          } else {
+          } if (planoSelecionado.idoperadora === 2) {
             operadora = 'Odontogroup'
+          } if (planoSelecionado.idoperadora === 3) {
+            operadora = 'Porto Seguro'
           }
           res.render("form", {
             planoSelecionado: planoSelecionado,
@@ -1163,26 +1165,11 @@ app.post("/testeFormulario", async (req, res) => {
 
     async function obsDigitalSaude() {
       if (dados.titularresponsavelfinanceiro === "Sim") {
-        return `O TITULAR É O MESMO TITULAR FINANCEIRO \n
-        Forma de Pagamento selecionada: ${nomeFormaPagamento} \n
-        Entidade Vinculada: ${nomeEntidade} \n
-        Profissão Titular do Plano: ${dados.profissaotitular} \n
+        return `O TITULAR É O MESMO TITULAR FINANCEIRO | Forma de Pagamento selecionada: ${nomeFormaPagamento} | Entidade Vinculada: ${nomeEntidade} | Profissão Titular do Plano: ${dados.profissaotitular}
         `;
       } else {
         return `
-            O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
-            ----> Dados responsável Financeiro <---- \n
-            CPF: ${dados.cpffinanceiro} \n
-            Nome: ${dados.nomefinanceiro} \n
-            Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
-            Telefone: ${dados.telefonetitularfinanceiro} \n
-            Email: ${dados.emailtitularfinanceiro} \n
-            Sexo: ${dados.sexotitularfinanceiro} \n
-            Estado Civil: ${dados.estadociviltitularfinanceiro} \n
-            Grau de Parentesco: ${dados.grauparentesco} \n
-            Forma de Pagamento selecionada: ${nomeFormaPagamento} \n
-            Entidade Vinculada: ${nomeEntidade} \n
-            Profissão Titular do Plano: ${dados.profissaotitular} \n
+            O TITULAR NÃO É O MESMO TITULAR FINANCEIRO | ----> Dados responsável Financeiro <---- |  CPF: ${dados.cpffinanceiro} | Nome: ${dados.nomefinanceiro} | Data de Nascimento: ${dados.datadenascimentofinanceiro} | Telefone: ${dados.telefonetitularfinanceiro} | Email: ${dados.emailtitularfinanceiro} | Sexo: ${dados.sexotitularfinanceiro} | Estado Civil: ${dados.estadociviltitularfinanceiro} | Grau de Parentesco: ${dados.grauparentesco} | Forma de Pagamento selecionada: ${nomeFormaPagamento} | Entidade Vinculada: ${nomeEntidade} | Profissão Titular do Plano: ${dados.profissaotitular}
             `;
       }
     }
@@ -1460,6 +1447,7 @@ app.post("/testeFormulario", async (req, res) => {
             **Titular Financeiro:** ${nomefinanceiro}
             **CPF:** ${cpffinanceiro}
             **Endereço:** ${dados.enderecoresidencial}, Nº ${dados.numeroendereco}, Bairro: ${dados.bairro}, Cidade: ${dados.cidade}, Estado: ${dados.estado}, CEP: ${dados.cep} \n
+            **Telefone Responsável Financeiro:** ${celulartitularfinanceiro}
             **--- Forma de Pagamento ---** \n
             **Descrição Forma de Pagamento** ${dadosFormaPagamento.descricao}\n
             **Data Vencimento:** ${formatarDataDs(dados.dataVencimento)} \n
@@ -2915,26 +2903,11 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
 
     async function obsDigitalSaude() {
       if (dados.titularresponsavelfinanceiro === "Sim") {
-        return `O TITULAR É O MESMO TITULAR FINANCEIRO \n
-        Forma de Pagamento selecionada: ${nomeFormaPagamento} \n
-        Entidade Vinculada: ${nomeEntidade} \n
-        Profissão Titular do Plano: ${dados.profissaotitular} \n
+        return `O TITULAR É O MESMO TITULAR FINANCEIRO | Forma de Pagamento selecionada: ${nomeFormaPagamento} | Entidade Vinculada: ${nomeEntidade} | Profissão Titular do Plano: ${dados.profissaotitular}
         `;
       } else {
         return `
-            O TITULAR NÃO É O MESMO TITULAR FINANCEIRO \n
-            ----> Dados responsável Financeiro <---- \n
-            CPF: ${dados.cpffinanceiro} \n
-            Nome: ${dados.nomefinanceiro} \n
-            Data de Nascimento: ${dados.datadenascimentofinanceiro} \n
-            Telefone: ${dados.telefonetitularfinanceiro} \n
-            Email: ${dados.emailtitularfinanceiro} \n
-            Sexo: ${dados.sexotitularfinanceiro} \n
-            Estado Civil: ${dados.estadociviltitularfinanceiro} \n
-            Grau de Parentesco: ${dados.grauparentesco} \n
-            Forma de Pagamento selecionada: ${nomeFormaPagamento} \n
-            Entidade Vinculada: ${nomeEntidade} \n
-            Profissão Titular do Plano: ${dados.profissaotitular} \n
+            O TITULAR NÃO É O MESMO TITULAR FINANCEIRO | ----> Dados responsável Financeiro <---- |  CPF: ${dados.cpffinanceiro} | Nome: ${dados.nomefinanceiro} | Data de Nascimento: ${dados.datadenascimentofinanceiro} | Telefone: ${dados.telefonetitularfinanceiro} | Email: ${dados.emailtitularfinanceiro} | Sexo: ${dados.sexotitularfinanceiro} | Estado Civil: ${dados.estadociviltitularfinanceiro} | Grau de Parentesco: ${dados.grauparentesco} | Forma de Pagamento selecionada: ${nomeFormaPagamento} | Entidade Vinculada: ${nomeEntidade} | Profissão Titular do Plano: ${dados.profissaotitular}
             `;
       }
     }
