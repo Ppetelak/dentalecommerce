@@ -2903,11 +2903,11 @@ app.get('/reenviarPropostaDS/:id', async (req, res) => {
 
     async function obsDigitalSaude() {
       if (dados.titularresponsavelfinanceiro === "Sim") {
-        return `O TITULAR É O MESMO TITULAR FINANCEIRO | Forma de Pagamento selecionada: ${nomeFormaPagamento} | Entidade Vinculada: ${nomeEntidade} | Profissão Titular do Plano: ${dados.profissaotitular}
+        return `O TITULAR É O MESMO TITULAR FINANCEIRO | Forma de Pagamento selecionada: ${nomeFormaPagamento} | Entidade Vinculada: ${dados.nomeEntidade} | Profissão Titular do Plano: ${dados.profissaotitular}
         `;
       } else {
         return `
-            O TITULAR NÃO É O MESMO TITULAR FINANCEIRO | ----> Dados responsável Financeiro <---- |  CPF: ${dados.cpffinanceiro} | Nome: ${dados.nomefinanceiro} | Data de Nascimento: ${dados.datadenascimentofinanceiro} | Telefone: ${dados.telefonetitularfinanceiro} | Email: ${dados.emailtitularfinanceiro} | Sexo: ${dados.sexotitularfinanceiro} | Estado Civil: ${dados.estadociviltitularfinanceiro} | Grau de Parentesco: ${dados.grauparentesco} | Forma de Pagamento selecionada: ${nomeFormaPagamento} | Entidade Vinculada: ${nomeEntidade} | Profissão Titular do Plano: ${dados.profissaotitular}
+            O TITULAR NÃO É O MESMO TITULAR FINANCEIRO | ----> Dados responsável Financeiro <---- |  CPF: ${dados.cpffinanceiro} | Nome: ${dados.nomefinanceiro} | Data de Nascimento: ${dados.datadenascimentofinanceiro} | Telefone: ${dados.telefonetitularfinanceiro} | Email: ${dados.emailtitularfinanceiro} | Sexo: ${dados.sexotitularfinanceiro} | Estado Civil: ${dados.estadociviltitularfinanceiro} | Grau de Parentesco: ${dados.grauparentesco} | Forma de Pagamento selecionada: ${nomeFormaPagamento} | Entidade Vinculada: ${dados.nomeEntidade} | Profissão Titular do Plano: ${dados.profissaotitular}
             `;
       }
     }

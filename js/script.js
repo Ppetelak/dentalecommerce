@@ -103,14 +103,25 @@ function validarFormulario(etapa) {
   }
 }
 
+setInterval(verificarNdependentes, 1000);
+
+function verificarNdependentes () {
+  var nDependentes = document.querySelector(".nDependentes").value;
+  console.log('Numero de depndentes: ' + nDependentes)
+}
+
+
+
 function pegaDados() {
 
   var dados = {};
   var dependentes = [];
   var inputs = {};
 
-  if(quantidadeDependentes + 1 > 1){
-    for(i = 1; i <= quantidadeDependentes; i++){
+  var nDependentes = document.querySelector(".nDependentes").value;
+
+  if(nDependentes > 0){
+    for(i = 1; i <= nDependentes; i++){
       let divDependente = document.querySelector(`[data-id="dependente-${i}"]`);
       let dependente = {};
       let inputs = divDependente.querySelectorAll('input, select');
@@ -684,7 +695,8 @@ function handlePossuiDependentesChange() {
     existeSim.innerHTML = '';
     botao.style.display = "none";
     nDependentes.value = 0;
-    var multiplicador = 1;
+    //var multiplicador = 1;
+    quantidadeDependentes = 1;
     atualizarValores(multiplicador);
 
     var btnProximo = document.querySelector(".btnproximo2");
@@ -717,19 +729,8 @@ function atualizaValoresFormaPagamento () {
 setInterval(atualizaValoresFormaPagamento, 1000);
 
 function atualizarValores(multiplicador) {
-  /* valorPagarAtualizado = parseFloat(valorUnitario);
-  console.log( {
-    'quando': 'antes de multiplicar',
-    'valor anual': valorPagarAtualizado,
-    'multiplicador': multiplicador
-  }) */
+  quantidadeDependentes = multiplicador;
   valorPagarAtualizado = parseFloat(valorUnitario * multiplicador);
-  console.log({
-    'quando': 'depois de multiplicar',
-    'valor anual': valorPagarAtualizado,
-    'multiplicador': multiplicador
-  })
-
 }
 
 function atualizarDataIdDependentes() {
@@ -738,7 +739,15 @@ function atualizarDataIdDependentes() {
   var spanQtdDependentes = document.querySelector("#qtdDependentes");
   spanQtdDependentes.textContent = quantidadeDependentes;
 
+  var inputQtdDependentes = document.querySelector(".nDependentes");
+
+  // Atualiza o valor do input hidden
+  if (inputQtdDependentes) {
+    inputQtdDependentes.value = quantidadeDependentes;
+  }
+
   var multiplicador = quantidadeDependentes + 1;
+  
   atualizarValores(multiplicador);
 
   dependentes.forEach(function (dependente, index) {
