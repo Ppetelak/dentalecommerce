@@ -1411,9 +1411,10 @@ app.post("/testeFormulario", async (req, res) => {
             }
           })
         );
-
-        const valorParcelaMinima = (dadosFormaPagamento.valor_parcela_minima * Number(dados.nDependentes)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        const valorTotal = (dadosFormaPagamento.valor_total_pgto * Number(dados.nDependentes)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        
+        let numeroBeneficiarios = dados.nDependentes + 1;
+        const valorParcelaMinima = (dadosFormaPagamento.valor_parcela_minima * Number(numeroBeneficiarios)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const valorTotal = (dadosFormaPagamento.valor_total_pgto * Number(numeroBeneficiarios)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
         try {
           await enviarMensagemDiscord(

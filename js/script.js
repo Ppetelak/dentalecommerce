@@ -149,6 +149,8 @@ function pegaDados() {
   
   var jsonDados = JSON.stringify(dados, null, 2);
 
+  console.log(jsonDados);
+
   $.ajax({
     type: 'POST',
     url: '/testeFormulario',
