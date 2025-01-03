@@ -34,7 +34,9 @@
             <div class="text-center">
                 <p class="text-center"> Número da Proposta: </p> <br>
                 <h2 class="text-center"> <%= numeroPropostaGerado %></h2>
-                <a href="https://api.whatsapp.com/send?phone=5511953662806&text=Olá, gostaria de saber sobre o status da proposta de nº <%= numeroPropostaGerado %>" target="_blank"><button class="btn btn-secondary whatsapp">Consultar Proposta</button></a>
+                <a href="<%= linkAssinatura %>"><button class="btn btn-secondary whatsapp">Acessar Proposta</button></a>
+
+                <a href="https://api.whatsapp.com/send?phone=5511953662806&text=Olá, gostaria de saber sobre o status da proposta de nº <%= numeroPropostaGerado %>" target="_blank"><button class="btn btn-secondary whatsapp">Entrar em contato Suporte</button></a>
             </div>
             </div>
         </div>

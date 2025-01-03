@@ -1551,7 +1551,10 @@ app.post("/testeFormulario", async (req, res) => {
           });
           console.error("Erro ao mudar status da proposta", error);
         }
-        res.status(200).json({ numeroPropostaGerado: numeroProposta });
+        const linkAleatorio = `${appUrl}/assinar/${resultImplantacaoId}/${numeroProposta}/${cpffinanceiro}/${dados.idEntidade}`;
+        res.status(200).json({ numeroPropostaGerado: numeroProposta,
+          linkAssinatura: linkAleatorio
+         });
         //res.render('sucesso', {numeroPropostaGerado: numeroProposta})
         //res.status(200).send({ message: "Implantação realizada com sucesso!" });
       })
